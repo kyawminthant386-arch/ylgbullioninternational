@@ -1,0 +1,411 @@
+/* ═══════════════════════════════════════════════════════════
+   YLG Bullion — Mobile Responsive CSS
+   Shared across all pages via:
+     <link rel="stylesheet" href="mobile-responsive.css">
+
+   Breakpoints:
+     992px  — tablet landscape / small desktop
+     768px  — tablet portrait
+     600px  — large mobile
+     480px  — small mobile
+   ═══════════════════════════════════════════════════════════ */
+
+
+/* ══════════════════════════════════
+   1. SIDEBAR → TOP NAV (≤ 768px)
+   ══════════════════════════════════ */
+@media (max-width: 768px) {
+
+    /* Stack body vertically */
+    body {
+        flex-direction: column !important;
+        overflow-x: hidden;
+    }
+
+    /* Sidebar becomes a top bar */
+    .sidebar {
+        width: 100% !important;
+        min-height: auto !important;
+        height: auto !important;
+        position: relative !important;
+        border-right: none !important;
+        border-bottom: 1px solid #333 !important;
+        z-index: 100;
+    }
+
+    /* Nav items go horizontal */
+    .sidebar nav,
+    .sidebar .sidebar-nav,
+    nav.nav-list {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: wrap !important;
+        padding: 6px 8px !important;
+        gap: 2px !important;
+    }
+
+    .nav-item {
+        padding: 9px 12px !important;
+        font-size: 11px !important;
+        border-left: none !important;
+        border-bottom: 2px solid transparent !important;
+        border-radius: 6px !important;
+        margin: 2px !important;
+    }
+
+    .nav-item.active {
+        border-left: none !important;
+        border-bottom: 2px solid var(--color-gold-accent, #FFD700) !important;
+        background: rgba(255, 215, 0, 0.08) !important;
+    }
+
+    /* Hide label text on very small screens, keep icons */
+    @media (max-width: 400px) {
+        .nav-item span { display: none; }
+        .nav-item i    { margin: 0 !important; font-size: 14px !important; }
+    }
+
+    /* Main content — full width, no left margin */
+    .main-content {
+        margin-left: 0 !important;
+        width: 100% !important;
+        padding: 16px !important;
+        box-sizing: border-box;
+    }
+
+    /* Footer */
+    .site-footer {
+        margin-left: 0 !important;
+        width: 100% !important;
+        padding: 14px 16px !important;
+        align-items: center !important;
+        text-align: center;
+    }
+
+    .site-footer .links {
+        justify-content: center !important;
+        gap: 12px !important;
+    }
+
+    /* Sidebar auth box becomes inline */
+    #dashboard-auth-box,
+    #sidebar-auth-box {
+        padding: 8px 12px !important;
+        border-top: 1px solid #333;
+    }
+}
+
+
+/* ══════════════════════════════════
+   2. HEADER
+   ══════════════════════════════════ */
+@media (max-width: 768px) {
+    header,
+    .page-header,
+    .main-header {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        padding-bottom: 14px !important;
+    }
+
+    header h2,
+    .page-header h2,
+    .main-header h2,
+    .header-title-group h2 {
+        font-size: 20px !important;
+    }
+
+    #header-auth,
+    .header-actions {
+        width: 100%;
+    }
+}
+
+
+/* ══════════════════════════════════
+   3. CARDS & GRIDS
+   ══════════════════════════════════ */
+@media (max-width: 768px) {
+
+    /* Dashboard grid → single column */
+    .dashboard-grid,
+    .info-grid,
+    .account-info-grid,
+    .ylg-stats-grid,
+    .stats-grid {
+        grid-template-columns: 1fr !important;
+        gap: 14px !important;
+    }
+
+    /* Card padding */
+    .dashboard-card,
+    .ylg-card,
+    .portfolio-card,
+    .history-card,
+    .info-card,
+    .withdraw-card,
+    .welcome-card,
+    .tier-card {
+        padding: 18px 16px !important;
+        border-radius: 10px !important;
+    }
+
+    /* Stat cards */
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .stats-grid { grid-template-columns: 1fr !important; }
+}
+
+
+/* ══════════════════════════════════
+   4. TRADING PAGE
+   ══════════════════════════════════ */
+@media (max-width: 992px) {
+    .trading-grid,
+    .trading-layout {
+        grid-template-columns: 1fr !important;
+        padding: 16px !important;
+        gap: 16px !important;
+    }
+}
+
+@media (max-width: 768px) {
+    /* Chart height reduced on mobile */
+    #chart-area,
+    .chart-card > div:last-child,
+    .tradingview-chart-container {
+        height: 320px !important;
+        min-height: 320px !important;
+    }
+
+    .trade-action-row {
+        grid-template-columns: 1fr 1fr !important;
+    }
+
+    .trade-btn { padding: 12px 8px !important; font-size: 13px !important; }
+}
+
+
+/* ══════════════════════════════════
+   5. WALLET PAGE
+   ══════════════════════════════════ */
+@media (max-width: 768px) {
+    .wallet-actions {
+        grid-template-columns: 1fr !important;
+    }
+
+    #user-balance-text {
+        font-size: 32px !important;
+    }
+
+    .balance-breakdown {
+        grid-template-columns: 1fr 1fr !important;
+    }
+
+    .tier-list { gap: 6px !important; }
+    .tier-item { font-size: 12px !important; }
+}
+
+@media (max-width: 480px) {
+    .balance-breakdown { grid-template-columns: 1fr !important; }
+}
+
+
+/* ══════════════════════════════════
+   6. HISTORY / TABLE
+   ══════════════════════════════════ */
+@media (max-width: 768px) {
+    /* Responsive table → card view */
+    .history-card {
+        overflow-x: visible !important;
+    }
+
+    .history-header {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+    }
+
+    .stats-summary {
+        width: 100%;
+        flex-wrap: wrap;
+    }
+
+    /* Hide thead, show data as label:value rows */
+    table thead { display: none !important; }
+
+    table tbody tr {
+        display: block !important;
+        margin-bottom: 12px !important;
+        border: 1px solid #2a2a2a !important;
+        border-radius: 10px !important;
+        padding: 12px !important;
+        background: #1a1a1a;
+    }
+
+    table tbody td {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        padding: 8px 0 !important;
+        border-bottom: 1px solid #2a2a2a !important;
+        font-size: 13px !important;
+    }
+
+    table tbody td:last-child { border-bottom: none !important; }
+
+    table tbody td::before {
+        content: attr(data-label);
+        font-weight: 700;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--color-gold-accent, #FFD700);
+    }
+}
+
+
+/* ══════════════════════════════════
+   7. KYC PAGE
+   ══════════════════════════════════ */
+@media (max-width: 768px) {
+    .kyc-container  { max-width: 100% !important; }
+    .kyc-header     { padding: 18px !important; }
+    .kyc-header h2  { font-size: 18px !important; }
+    .kyc-card       { padding: 20px 16px !important; }
+
+    .upload-grid {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+    }
+
+    .upload-area { min-height: 140px !important; }
+}
+
+
+/* ══════════════════════════════════
+   8. PORTFOLIO PAGE
+   ══════════════════════════════════ */
+@media (max-width: 768px) {
+    #total-assets-main { font-size: 30px !important; }
+    .portfolio-hero    { padding: 20px !important; }
+    .actions-row       { flex-direction: column !important; }
+    .action-btn        { justify-content: center !important; width: 100% !important; }
+}
+
+
+/* ══════════════════════════════════
+   9. CHAT / SUPPORT PAGE
+   ══════════════════════════════════ */
+@media (max-width: 768px) {
+    .chat-container,
+    #chatMessages {
+        height: 400px !important;
+        min-height: 400px !important;
+    }
+
+    .message { max-width: 88% !important; }
+}
+
+
+/* ══════════════════════════════════
+   10. MODALS
+   ══════════════════════════════════ */
+@media (max-width: 600px) {
+    .modal-content,
+    .ylg-modal {
+        width: 95% !important;
+        padding: 20px 16px !important;
+        border-radius: 12px !important;
+    }
+}
+
+
+/* ══════════════════════════════════
+   11. TIMELINE (index/dashboard)
+   ══════════════════════════════════ */
+@media (max-width: 768px) {
+    .timeline-row {
+        grid-template-columns: 1fr !important;
+        gap: 14px !important;
+    }
+
+    .timeline-row.reverse .timeline-img-wrap,
+    .timeline-row.reverse .timeline-content,
+    .timeline-row.reverse .timeline-spine {
+        order: unset !important;
+    }
+
+    .timeline-row.reverse .timeline-content {
+        text-align: left !important;
+    }
+
+    .timeline-img {
+        max-width: 100% !important;
+        height: 160px !important;
+    }
+
+    .timeline-spine {
+        flex-direction: row !important;
+        justify-content: flex-start !important;
+        gap: 8px !important;
+    }
+}
+
+
+/* ══════════════════════════════════
+   12. FORMS (login / register)
+   ══════════════════════════════════ */
+@media (max-width: 480px) {
+    .card {
+        padding: 20px 16px !important;
+        border-radius: 10px !important;
+    }
+
+    .brand { gap: 10px !important; }
+    .brand h1, .brand-text h1 { font-size: 18px !important; }
+}
+
+
+/* ══════════════════════════════════
+   13. WITHDRAW PAGE
+   ══════════════════════════════════ */
+@media (max-width: 768px) {
+    .withdraw-card { max-width: 100% !important; }
+    .balance-bar   { flex-direction: row; }
+    .modal-btns    { flex-direction: column !important; }
+}
+
+
+/* ══════════════════════════════════
+   14. UTILITIES
+   ══════════════════════════════════ */
+
+/* Touch-friendly tap targets */
+@media (max-width: 768px) {
+    button, a, select, input[type="checkbox"] {
+        min-height: 40px;
+    }
+}
+
+/* Prevent text overflow on small screens */
+@media (max-width: 600px) {
+    .info-email,
+    #display-email,
+    [style*="font-size:12px"] {
+        word-break: break-all;
+        font-size: 11px !important;
+    }
+}
+
+/* Safe area padding for notched phones */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+    body {
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+}
