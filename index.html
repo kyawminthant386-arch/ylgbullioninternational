@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="my">
 <head>
+    <link rel="icon" type="image/png" href="favicon.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - YLG Bullion</title>
@@ -98,12 +99,6 @@
             border-left: 4px solid var(--color-gold-accent);
         }
 
-        .side-profile {
-            padding: 20px;
-            border-top: 1px solid #333;
-            display: none;
-        }
-
         /* Main Content */
         .main-content {
             margin-left: 260px;
@@ -198,27 +193,16 @@
         }
     </style>
     <link rel="stylesheet" href="mobile-responsive.css">
-<style>
-        /* 3-line logo */
-        .logo-section { padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.07); display: flex; align-items: center; gap: 12px; }
-        .logo-img { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 2px solid var(--gold, #C9A84C); flex-shrink: 0; }
-        .logo-text-group { line-height: 1; }
-        .logo-y-text    { font-size: 20px !important; font-weight: 800 !important; color: var(--gold, #C9A84C) !important; display: block !important; letter-spacing: 0.5px !important; }
-        .logo-subtext   { font-size: 11px !important; font-weight: 700 !important; color: #fff !important; letter-spacing: 2px !important; display: block !important; margin-top: 2px !important; }
-        .logo-company   { font-size: 9px !important; color: var(--muted, #7A8196) !important; display: block !important; margin-top: 3px !important; letter-spacing: 0.6px !important; }
-    </style>
 </head>
 
 <body>
     <aside class="sidebar">
         <div class="logo-section">
-            <img src="logo.png" class="logo-img" alt="YLG" onerror="this.src='https://ui-avatars.com/api/?name=YLG&background=C9A84C&color=000&bold=true'">
+            <img src="logo.png" class="logo-img" alt="YLG" onerror="this.src='https://ui-avatars.com/api/?name=YLG&background=FFD700&color=000&bold=true'">
             <div class="logo-text-group">
                 <div class="logo-y-text">YLG</div>
                 <div class="logo-subtext">BULLION</div>
-                <div class="logo-company">INTERNATIONAL CO., LTD.</div>
             </div>
-        </div>
         </div>
 
         <div class="sidebar-lang-box" style="padding: 10px 20px; border-bottom: 1px solid #3A3A3A; margin-bottom: 10px;">
@@ -297,57 +281,127 @@
             <p id="about-desc" style="color: var(--color-text-fade);">YLG Bullion International is a globally renowned gold trading company providing excellent services to our clients.</p>
         </div>
 
-        <div class="dashboard-card">
-            <h3 id="history-header" style="font-size: 24px; margin: 0 0 30px 0; text-align: center; border-bottom: 3px solid var(--color-gold-accent); padding-bottom: 15px;">Company History</h3>
-            <div style="margin-top: 20px;">
-                <!-- 1993 Timeline -->
-                <div style="display: flex; align-items: center; gap: 30px; padding: 30px 0; border-bottom: 2px solid #3A3A3A;">
-                    <img src="og-image.png" alt="1993" style="width:180px;height:140px;border-radius:10px;border:3px solid var(--color-gold-accent);object-fit:cover;flex-shrink:0;" onerror="this.style.display='none'">
-                    <div style="flex: 1;">
-                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-                            <span style="font-size: 24px; font-weight: bold; color: var(--color-gold-accent); background: #2A2A2A; padding: 5px 12px; border-radius: 20px;">1993</span>
-                        </div>
-                        <span id="h-1993-t" style="display: block; color: var(--color-text-light); font-weight: bold; font-size: 20px; margin-bottom: 8px;">Founding Success</span>
-                        <span id="h-1993-d" style="display: block; color: var(--color-text-fade); font-size: 15px; line-height: 1.6;">YLG was established as a trusted metal trading company, laying the foundation for international precious metals commerce.</span>
-                    </div>
+        <div class="dashboard-card" id="journey-card" style="padding: 40px 36px; background: linear-gradient(180deg, #111318 0%, #0C0D0F 100%);">
+            <!-- Section Header -->
+            <div style="text-align: center; margin-bottom: 48px;">
+                <div style="display: inline-block; padding: 6px 16px; border-radius: 99px; background: rgba(201,168,76,0.1); border: 1px solid rgba(201,168,76,0.28); color: var(--color-gold-accent, #C9A84C); font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 14px;">
+                    <i class="fas fa-award" style="margin-right: 6px;"></i>
+                    <span id="journey-badge">Our Heritage</span>
                 </div>
-
-                <!-- 2003 Timeline -->
-                <div style="display: flex; align-items: center; gap: 30px; padding: 30px 0; border-bottom: 2px solid #3A3A3A; flex-direction: row-reverse;">
-                    <img src="ylg-2003.PNG" alt="2003" style="width:180px;height:140px;border-radius:10px;border:3px solid var(--color-gold-accent);object-fit:cover;flex-shrink:0;" onerror="this.style.display='none'">
-                    <div style="flex: 1;">
-                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-                            <span style="font-size: 24px; font-weight: bold; color: var(--color-gold-accent); background: #2A2A2A; padding: 5px 12px; border-radius: 20px;">2003</span>
-                        </div>
-                        <span id="h-2003-t" style="display: block; color: var(--color-text-light); font-weight: bold; font-size: 20px; margin-bottom: 8px;">Expansion Strategy</span>
-                        <span id="h-2003-d" style="display: block; color: var(--color-text-fade); font-size: 15px; line-height: 1.6;">Built international trading platforms meeting global standards. Established infrastructure for seamless cross-border transactions.</span>
-                    </div>
-                </div>
-
-                <!-- 2009 Timeline -->
-                <div style="display: flex; align-items: center; gap: 30px; padding: 30px 0; border-bottom: 2px solid #3A3A3A;">
-                    <img src="ylg-2009.PNG" alt="2009" style="width:180px;height:140px;border-radius:10px;border:3px solid var(--color-gold-accent);object-fit:cover;flex-shrink:0;" onerror="this.style.display='none'">
-                    <div style="flex: 1;">
-                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-                            <span style="font-size: 24px; font-weight: bold; color: var(--color-gold-accent); background: #2A2A2A; padding: 5px 12px; border-radius: 20px;">2009</span>
-                        </div>
-                        <span id="h-2009-t" style="display: block; color: var(--color-text-light); font-weight: bold; font-size: 20px; margin-bottom: 8px;">YLG Bullion and Futures</span>
-                        <span id="h-2009-d" style="display: block; color: var(--color-text-fade); font-size: 15px; line-height: 1.6;">SEC-approved gold futures trading organization. Obtained full regulatory license covering precious metals, equities, and derivatives.</span>
-                    </div>
-                </div>
-
-                <!-- 2012 Timeline -->
-                <div style="display: flex; align-items: center; gap: 30px; padding: 30px 0;">
-                    <img src="ylg-2012.PNG" alt="2012" style="width:180px;height:140px;border-radius:10px;border:3px solid var(--color-gold-accent);object-fit:cover;flex-shrink:0;" onerror="this.style.display='none'">
-                    <div style="flex: 1;">
-                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-                            <span style="font-size: 24px; font-weight: bold; color: var(--color-gold-accent); background: #2A2A2A; padding: 5px 12px; border-radius: 20px;">2012</span>
-                        </div>
-                        <span id="h-2012-t" style="display: block; color: var(--color-text-light); font-weight: bold; font-size: 20px; margin-bottom: 8px;">Singapore Global Path</span>
-                        <span id="h-2012-d" style="display: block; color: var(--color-text-fade); font-size: 15px; line-height: 1.6;">Opened Singapore office to strengthen market presence in Asia-Pacific region and solidify leadership in global gold market.</span>
-                    </div>
-                </div>
+                <h3 id="history-header" style="font-size: 32px; margin: 0 0 10px 0; color: #EDF0F7; font-weight: 700; letter-spacing: -0.5px;">
+                    <span style="color: var(--color-gold-accent, #C9A84C);">30+ Years</span> of Excellence
+                </h3>
+                <p id="journey-subtitle" style="color: var(--color-text-fade, #7A8196); font-size: 14px; margin: 0; max-width: 620px; margin: 0 auto; line-height: 1.6;">
+                    From a local metals company to a global bullion powerhouse — a journey of trust, innovation, and market leadership.
+                </p>
             </div>
+
+            <!-- Timeline — zig-zag layout with center spine -->
+            <div class="journey-timeline" style="position: relative; max-width: 980px; margin: 0 auto;">
+
+                <!-- Central vertical spine -->
+                <div class="timeline-spine" style="position: absolute; left: 50%; top: 30px; bottom: 30px; width: 2px; background: linear-gradient(180deg, transparent, rgba(201,168,76,0.4), rgba(201,168,76,0.4), transparent); transform: translateX(-50%); z-index: 0;"></div>
+
+                <!-- ═══ 1993 — Founding (LEFT) ═══ -->
+                <div class="timeline-row" style="display: grid; grid-template-columns: 1fr 60px 1fr; gap: 0; margin-bottom: 40px; align-items: center;">
+                    <div class="timeline-content" style="text-align: right; padding-right: 24px;">
+                        <div style="display: inline-block; padding: 4px 12px; background: var(--color-gold-accent, #C9A84C); color: #000; border-radius: 6px; font-size: 13px; font-weight: 700; letter-spacing: 1px; margin-bottom: 10px;">1993</div>
+                        <h4 id="h-1993-t" style="font-size: 20px; color: #EDF0F7; margin: 0 0 8px; font-weight: 700;">The Beginning — Yollin</h4>
+                        <p id="h-1993-d" style="color: var(--color-text-fade, #7A8196); font-size: 13.5px; line-height: 1.7; margin: 0;">
+                            Founded as <strong style="color: #EDF0F7;">Yollin</strong>, a specialist precious metals company. A small team with a big vision — to build Thailand's most trusted name in bullion.
+                        </p>
+                    </div>
+                    <div class="timeline-node" style="display: flex; justify-content: center; align-items: center; position: relative; z-index: 1;">
+                        <div style="width: 16px; height: 16px; border-radius: 50%; background: var(--color-gold-accent, #C9A84C); box-shadow: 0 0 0 4px rgba(201,168,76,0.15), 0 0 20px rgba(201,168,76,0.4);"></div>
+                    </div>
+                    <div class="timeline-image-wrap" style="padding-left: 24px;">
+                        <div class="timeline-img" style="width: 100%; max-width: 320px; height: 180px; border-radius: 14px; overflow: hidden; border: 1px solid rgba(201,168,76,0.28); box-shadow: 0 10px 30px rgba(0,0,0,0.4); position: relative; background: linear-gradient(135deg, #1a1d24, #0C0D0F);">
+                            <img src="ylg-1993.PNG" alt="1993" style="width:100%; height:100%; object-fit:cover; display:block;" onerror="this.style.display='none'">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ═══ 2003 — Rebrand to YLG (RIGHT) ═══ -->
+                <div class="timeline-row" style="display: grid; grid-template-columns: 1fr 60px 1fr; gap: 0; margin-bottom: 40px; align-items: center;">
+                    <div class="timeline-image-wrap" style="padding-right: 24px;">
+                        <div class="timeline-img" style="width: 100%; max-width: 320px; height: 180px; border-radius: 14px; overflow: hidden; border: 1px solid rgba(201,168,76,0.28); box-shadow: 0 10px 30px rgba(0,0,0,0.4); margin-left: auto; background: linear-gradient(135deg, #1a1d24, #0C0D0F);">
+                            <img src="ylg-2003.PNG" alt="2003" style="width:100%; height:100%; object-fit:cover; display:block;" onerror="this.style.display='none'">
+                        </div>
+                    </div>
+                    <div class="timeline-node" style="display: flex; justify-content: center; align-items: center; position: relative; z-index: 1;">
+                        <div style="width: 16px; height: 16px; border-radius: 50%; background: var(--color-gold-accent, #C9A84C); box-shadow: 0 0 0 4px rgba(201,168,76,0.15), 0 0 20px rgba(201,168,76,0.4);"></div>
+                    </div>
+                    <div class="timeline-content" style="padding-left: 24px;">
+                        <div style="display: inline-block; padding: 4px 12px; background: var(--color-gold-accent, #C9A84C); color: #000; border-radius: 6px; font-size: 13px; font-weight: 700; letter-spacing: 1px; margin-bottom: 10px;">2003</div>
+                        <h4 id="h-2003-t" style="font-size: 20px; color: #EDF0F7; margin: 0 0 8px; font-weight: 700;">Becoming YLG — Entering Gold</h4>
+                        <p id="h-2003-d" style="color: var(--color-text-fade, #7A8196); font-size: 13.5px; line-height: 1.7; margin: 0;">
+                            Rebranded from Yollin to <strong style="color: var(--color-gold-accent, #C9A84C);">YLG</strong>, and stepped into the gold market. A decade of metals expertise became the foundation for our ascent into Thailand's fastest-growing bullion business.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- ═══ 2009 — Trading Futures (LEFT) ═══ -->
+                <div class="timeline-row" style="display: grid; grid-template-columns: 1fr 60px 1fr; gap: 0; margin-bottom: 40px; align-items: center;">
+                    <div class="timeline-content" style="text-align: right; padding-right: 24px;">
+                        <div style="display: inline-block; padding: 4px 12px; background: var(--color-gold-accent, #C9A84C); color: #000; border-radius: 6px; font-size: 13px; font-weight: 700; letter-spacing: 1px; margin-bottom: 10px;">2009</div>
+                        <h4 id="h-2009-t" style="font-size: 20px; color: #EDF0F7; margin: 0 0 8px; font-weight: 700;">Entering the Trading World</h4>
+                        <p id="h-2009-d" style="color: var(--color-text-fade, #7A8196); font-size: 13.5px; line-height: 1.7; margin: 0;">
+                            Launched <strong style="color: #EDF0F7;">YLG Bullion and Futures</strong> — Thailand's SEC-licensed gold futures broker. Expanded from physical bullion into derivatives, equities, and global commodities trading.
+                        </p>
+                    </div>
+                    <div class="timeline-node" style="display: flex; justify-content: center; align-items: center; position: relative; z-index: 1;">
+                        <div style="width: 16px; height: 16px; border-radius: 50%; background: var(--color-gold-accent, #C9A84C); box-shadow: 0 0 0 4px rgba(201,168,76,0.15), 0 0 20px rgba(201,168,76,0.4);"></div>
+                    </div>
+                    <div class="timeline-image-wrap" style="padding-left: 24px;">
+                        <div class="timeline-img" style="width: 100%; max-width: 320px; height: 180px; border-radius: 14px; overflow: hidden; border: 1px solid rgba(201,168,76,0.28); box-shadow: 0 10px 30px rgba(0,0,0,0.4); background: linear-gradient(135deg, #1a1d24, #0C0D0F);">
+                            <img src="ylg-2009.PNG" alt="2009" style="width:100%; height:100%; object-fit:cover; display:block;" onerror="this.style.display='none'">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ═══ 2012 — Singapore (RIGHT) ═══ -->
+                <div class="timeline-row" style="display: grid; grid-template-columns: 1fr 60px 1fr; gap: 0; margin-bottom: 20px; align-items: center;">
+                    <div class="timeline-image-wrap" style="padding-right: 24px;">
+                        <div class="timeline-img" style="width: 100%; max-width: 320px; height: 180px; border-radius: 14px; overflow: hidden; border: 1px solid rgba(201,168,76,0.28); box-shadow: 0 10px 30px rgba(0,0,0,0.4); margin-left: auto; background: linear-gradient(135deg, #1a1d24, #0C0D0F);">
+                            <img src="ylg-2012.PNG" alt="2012" style="width:100%; height:100%; object-fit:cover; display:block;" onerror="this.style.display='none'">
+                        </div>
+                    </div>
+                    <div class="timeline-node" style="display: flex; justify-content: center; align-items: center; position: relative; z-index: 1;">
+                        <div style="width: 16px; height: 16px; border-radius: 50%; background: var(--color-gold-accent, #C9A84C); box-shadow: 0 0 0 4px rgba(201,168,76,0.15), 0 0 20px rgba(201,168,76,0.4);"></div>
+                    </div>
+                    <div class="timeline-content" style="padding-left: 24px;">
+                        <div style="display: inline-block; padding: 4px 12px; background: var(--color-gold-accent, #C9A84C); color: #000; border-radius: 6px; font-size: 13px; font-weight: 700; letter-spacing: 1px; margin-bottom: 10px;">2012</div>
+                        <h4 id="h-2012-t" style="font-size: 20px; color: #EDF0F7; margin: 0 0 8px; font-weight: 700;">Going Global — Singapore</h4>
+                        <p id="h-2012-d" style="color: var(--color-text-fade, #7A8196); font-size: 13.5px; line-height: 1.7; margin: 0;">
+                            Opened our first international branch in <strong style="color: #EDF0F7;">Singapore</strong> — Asia's financial hub. A decisive step in our global expansion, bringing YLG's expertise to investors across Southeast Asia and beyond.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Mobile responsive override -->
+            <style>
+                @media (max-width: 768px) {
+                    .journey-timeline .timeline-spine { display: none; }
+                    .journey-timeline .timeline-row {
+                        grid-template-columns: 1fr !important;
+                        gap: 16px !important;
+                        margin-bottom: 28px !important;
+                    }
+                    .journey-timeline .timeline-node { display: none !important; }
+                    .journey-timeline .timeline-content,
+                    .journey-timeline .timeline-image-wrap {
+                        padding: 0 !important;
+                        text-align: left !important;
+                    }
+                    .journey-timeline .timeline-img {
+                        max-width: 100% !important;
+                        margin-left: 0 !important;
+                        height: 200px !important;
+                    }
+                }
+            </style>
         </div>
 
         <div class="dashboard-card">
@@ -357,18 +411,20 @@
                 <p>YLG is certified by the Securities and Exchange Commission (SEC) and is a member of the Gold Traders Association. It operates in compliance with the Derivatives Act B.E. 2546 (2003).</p>
                 <p>In 2022, YLG expanded its market reach to Global Markets, offering world-class products such as COMEX, NYMEX, and S&P Dow Jones. Investors can trade 24/7 through leading platforms like CQG and MT5. Additionally, YLG became the first in Thailand to provide investor trading via TradingView, reaffirming its leadership in the Futures market both domestically and globally.</p>
             </div>
-            <!-- YLG Promo Video -->
-            <div style="margin-top: 24px; border-radius: 12px; overflow: hidden; border: 1px solid var(--border, rgba(255,255,255,0.07));">
+
+            <!-- ── YLG Promo Video ── -->
+            <div style="margin-top: 28px; border-radius: 14px; overflow: hidden; border: 1px solid rgba(255,255,255,0.07); box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
                 <video id="ylg-promo-video"
                        style="width:100%; height:auto; display:block; background:#000;"
                        autoplay muted loop playsinline
                        controls preload="metadata">
                     <source src="ylgvideo.mp4" type="video/mp4">
+                    Your browser does not support the video tag.
                 </video>
             </div>
 
-            <!-- Risk Disclosure & Copyright -->
-            <div style="margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--border, rgba(255,255,255,0.07)); font-size: 11px; line-height: 1.7; color: var(--color-text-fade, #7A8196);">
+            <!-- ── Risk Disclosure & Copyright ── -->
+            <div style="margin-top: 28px; padding-top: 22px; border-top: 1px solid rgba(255,255,255,0.07); font-size: 11px; line-height: 1.7; color: var(--color-text-fade, #7A8196);">
                 <p style="margin: 0 0 10px;">
                     <strong style="color: var(--color-gold-accent, #C9A84C); font-size: 12px;">YLG Bullion and Futures Co., Ltd. (License No. S1-0035-01)</strong>
                     holds a license to provide services in exchange traded derivative products (futures and options) by The Securities and Exchange Commission of Thailand. Trading in financial markets involves substantial risk and may not be suitable for all investors as it can lead to losses exceeding the initial investment. Please ensure that you fully understand the risks, fees, and costs involved by reviewing our Risk Disclosure Statement.
@@ -377,11 +433,10 @@
                     <strong style="color: var(--color-text-light, #EDF0F7);">Restricted Regions:</strong>
                     YLG Bullion and Futures Co., Ltd. does not provide services to residents of certain countries identified by the FATF (Financial Action Task Force) as high-risk or non-cooperative jurisdictions.
                 </p>
-                <p style="margin: 0; text-align: center; padding-top: 10px; border-top: 1px solid var(--border, rgba(255,255,255,0.07)); color: var(--color-gold-accent, #C9A84C); font-weight: 600;">
+                <p style="margin: 0; text-align: center; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.07); color: var(--color-gold-accent, #C9A84C); font-weight: 600; letter-spacing: 0.3px;">
                     &copy; Copyright 2023. YLG Bullion And Futures Co., Ltd.
                 </p>
             </div>
-
         </div>
     </main>
 
@@ -394,14 +449,14 @@
                 'about-title': 'About YLG Bullion',
                 'about-desc': 'YLG Bullion International is a globally renowned gold trading company providing excellent services to our clients.',
                 'history-header': 'Company History',
-                'h-1993-t': 'Founding Success',
-                'h-1993-d': 'YLG was established as a trusted gold trading company.',
-                'h-2003-t': 'Expansion Strategy',
-                'h-2003-d': 'Built international trading platforms to international standards.',
-                'h-2009-t': 'YLG Bullion and Futures',
-                'h-2009-d': 'SEC-approved gold futures trading organization.',
-                'h-2012-t': 'Singapore Global Path',
-                'h-2012-d': 'Opened Singapore office to strengthen global gold market presence.',
+                'h-1993-t': 'The Beginning — Yollin',
+                'h-1993-d': 'Founded as <strong style="color:#EDF0F7;">Yollin</strong>, a specialist precious metals company. A small team with a big vision — to build Thailand\'s most trusted name in bullion.',
+                'h-2003-t': 'Becoming YLG — Entering Gold',
+                'h-2003-d': 'Rebranded from Yollin to <strong style="color:var(--color-gold-accent);">YLG</strong>, and stepped into the gold market. A decade of metals expertise became the foundation for our ascent into Thailand\'s fastest-growing bullion business.',
+                'h-2009-t': 'ก้าวสู่โลกการเทรด',
+                'h-2009-d': 'Launched <strong style="color:#EDF0F7;">YLG Bullion and Futures</strong> — Thailand\'s SEC-licensed gold futures broker. Expanded from physical bullion into derivatives, equities, and global commodities trading.',
+                'h-2012-t': 'Going Global — Singapore',
+                'h-2012-d': 'Opened our first international branch in <strong style="color:#EDF0F7;">Singapore</strong> — Asia\'s financial hub. A decisive step in our global expansion, bringing YLG\'s expertise to investors across Southeast Asia and beyond.',
                 'license-main-title': 'YLG Bullion and Futures Co., Ltd.'
             },
             mm: {
@@ -410,14 +465,14 @@
                 'about-title': 'ကျွန်ုပ်တို့အကြောင်း',
                 'about-desc': 'YLG Bullion International Co., Ltd. သည် ကမ္ဘာလုံးဆိုင်ရာ စံနှုန်းမြင့် ရွှေထုတ်ကုန် ကုန်သွယ်ရေး ကုမ္ပဏီဖြစ်ပြီး သာယာကောင်းမွန်သော ဝန်ဆောင်မှုများကို ဖောက်သည်များအား ပေးဆောင်သည်။',
                 'history-header': 'ကုမ္ပဏီ သမိုင်း',
-                'h-1993-t': 'တည်ထောင်မှု အောင်မြင်မှု',
-                'h-1993-d': 'YLG သည် ယုံကြည်စိတ်ချရသော ရွှေ ကုန်သွယ်ရေး ကုမ္ပဏီတစ်ခုအဖြစ် စတင်တည်ထောင်ခဲ့သည်။',
-                'h-2003-t': 'တိုးချဲ့ရေး မဟာဗျူဟာ',
-                'h-2003-d': 'ကမ္ဘာလုံးဆိုင်ရာ စံချိန်စံနစ်အရ ကုန်သွယ်ရေး ပလက်ဖောင်းများကို တည်ဆောက်ခဲ့သည်။',
-                'h-2009-t': 'YLG Bullion နှင့် Futures',
-                'h-2009-d': 'SEC အတည်ပြုထားသော ရွှေ ဖျူးချန် ကုန်သွယ်ရေး အဖွဲ့အစည်း ဖြစ်လာခဲ့သည်။',
-                'h-2012-t': 'စင်ကာပူ ကမ္ဘာလမ်း',
-                'h-2012-d': 'စင်ကာပူ ရုံးကို စတင်ဖွင့်လှစ်ကာ ကမ္ဘာ့ ရွှေစျေးကွက်တွင် ပိုမိုတည်တံခါး ခဲ့သည်။',
+                'h-1993-t': 'အစပြုခြင်း — Yollin',
+                'h-1993-d': '<strong style="color:#EDF0F7;">Yollin</strong> အမည်ဖြင့် အဖိုးတန်သတ္တု အထူးပြု ကုမ္ပဏီအဖြစ် စတင်တည်ထောင်ခဲ့သည်။ အစိတ်အပိုင်းငယ် အဖွဲ့နှင့် ကြီးမားသော အမြင်ဖြင့် — ထိုင်းနိုင်ငံ၏ ယုံကြည်စိတ်ချရဆုံး ရွှေတုံး ကုန်သွယ်မှု အမည်ကို တည်ဆောက်ရန် ရည်ရွယ်ခဲ့သည်။',
+                'h-2003-t': 'YLG သို့ ပြောင်းလဲ — ရွှေဈေးကွက်သို့',
+                'h-2003-d': 'Yollin ကနေ <strong style="color:var(--color-gold-accent);">YLG</strong> သို့ ပြောင်းလဲခဲ့ပြီး ရွှေဈေးကွက်ထဲသို့ ဝင်ရောက်လာခဲ့သည်။ ဆယ်စုနှစ်တစ်ခုတာ သတ္တုကုန်သွယ်ရေး အတွေ့အကြုံသည် ထိုင်းနိုင်ငံ၏ အလျင်မြန်ဆုံး ကြီးထွားလာသော ရွှေတုံးလုပ်ငန်း ၏ အခြေခံ ဖြစ်လာခဲ့သည်။',
+                'h-2009-t': 'ကုန်သွယ်မှု လောကထဲသို့ ဝင်ရောက်ခြင်း',
+                'h-2009-d': '<strong style="color:#EDF0F7;">YLG Bullion and Futures</strong> ကို စတင်တည်ထောင်ခဲ့သည် — ထိုင်းနိုင်ငံ SEC လိုင်စင်ရ ရွှေ Futures ဘရော်ကာ။ ရုပ်ပိုင်းဆိုင်ရာ ရွှေတုံးများမှ derivatives၊ equities နှင့် ကမ္ဘာလုံးဆိုင်ရာ ကုန်စည်ကုန်သွယ်ရေး သို့ တိုးချဲ့ခဲ့သည်။',
+                'h-2012-t': 'ကမ္ဘာလုံး ရောက် — စင်ကာပူ',
+                'h-2012-d': 'အာရှ၏ ငွေကြေးဗဟို — <strong style="color:#EDF0F7;">စင်ကာပူ</strong> တွင် ပထမဆုံး နိုင်ငံတကာ ရုံးခွဲကို ဖွင့်လှစ်ခဲ့သည်။ YLG ၏ ကျွမ်းကျင်မှုကို အရှေ့တောင်အာရှနှင့် ထို့ထက်ပိုသော ဒေသများရှိ ရင်းနှီးမြှုပ်နှံသူများသို့ ရောက်ရှိစေရန် ကမ္ဘာလုံးဆိုင်ရာ တိုးချဲ့မှု ၏ အရေးပါသော ခြေလှမ်း တစ်ခု ဖြစ်ခဲ့သည်။',
                 'license-main-title': 'YLG Bullion နှင့် Futures Co., Ltd.'
             },
             th: {
@@ -426,12 +481,12 @@
                 'about-title': 'เกี่ยวกับเรา',
                 'about-desc': 'YLG Bullion International Co., Ltd. เป็นบริษัทเทรดทองคำมาตรฐานสากล ให้บริการที่ปลอดภัยและเชื่อถือได้แก่ลูกค้าของเรา.',
                 'history-header': 'ประวัติบริษัท',
-                'h-1993-t': 'ความเป็นเลิศในการก่อตั้ง',
-                'h-1993-d': 'YLG ก่อตั้งขึ้นในฐานะผู้นำค้าทองคำ เพื่อสร้างมาตรฐานคุณภาพและความน่าเชื่อถือ.',
-                'h-2003-t': 'การขยายกลยุทธ์',
-                'h-2003-d': 'พัฒนาโครงสร้างพื้นฐานมาตรฐานสากลและเปิดตัวแพลตฟอร์มการซื้อขายดิจิทัลที่ทันสมัย.',
-                'h-2009-t': 'YLG Bullion and Futures',
-                'h-2009-d': 'ก่อตั้งเป็นโบรกเกอร์ทองคำฟิวเจอร์สระดับมืออาชีพ ภายใต้การกำกับดูแลของ ก.ล.ต.',
+                'h-1993-t': 'จุดเริ่มต้น — Yollin',
+                'h-1993-d': 'ก่อตั้งในชื่อ <strong style="color:#EDF0F7;">Yollin</strong> บริษัทผู้เชี่ยวชาญด้านโลหะมีค่า ด้วยทีมเล็กๆ และวิสัยทัศน์ยิ่งใหญ่ — มุ่งสร้างชื่อเสียงด้านทองคำที่น่าเชื่อถือที่สุดในประเทศไทย',
+                'h-2003-t': 'เปลี่ยนเป็น YLG — ก้าวสู่ตลาดทองคำ',
+                'h-2003-d': 'เปลี่ยนชื่อจาก Yollin เป็น <strong style="color:var(--color-gold-accent);">YLG</strong> และก้าวเข้าสู่ตลาดทองคำอย่างเต็มตัว ประสบการณ์ด้านโลหะมีค่ากว่าทศวรรษกลายเป็นรากฐานของธุรกิจทองคำที่เติบโตเร็วที่สุดในไทย',
+                'h-2009-t': 'ก้าวสู่โลกการเทรด',
+                'h-2009-d': 'เปิดตัว <strong style="color:#EDF0F7;">YLG Bullion and Futures</strong> — โบรกเกอร์ทองคำฟิวเจอร์สที่ได้รับใบอนุญาตจาก ก.ล.ต. ไทย ขยายจากทองคำแท่งสู่ตราสารอนุพันธ์ หุ้น และสินค้าโภคภัณฑ์ระดับโลก',
                 'h-2012-t': 'ศูนย์กลางสิงคโปร์',
                 'h-2012-d': 'เปิดสำนักงานสิงคโปร์เพื่อเสริมความแข็งแกร่งในตลาดทองคำระดับโลก.',
                 'license-main-title': 'บริษัท YLG Bullion and Futures จำกัด'
@@ -488,7 +543,12 @@
             Object.keys(translations[lang]).forEach(key => {
                 const elem = document.getElementById(key);
                 if (elem) {
-                    elem.innerText = translations[lang][key];
+                    // Timeline descriptions contain <strong> tags, need innerHTML
+                    if (key.startsWith('h-') && (key.endsWith('-d') || key.endsWith('-t'))) {
+                        elem.innerHTML = translations[lang][key];
+                    } else {
+                        elem.innerText = translations[lang][key];
+                    }
                 }
             });
 
@@ -563,27 +623,21 @@
 <script>
 /* ═══ YLG Language Sync — v2 ═══ */
 (function(){
-    console.log('[YLG Sync] Initialising language sync');
     function triggerApply(lang){
         const fns = ['applyLanguage','applyChatLanguage','applyHistoryLanguage',
                      'applyKycLanguage','applyWalletLanguage','applyPortfolioLanguage',
                      'applyTradingLanguage','applyAccountLanguage','applyLang'];
-        let foundAny = false;
         for (const fn of fns) {
             if (typeof window[fn] === 'function') {
-                foundAny = true;
-                console.log('[YLG Sync] Calling window.' + fn + '(' + lang + ')');
-                try { window[fn](lang); } catch(e) { console.error('[YLG Sync]', e); }
+                try { window[fn](lang); } catch(e) {}
             }
         }
-        if (!foundAny) console.warn('[YLG Sync] No apply function found on window for lang=' + lang);
     }
     window.addEventListener('storage', function(e){
         if (e.key === 'selectedLang' && e.newValue) triggerApply(e.newValue);
     });
     function initialApply(){
         const lang = localStorage.getItem('selectedLang') || 'en';
-        console.log('[YLG Sync] Initial apply for lang=' + lang);
         triggerApply(lang);
     }
     if (document.readyState === 'loading') {
@@ -592,7 +646,6 @@
         setTimeout(initialApply, 50);
     }
     setTimeout(initialApply, 500);
-    setTimeout(initialApply, 1500);
 })();
 </script>
 
