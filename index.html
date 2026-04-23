@@ -1,12 +1,6 @@
 <!DOCTYPE html>
 <html lang="my">
 <head>
-    <meta property="og:type" content="website">
-<meta property="og:url" content="https://www.ylgbullion.asia/">
-<meta property="og:title" content="Dashboard - YLG Bullion">
-<meta property="og:description" content="YLG Bullion International သို့ ကြိုဆိုပါသည်။">
-<meta property="og:image" content="https://www.ylgbullion.asia/og-image.png">
-    <link rel="icon" type="image/png" href="favicon.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - YLG Bullion</title>
@@ -196,7 +190,307 @@
                 grid-template-columns: 1fr;
             }
         }
-    </style>
+    
+        
+        /* ══════════════════════════════════════════════
+           MOBILE RESPONSIVE — Dashboard (index.html)
+           Breakpoints: 992px, 768px, 480px
+           ══════════════════════════════════════════════ */
+
+        /* ── TABLET (992px) ── */
+        @media (max-width: 992px) {
+            .journey-timeline .timeline-row {
+                grid-template-columns: 1fr 40px 1fr !important;
+            }
+            .journey-timeline .timeline-img {
+                height: 150px !important;
+            }
+            #journey-card {
+                padding: 28px 20px !important;
+            }
+            #history-header {
+                font-size: 26px !important;
+            }
+        }
+
+        /* ── MOBILE (768px) ── */
+        @media (max-width: 768px) {
+
+            /* Body layout */
+            body {
+                flex-direction: column !important;
+                overflow-x: hidden !important;
+            }
+
+            /* ── Sidebar → sticky top bar ── */
+            .sidebar {
+                position: sticky !important;
+                top: 0 !important;
+                z-index: 100 !important;
+                width: 100% !important;
+                min-height: auto !important;
+                height: auto !important;
+                max-height: none !important;
+                border-right: none !important;
+                border-bottom: 1px solid rgba(255,255,255,0.07) !important;
+                overflow: visible !important;
+            }
+
+            /* ── Logo area — compact row ── */
+            .logo-section {
+                padding: 12px 16px !important;
+                border-bottom: none !important;
+            }
+
+            .logo-img {
+                width: 36px !important;
+                height: 36px !important;
+            }
+
+            .logo-y-text  { font-size: 17px !important; }
+            .logo-subtext { font-size: 10px !important; }
+            .logo-company { font-size: 8px !important; }
+
+            /* ── Language switcher — inline with logo ── */
+            #sidebar-lang-box,
+            .sidebar > div:nth-child(2) {
+                padding: 8px 16px !important;
+                border-bottom: 1px solid rgba(255,255,255,0.07) !important;
+            }
+
+            /* ── Nav — horizontal scrollable strip ── */
+            .sidebar nav,
+            .sidebar-nav {
+                display: flex !important;
+                flex-direction: row !important;
+                flex-wrap: nowrap !important;
+                overflow-x: auto !important;
+                overflow-y: hidden !important;
+                -webkit-overflow-scrolling: touch !important;
+                padding: 6px 10px !important;
+                gap: 4px !important;
+                scrollbar-width: none !important;
+            }
+
+            .sidebar nav::-webkit-scrollbar { display: none !important; }
+
+            .nav-item {
+                flex: 0 0 auto !important;
+                white-space: nowrap !important;
+                padding: 8px 12px !important;
+                font-size: 12px !important;
+                border-left: none !important;
+                border-bottom: 2px solid transparent !important;
+                border-radius: 6px !important;
+                margin: 0 !important;
+            }
+
+            .nav-item.active {
+                border-left: none !important;
+                border-bottom-color: var(--color-gold-accent, #C9A84C) !important;
+                background: rgba(201,168,76,0.1) !important;
+            }
+
+            /* ── Hide auth/logout from sidebar on mobile ── */
+            #dashboard-auth-box {
+                padding: 8px 14px !important;
+                border-top: 1px solid rgba(255,255,255,0.07) !important;
+            }
+
+            /* ── Main content ── */
+            .main-content {
+                margin-left: 0 !important;
+                width: 100% !important;
+                padding: 14px !important;
+                box-sizing: border-box !important;
+            }
+
+            /* ── Page header ── */
+            header, .main-header {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                padding-bottom: 14px !important;
+                gap: 6px !important;
+            }
+
+            header h2, .main-header h2 {
+                font-size: 20px !important;
+            }
+
+            header p, .main-header p {
+                font-size: 12px !important;
+            }
+
+            /* ── Dashboard cards ── */
+            .dashboard-card {
+                padding: 16px 14px !important;
+                border-radius: 10px !important;
+                margin-bottom: 14px !important;
+            }
+
+            .dashboard-card h3 {
+                font-size: 17px !important;
+            }
+
+            /* ── Promo image (hero) ── */
+            .dashboard-card img[alt="YLG Gold"] {
+                max-height: 220px !important;
+                object-fit: cover !important;
+            }
+
+            /* ── Journey section header ── */
+            #journey-card {
+                padding: 20px 14px !important;
+            }
+
+            #journey-card > div:first-child {
+                margin-bottom: 24px !important;
+            }
+
+            #history-header {
+                font-size: 22px !important;
+                line-height: 1.3 !important;
+            }
+
+            #journey-subtitle {
+                font-size: 12px !important;
+            }
+
+            /* ── Timeline — single column vertical ── */
+            .journey-timeline {
+                max-width: 100% !important;
+            }
+
+            .timeline-spine {
+                display: none !important;
+            }
+
+            .journey-timeline .timeline-row {
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 12px !important;
+                margin-bottom: 28px !important;
+                padding-bottom: 28px !important;
+                border-bottom: 1px solid rgba(255,255,255,0.06) !important;
+            }
+
+            .journey-timeline .timeline-row:last-child {
+                border-bottom: none !important;
+            }
+
+            .timeline-node { display: none !important; }
+
+            .timeline-image-wrap,
+            .timeline-content {
+                padding: 0 !important;
+                text-align: left !important;
+                order: unset !important;
+            }
+
+            /* Image always on top */
+            .journey-timeline .timeline-row .timeline-image-wrap {
+                order: 1 !important;
+            }
+
+            .journey-timeline .timeline-row .timeline-content {
+                order: 2 !important;
+                text-align: left !important;
+            }
+
+            .timeline-img {
+                max-width: 100% !important;
+                width: 100% !important;
+                height: 185px !important;
+                margin: 0 !important;
+            }
+
+            .timeline-content h4 {
+                font-size: 17px !important;
+                text-align: left !important;
+            }
+
+            .timeline-content p {
+                font-size: 13px !important;
+                line-height: 1.65 !important;
+                text-align: left !important;
+            }
+
+            /* Year badge on mobile */
+            .timeline-content > div:first-child {
+                margin-bottom: 8px !important;
+            }
+
+            /* ── License card ── */
+            #ylg-promo-video {
+                border-radius: 10px !important;
+            }
+        }
+
+        /* ── SMALL PHONES (480px) ── */
+        @media (max-width: 480px) {
+            .main-content {
+                padding: 10px !important;
+            }
+
+            .dashboard-card {
+                padding: 14px 12px !important;
+            }
+
+            .nav-item {
+                padding: 7px 10px !important;
+                font-size: 11px !important;
+            }
+
+            #history-header {
+                font-size: 19px !important;
+            }
+
+            .timeline-img {
+                height: 160px !important;
+            }
+
+            .timeline-content h4 {
+                font-size: 15px !important;
+            }
+
+            .dashboard-card p {
+                font-size: 12px !important;
+                line-height: 1.6 !important;
+            }
+
+            .logo-section {
+                padding: 10px 14px !important;
+            }
+
+            .logo-img {
+                width: 32px !important;
+                height: 32px !important;
+            }
+
+            .logo-y-text { font-size: 15px !important; }
+        }
+
+        /* ── LANDSCAPE PHONES ── */
+        @media (max-width: 768px) and (orientation: landscape) {
+            .sidebar {
+                position: relative !important;
+            }
+            .timeline-img {
+                height: 160px !important;
+            }
+            .journey-timeline .timeline-row {
+                flex-direction: row !important;
+                gap: 16px !important;
+            }
+            .timeline-image-wrap {
+                flex: 0 0 45% !important;
+            }
+            .timeline-content {
+                flex: 1 !important;
+            }
+        }
+
+</style>
     <link rel="stylesheet" href="mobile-responsive.css">
 </head>
 
