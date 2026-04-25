@@ -182,11 +182,56 @@
         window.location.href = 'login.html';
       }catch(err){
         console.error(err);
-        submitBtn.disabled = false; btnText.textContent = texts[localStorage.getItem('selectedLang')||'en'].register;
-        let msg = err.message || 'Register error';
-        if (err.code === 'auth/email-already-in-use') msg = 'Email already in use';
-        if (location.search.includes('debug=1') || localStorage.getItem('debug')==='true'){ debugBox.style.display='block'; debugBox.textContent = `Error code: ${err.code || 'N/A'}\n${err.message || ''}`; }
+        const lang = localStorage.getItem('selectedLang') || 'en';
+        const t = texts[lang] || texts.en;
+        submitBtn.disabled = false; btnText.textContent = t.register;
+        
+        // Map Firebase error codes to friendly messages
+        const errMessages = {
+          en: {
+            emailUsed: 'This email is already registered. Try logging in instead.',
+            weakPass: 'Password is too weak. Use at least 6 characters.',
+            invalidEmail: 'Invalid email format.',
+            network: 'Network error. Please check your connection.',
+            tooMany: 'Too many attempts. Please try again later.',
+            generic: 'Registration failed. Please try again.'
+          },
+          mm: {
+            emailUsed: 'ဤအီးမေးလ်ဖြင့် မှတ်ပုံတင်ထားပြီးဖြစ်သည်။ Login ဘက်က ဝင်ပါ။',
+            weakPass: 'စကားဝှက် အားနည်းသည်။ အနည်းဆုံး ၆ လုံး ထည့်ပါ။',
+            invalidEmail: 'အီးမေးလ်ပုံစံ မမှန်ပါ။',
+            network: 'အင်တာနက် ချိတ်ဆက်မှု ပြဿနာရှိနေပါသည်။',
+            tooMany: 'အကြိမ်များစွာ မှားယွင်းပါသည်။ ခဏကြာမှ ပြန်ကြိုးစားပါ။',
+            generic: 'မှတ်ပုံတင်ခြင်း မအောင်မြင်ပါ။ ပြန်ကြိုးစားပါ။'
+          },
+          th: {
+            emailUsed: 'อีเมลนี้ถูกใช้แล้ว กรุณาเข้าสู่ระบบแทน',
+            weakPass: 'รหัสผ่านอ่อนเกินไป ใช้อย่างน้อย 6 ตัวอักษร',
+            invalidEmail: 'รูปแบบอีเมลไม่ถูกต้อง',
+            network: 'เครือข่ายขัดข้อง กรุณาตรวจสอบการเชื่อมต่อ',
+            tooMany: 'พยายามมากเกินไป กรุณาลองใหม่ภายหลัง',
+            generic: 'การลงทะเบียนไม่สำเร็จ กรุณาลองใหม่'
+          }
+        };
+        const em = errMessages[lang] || errMessages.en;
+        
+        let msg = em.generic;
+        const code = err.code || '';
+        if (code === 'auth/email-already-in-use') msg = em.emailUsed;
+        else if (code === 'auth/weak-password') msg = em.weakPass;
+        else if (code === 'auth/invalid-email') msg = em.invalidEmail;
+        else if (code === 'auth/network-request-failed') msg = em.network;
+        else if (code === 'auth/too-many-requests') msg = em.tooMany;
+        
         setError(msg);
+        
+        // Debug mode (when ?debug=1)
+        if (location.search.includes('debug=1') || localStorage.getItem('debug')==='true') {
+          if (typeof debugBox !== 'undefined' && debugBox) {
+            debugBox.style.display = 'block';
+            debugBox.textContent = (err.code || '') + '\n' + (err.message || '');
+          }
+        }
       }
     });
   </script>
@@ -310,96 +355,7 @@
     </form>
   </main>
 
-  <script type="module">
-        import { createUserWithEmailAndPassword, updateProfile } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-    import { doc, setDoc, runTransaction } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-
-    const form = document.getElementById('registerForm');
-    const fullname = document.getElementById('fullname');
-    const phone = document.getElementById('phone');
-    const email = document.getElementById('email');
-    const password = document.getElementById('password');
-    const confirm = document.getElementById('confirm');
-    const terms = document.getElementById('terms');
-    const submitBtn = document.getElementById('submitBtn');
-    const errorBox = document.getElementById('errorBox');
-    const debugBox = document.getElementById('debugBox');
-
-    const texts = {
-      en: { title:'Create your account', subtitle:'Sign up to start trading', full:'Full name', phone:'Phone', email:'Email', pass:'Password', confirm:'Confirm password', terms:'I agree to Terms and Privacy', register:'Register', required:'Please fill required fields.' },
-      mm: { title:'အသစ်အကောင့်ဖန်တီးရန်', subtitle:'ရောင်းဝယ်မှု အစကို စတင်ရန်', full:'အမည်', phone:'ဖုန်း', email:'အီးမေးလ်', pass:'စကားဝှက်', confirm:'စကားဝှက် ထပ်မံရိုက်', terms:'စည်းမျဥ်းနှင့် ကိုယ်ရေးမူဝါဒ အတည်ပြုပါ', register:'မှတ်ပုံတင်', required:'လိုအပ်သောအကွက်များကို ဖြည့်ပါ။' },
-      th: { title:'สร้างบัญชีของคุณ', subtitle:'สมัครเพื่อเริ่มการซื้อขาย', full:'ชื่อ-นามสกุล', phone:'โทรศัพท์', email:'อีเมล', pass:'รหัสผ่าน', confirm:'ยืนยันรหัสผ่าน', terms:'ฉันยอมรับข้อกำหนดและนโยบาย', register:'สมัคร', required:'กรุณากรอกข้อมูลที่จำเป็น.' }
-    };
-
-    function applyLang(){
-      const lang = localStorage.getItem('selectedLang') || 'en';
-      const t = texts[lang] || texts.en;
-      document.getElementById('title').textContent = t.title;
-      document.getElementById('subtitle').textContent = t.subtitle;
-      document.getElementById('labelFull').textContent = t.full;
-      document.getElementById('labelPhone').textContent = t.phone;
-      document.getElementById('labelEmail').textContent = t.email;
-      document.getElementById('labelPass').textContent = t.pass;
-      document.getElementById('labelConfirm').textContent = t.confirm;
-      document.getElementById('labelTerms').textContent = t.terms;
-      submitBtn.textContent = t.register;
-    }
-    applyLang();
-
-    function setError(msg){ errorBox.style.display = msg ? 'block' : 'none'; errorBox.textContent = msg || ''; }
-
-    form.addEventListener('submit', async (e)=>{
-      e.preventDefault();
-      setError(''); debugBox.style.display = 'none';
-
-      const nameVal = fullname.value.trim();
-      const phoneVal = phone.value.trim();
-      const emailVal = email.value.trim();
-      const passVal = password.value;
-      const confVal = confirm.value;
-
-      const lang = localStorage.getItem('selectedLang') || 'en';
-      const t = texts[lang] || texts.en;
-
-      if (!nameVal || !emailVal || !passVal || !confVal || !terms.checked){ setError(t.required); return; }
-      if (passVal.length < 6){ setError('Password must be at least 6 characters'); return; }
-      if (passVal !== confVal){ setError('Passwords do not match'); return; }
-
-      submitBtn.disabled = true; submitBtn.textContent = 'Processing...';
-
-      try{
-        const counterRef = doc(db, 'settings', 'userCounter');
-        let newIndex = 1;
-        await runTransaction(db, async (tx)=>{
-          const snap = await tx.get(counterRef);
-          if (snap.exists()){ newIndex = (snap.data().lastIndex || 0) + 1; tx.update(counterRef, { lastIndex: newIndex }); }
-          else { tx.set(counterRef, { lastIndex: 1 }); newIndex = 1; }
-        });
-
-        const currentYear = new Date().getFullYear();
-        const formatted = String(newIndex).padStart(4,'0');
-        const customYlgId = `YLG-${currentYear}${formatted}`;
-
-        const cred = await createUserWithEmailAndPassword(auth, emailVal, passVal);
-        await updateProfile(cred.user, { displayName: nameVal });
-
-        await setDoc(doc(db, 'users', cred.user.uid), {
-          uid: cred.user.uid, fullname: nameVal, email: emailVal, phone: phoneVal, balance: 0,
-          userIndex: newIndex, ylgId: customYlgId, tradeControl: 'NORMAL', kycStatus: 'pending', createdAt: new Date().toISOString()
-        });
-
-        await Swal.fire({ icon:'success', title:'Registered', text:`Account created. ID: ${customYlgId}`, timer:2000 });
-        window.location.href = 'login.html';
-      }catch(err){
-        console.error(err);
-        submitBtn.disabled = false; submitBtn.textContent = texts[localStorage.getItem('selectedLang')||'en'].register;
-        let msg = err.message || 'Register error';
-        if (err.code === 'auth/email-already-in-use') msg = 'Email already in use';
-        if (location.search.includes('debug=1') || localStorage.getItem('debug')==='true'){ debugBox.style.display='block'; debugBox.textContent = `Error code: ${err.code || 'N/A'}\n${err.message || ''}`; }
-        setError(msg);
-      }
-    });
-  </script>
+  
 </body>
 </html>
 <!DOCTYPE html>
@@ -504,41 +460,41 @@
     </aside>
     <div class="register-container" style="margin-left: 260px;">
 
-        <h2>ᬡᬬᬱᬬ�ᬷᬺ�~�&ᬺ �&ᬬ�:�ᬺᬸ�~ᬽ�ᬺᬸ�:�ᬺ (Register)</h2>
+        <h2>~& &:~: (Register)</h2>
 
         <form id="registerForm">
              <div class="form-group">
                 <div class="form-input-wrapper">
                     <i class="fas fa-user input-icon"></i>
-                    <input type="text" id="fullname" class="form-input" placeholder="ᬡ�"�`ᬺ ᬡ�"ᬼ�`ᬷᬺᬡ�&ᬯᬶ (Full Name)" required>
+                    <input type="text" id="fullname" class="form-input" placeholder=""` "`& (Full Name)" required>
                 </div>
             </div>
             
             <div class="form-group">
                 <div class="form-input-wrapper">
                     <i class="fas fa-envelope input-icon"></i>
-                    <input type="email" id="email" class="form-input" placeholder="ᬡᬮᬸ�"ᬱᬸ�Sᬺ (Email Address)" required>
+                    <input type="email" id="email" class="form-input" placeholder=""S (Email Address)" required>
                 </div>
             </div>
             
              <div class="form-group">
                 <div class="form-input-wrapper">
                     <i class="fas fa-phone input-icon"></i>
-                    <input type="text" id="phone" class="form-input" placeholder="�ᬯ�ᬺᬸ�ᬶ�"ᬫᬐᬺ (Phone Number)" required>
+                    <input type="text" id="phone" class="form-input" placeholder="" (Phone Number)" required>
                 </div>
             </div>
 
             <div class="form-group">
                 <div class="form-input-wrapper">
                     <i class="fas fa-lock input-icon"></i>
-                    <input type="password" id="password" class="form-input" placeholder="�Sᬻᬾᬭᬯᬷᬝᬾᬬᬺ�ᬶ�"ᬫᬐᬺ (Password)" required>
+                    <input type="password" id="password" class="form-input" placeholder="S" (Password)" required>
                 </div>
             </div>
             
             <div class="form-group">
                 <div class="form-input-wrapper">
                     <i class="fas fa-check-double input-icon"></i>
-                    <input type="password" id="confirm-password" class="form-input" placeholder="�Sᬻᬾᬭᬯᬷᬝᬾᬬᬺ�ᬶ�"ᬫᬐᬺ ᬡᬐ�`ᬺ�"ᬼᬯ�:�ᬺ" required>
+                    <input type="password" id="confirm-password" class="form-input" placeholder="S" `":" required>
                 </div>
             </div>
             
@@ -547,115 +503,15 @@
                 <label for="terms">I agree to the <a href="#">Terms and Conditions</a> and <a href="#">Privacy Policy</a>.</label>
             </p>
 
-            <button type="submit" id="submitBtn" class="btn-register"><i class="fas fa-user-plus"></i> �&ᬬ�:�ᬺᬸ�~ᬽ�ᬺᬸ�:�ᬺ</button>
+            <button type="submit" id="submitBtn" class="btn-register"><i class="fas fa-user-plus"></i> &:~:</button>
         </form>
 
         <p class="link-text">
-            ᬡᬬᬱᬬ�ᬷᬺ �:ᬾᬭ�"ᬼᬮᬸ�~ᬬᬸ�Sᬬᬸ? <a href="login.html">ᬝ�ᬺ�:ᬱᬬᬬᬺ�:�ᬺ (Login)</a>
+             :"~S? <a href="login.html">:: (Login)</a>
         </p>
     </div>
 
  
-<script type="module">
-        import { createUserWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { doc, setDoc, runTransaction } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    const MySwal = Swal.mixin({
-        background: '#2A2A2A',
-        color: '#fff',
-        confirmButtonColor: '#3498db'
-    });
-
-    document.getElementById('registerForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        
-        const name = document.getElementById('fullname').value;
-        const email = document.getElementById('email').value;
-        const phone = document.getElementById('phone').value;
-        const password = document.getElementById('password').value;
-        const confirmPassword = document.getElementById('confirm-password').value;
-        const submitBtn = document.getElementById('submitBtn');
-
-        if(password !== confirmPassword) {
-            MySwal.fire({ icon: 'warning', title: '�"ᬾᬬᬸ�aᬽ�ᬺᬸ�ᬱ�"ᬫ�~�`ᬺ', text: '�Sᬻᬾᬭᬯᬷᬝᬾᬬᬺ�ᬶ�"ᬫᬐᬺ�"ᬻᬬᬸ �"ᬐᬰ�`ᬮ�"ᬫ�` �"ᬼ�ᬺ�&�&ᬺ�"ᬱᬸ�"ᬫ�9' });
-            return;
-        }
-
-        if(password.length < 6) {
-            MySwal.fire({ icon: 'warning', title: 'Password ᬡᬬᬸ��`ᬺᬸ�ᬱ�"ᬫ�~�`ᬺ', text: 'Password �~�`ᬺ ᬡ��`ᬺᬸ� ᬯᬶᬸ �&ᬬ�Sᬯᬶᬸ �  �Sᬯᬶᬸ �:ᬾᬭ�:�"ᬫ�"�`ᬺ�9' });
-            return;
-        }
-
-        try {
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ᬁᬏ�&ᬱᬬ�ᬷᬺ�"ᬫ...';
-
-            const counterRef = doc(db, "settings", "userCounter");
-            let newMemberIndex = 1;
-
-            await runTransaction(db, async (transaction) => {
-                const counterSnap = await transaction.get(counterRef);
-                if (counterSnap.exists()) {
-                    newMemberIndex = counterSnap.data().lastIndex + 1;
-                    transaction.update(counterRef, { lastIndex: newMemberIndex });
-                } else {
-                    transaction.set(counterRef, { lastIndex: 1 });
-                    newMemberIndex = 1;
-                }
-            });
-
-            // �S& ID Formatting Logic (YLG-2026-0001 �"ᬯᬶ�&ᬶ�ᬱᬬᬺᬁᬼ�ᬺᬸ)
-            const currentYear = new Date().getFullYear();
-            const formattedIndex = String(newMemberIndex).padStart(4, '0'); // �ᬶ�"ᬫᬐᬺᬬᬭᬯ �ᬏ�ᬺᬸ � �Sᬯᬶᬸ�ᬼ�&ᬺᬡᬱᬬ�ᬺ �:ᬾᬱᬷᬬ ၬ �ᬼ�`ᬷᬺ�"ᬱᬸᬐᬬ (ᬥ�"�"ᬬ- 0005)
-            // �S& ᬡ�xᬱᬬ�ᬺᬸ (Old)
-// const customYlgId = `YLG-${currentYear}-${formattedIndex}`; 
-
-// �S& ᬡ�~�&ᬺ (New) - �ᬫ�Sᬱᬸᬡᬐᬭᬯ�ᬺᬸ �"ᬼᬱᬬ�ᬺᬸ�Sᬭᬯᬬᬺ�"ᬫ
-const customYlgId = `YLG-${currentYear}${formattedIndex}`;
-
-            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-            const user = userCredential.user;
-
-            await updateProfile(user, { displayName: name });
-
-            await setDoc(doc(db, "users", user.uid), {
-                uid: user.uid,
-                fullname: name,
-                email: email,
-                phone: phone,
-                balance: 0,
-                userIndex: newMemberIndex, 
-                ylgId: customYlgId, // �x� �ᬫ�Sᬱᬸᬬ Portfolio �"ᬾᬬ �"ᬼ�"�aᬷᬺ ID ᬡ�~�&ᬺ
-                tradeControl: "NORMAL",
-                kycStatus: "pending",
-                createdAt: new Date().toISOString()
-            });
-
-            await MySwal.fire({
-                icon: 'success',
-                title: 'ᬡᬱᬬ�ᬺ�"ᬼ�ᬺ�"ᬫ�~�`ᬺ',
-                text: `�&ᬬ�:�ᬺᬸ�~ᬽ�ᬺᬸᬁᬼ�ᬺᬸ ᬡᬱᬬ�ᬺ�"ᬼ�ᬺ�"ᬫ�~�`ᬺ�9 �~�ᬺ၏ ID �"ᬾᬬ ${customYlgId} �ᬼ�&ᬺ�"ᬫ�~�`ᬺ�9`,
-                timer: 3000,
-                showConfirmButton: true
-            });
-            
-            window.location.href = "login.html";
-
-        } catch (error) {
-            console.error(error);
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = '<i class="fas fa-user-plus"></i> �&ᬬ�:�ᬺᬸ�~ᬽ�ᬺᬸ�:�ᬺ';
-            
-            let errorMsg = "ᬡᬬᬱᬬ�ᬷᬺ�ᬽ�ᬷᬺ၍ �"�:�"ᬫ�9 ";
-            if (error.code === 'auth/email-already-in-use') {
-                errorMsg = "ᬤᬡᬮᬸ�"ᬱᬸ�Sᬺ�ᬼ�ᬷᬺ ᬡᬬᬱᬬ�ᬷᬺ�ᬽ�ᬷᬺ�"ᬼᬮᬸ�~ᬬᬸ �ᬼ�&ᬺ�ᬱ�"ᬫ�~�`ᬺ�9";
-            } else if (error.code === 'auth/network-request-failed') {
-                errorMsg = "ᬡ�ᬺᬐᬬ�ᬬᬺ�Sᬭᬯ�ᬺᬸ �"ᬬᬱᬬ�ᬺᬸ�"ᬫ�9 �Sᬭᬯ�ᬺᬸ�"ᬼ�ᬺ�&�&ᬺ�"ᬱᬸ�"ᬫ�9";
-            }
-
-            MySwal.fire({ icon: 'error', title: 'ᬡ�"ᬾᬬᬸᬐ�&ᬺᬁᬯ�:ᬾᬭ�"ᬫ�~�`ᬺ', text: errorMsg });
-        }
-    });
-</script>
 </body>
 </html>

@@ -441,7 +441,7 @@
                     await updateDoc(doc(db, "users", activeUser.uid), { balance: increment(finalPayout) });
 
                     Swal.fire({
-                        title: 'ðŸŽ‰ Congratulations!',
+                        title: '<i class="fas fa-trophy"></i> Congratulations!',
                         html: `<b style="font-size: 20px;">You WON $${(amt * pct).toFixed(2)}</b>`,
                         icon: 'success',
                         confirmButtonColor: '#FFD700',

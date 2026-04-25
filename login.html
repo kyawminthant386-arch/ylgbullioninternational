@@ -22,7 +22,9 @@
 		p.lead{margin:0 0 18px 0;color:var(--muted);font-size:13px}
 
 		label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
-		input[type=email],input[type=password]{width:100%;padding:12px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:var(--input);color:#fff;font-size:14px}
+		input[type=email],input[type=password],input[type=text]{width:100%;padding:12px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:var(--input);color:#fff;font-size:14px;min-width:0;box-sizing:border-box}
+		.row input[type=password],.row input[type=text]{flex:1 1 0;width:0;min-width:0;box-sizing:border-box}
+		.show-pass{flex:0 0 auto;padding:8px 12px;font-size:18px;background:transparent;border:none;color:var(--muted);cursor:pointer;width:auto;height:auto}
 		.row{display:flex;gap:10px;align-items:center}
 		.actions{margin-top:14px}
 		button.primary{width:100%;padding:12px;border-radius:10px;border:none;background:var(--accent);color:#111;font-weight:700;cursor:pointer;font-size:15px}
@@ -32,7 +34,7 @@
 		.small{font-size:12px;color:var(--muted)}
 		.error{margin-top:10px;padding:10px;background:#3a1b1b;color:#ffd3d3;border-radius:8px;display:none}
 		.debug{margin-top:10px;padding:10px;background:#0b1220;color:#9fefff;border-radius:8px;white-space:pre-wrap;display:none;font-size:12px}
-		.show-pass{background:transparent;border:none;color:var(--muted);cursor:pointer}
+		
 		@media (max-width:480px){.card{padding:18px;border-radius:10px}}
 	</style>
 </head>
@@ -103,9 +105,9 @@
 
 		// Small i18n support using localStorage.selectedLang (en/mm/th)
 		const texts = {
-			en: { title: 'Sign in to your account', subtitle: 'Secure access to trading and wallet', email:'Email', password:'Password', remember:'Remember me', forgot:'Forgot password?', login:'Login', errorRequired:'Please fill email and password.' },
-			mm: { title: 'သင့်အကောင့် ဝင်ပါ', subtitle: 'ရောင်းဝယ်မှုနှင့် ပိုက်ဆံလက်ခံရန်', email:'အီးမေးလ်', password:'စကားဝှက်', remember:'မှတ်ထားပါ', forgot:'စကားဝှက်မေ့လျှင်?', login:'လောဂ်အင်', errorRequired:'အီးမေးလ်နှင့် စကားဝှက် ထည့်ပါ။' },
-			th: { title: 'เข้าสู่ระบบบัญชีของคุณ', subtitle: 'การเข้าถึงการซื้อขายและกระเป๋าอย่างปลอดภัย', email:'อีเมล', password:'รหัสผ่าน', remember:'จดจำฉัน', forgot:'ลืมรหัสผ่าน?', login:'เข้าสู่ระบบ', errorRequired:'กรุณากรอกอีเมลและรหัสผ่าน.' }
+			en: { title: 'Sign in to your account', subtitle: 'Secure access to trading and wallet', email:'Email', password:'Password', remember:'Remember me', forgot:'Forgot password?', login:'Login', errorRequired:'Please fill email and password.', errorWrongPass:'Email or password is incorrect.', errorUserNotFound:'No account found with this email.', errorTooMany:'Too many failed attempts. Please try again later.', errorNetwork:'Network error. Please check your connection.', errorInvalidEmail:'Invalid email format.', errorGeneric:'Login failed. Please try again.' },
+			mm: { title: 'သင့်အကောင့် ဝင်ပါ', subtitle: 'ရောင်းဝယ်မှုနှင့် ပိုက်ဆံလက်ခံရန်', email:'အီးမေးလ်', password:'စကားဝှက်', remember:'မှတ်ထားပါ', forgot:'စကားဝှက်မေ့လျှင်?', login:'လောဂ်အင်', errorRequired:'အီးမေးလ်နှင့် စကားဝှက် ထည့်ပါ။', errorWrongPass:'အီးမေးလ် သို့မဟုတ် စကားဝှက် မှားနေပါသည်။', errorUserNotFound:'ဤအီးမေးလ်ဖြင့် အကောင့် မရှိပါ။', errorTooMany:'အကြိမ်များစွာ မှားယွင်းပါသည်။ ခဏကြာမှ ပြန်ကြိုးစားပါ။', errorNetwork:'အင်တာနက် ချိတ်ဆက်မှု ပြဿနာရှိနေပါသည်။', errorInvalidEmail:'အီးမေးလ်ပုံစံ မမှန်ပါ။', errorGeneric:'လောဂ်အင် မအောင်မြင်ပါ။ ပြန်ကြိုးစားပါ။' },
+			th: { title: 'เข้าสู่ระบบบัญชีของคุณ', subtitle: 'การเข้าถึงการซื้อขายและกระเป๋าอย่างปลอดภัย', email:'อีเมล', password:'รหัสผ่าน', remember:'จดจำฉัน', forgot:'ลืมรหัสผ่าน?', login:'เข้าสู่ระบบ', errorRequired:'กรุณากรอกอีเมลและรหัสผ่าน.', errorWrongPass:'อีเมลหรือรหัสผ่านไม่ถูกต้อง', errorUserNotFound:'ไม่พบบัญชีที่ใช้อีเมลนี้', errorTooMany:'พยายามเข้าสู่ระบบบ่อยเกินไป กรุณาลองใหม่ภายหลัง', errorNetwork:'เครือข่ายขัดข้อง กรุณาตรวจสอบการเชื่อมต่อ', errorInvalidEmail:'รูปแบบอีเมลไม่ถูกต้อง', errorGeneric:'เข้าสู่ระบบไม่สำเร็จ กรุณาลองใหม่' }
 		};
 
 		window.applyLang = function(){
@@ -149,11 +151,32 @@
 				window.location.replace('index.html');
 			}catch(err){
 				console.error(err);
-				setError(err.message || 'Login error');
-				// show debug if query ?debug=1 or localStorage.debug=true
+				const lang = localStorage.getItem('selectedLang') || 'en';
+				const t = texts[lang] || texts.en;
+				
+				// Map Firebase error codes to friendly messages
+				let friendlyMsg = t.errorGeneric;
+				const code = err.code || '';
+				if (code === 'auth/wrong-password' || code === 'auth/invalid-credential' || code === 'auth/invalid-login-credentials') {
+					friendlyMsg = t.errorWrongPass;
+				} else if (code === 'auth/user-not-found') {
+					friendlyMsg = t.errorUserNotFound;
+				} else if (code === 'auth/too-many-requests') {
+					friendlyMsg = t.errorTooMany;
+				} else if (code === 'auth/network-request-failed') {
+					friendlyMsg = t.errorNetwork;
+				} else if (code === 'auth/invalid-email') {
+					friendlyMsg = t.errorInvalidEmail;
+				} else if (code === 'auth/user-disabled') {
+					friendlyMsg = lang === 'mm' ? 'အကောင့် ပိတ်ထားပါသည်။' : lang === 'th' ? 'บัญชีถูกปิดใช้งาน' : 'Account has been disabled.';
+				}
+				
+				setError(friendlyMsg);
+				
+				// Debug mode shows raw error
 				const showDebug = location.search.includes('debug=1') || localStorage.getItem('debug') === 'true';
 				if (showDebug){ debugBox.style.display = 'block'; debugBox.textContent = `Error code: ${err.code || 'N/A'}\n${err.message || ''}`; }
-				submitBtn.disabled = false; submitBtn.textContent = texts[localStorage.getItem('selectedLang')||'en'].login;
+				submitBtn.disabled = false; submitBtn.textContent = t.login;
 			}
 		});
 
