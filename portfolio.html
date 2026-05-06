@@ -4,9 +4,10 @@
     <link rel="icon" type="image/png" href="favicon.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portfolio - YLG Bullion</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <title>YLG Bullion</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
         <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="dashboard-styles.css">
     <link rel="stylesheet" href="theme.css">
     <style>
@@ -193,14 +194,44 @@
                 <h3 id="security-title" style="margin-top:0; font-size: 18px;"><i class="fas fa-lock"></i> Security</h3>
                 <p id="security-desc" style="font-size: 13px; color: var(--color-text-fade);">If you forget or want to change your password, you can reset it.</p>
                 <button id="reset-pw-btn" class="btn-reset">Reset Password via Email</button>
+
+                <hr style="border:none;border-top:1px solid #333;margin:18px 0;">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+                    <i class="fas fa-key" style="color:#C9A84C;font-size:14px;"></i>
+                    <span style="font-size:14px;font-weight:600;">Withdrawal PIN</span>
+                    <span id="pin-status-badge" style="font-size:11px;padding:2px 8px;border-radius:10px;background:rgba(255,107,107,0.15);color:#FF6B6B;">Not Set</span>
+                </div>
+                <p style="font-size:12px;color:#666;margin:0 0 12px;">A 4-digit PIN required every time you withdraw funds.</p>
+                <button id="set-pin-btn" onclick="openSetPin()" class="btn-reset" style="background:rgba(201,168,76,0.08);border-color:rgba(201,168,76,0.3);">
+                    <i class="fas fa-key" style="margin-right:6px;"></i><span id="set-pin-label">Set Withdrawal PIN</span>
+                </button>
             </div>
         </div>
+
+        <!-- Performance Graph -->
+        <div class="portfolio-card" id="perf-graph-card" style="margin-top:20px;">
+            <h3 style="margin-top:0;font-size:16px;display:flex;align-items:center;gap:8px;">
+                <i class="fas fa-chart-area" style="color:#C9A84C;"></i> Portfolio Performance
+                <span style="font-size:11px;color:#666;font-weight:400;margin-left:4px;">(Cumulative P&amp;L from trades)</span>
+            </h3>
+            <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;" id="perf-stat-row">
+                <span class="perf-pill" id="perf-total-trades" style="background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.2);border-radius:20px;padding:4px 12px;font-size:12px;color:#C9A84C;">Trades: —</span>
+                <span class="perf-pill" id="perf-win-rate"     style="background:rgba(0,176,80,0.1);border:1px solid rgba(0,176,80,0.2);border-radius:20px;padding:4px 12px;font-size:12px;color:#00B050;">Win Rate: —</span>
+                <span class="perf-pill" id="perf-total-pl"     style="background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.2);border-radius:20px;padding:4px 12px;font-size:12px;color:#fff;">P&amp;L: —</span>
+            </div>
+            <div style="position:relative;height:220px;">
+                <canvas id="perfChart"></canvas>
+            </div>
+            <p id="perf-empty" style="text-align:center;color:#555;font-size:13px;display:none;padding:40px 0;">No trade history yet. Start trading to see your performance graph.</p>
+        </div>
+
     </main>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script type="module">
         import { app, auth, db } from './firebase-init.js';
         import { onAuthStateChanged, sendPasswordResetEmail, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { doc, getDoc, updateDoc, collection, query, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     // Function to get member level based on deposit
     function getMemberLevel(deposit) {
@@ -213,6 +244,7 @@
 
     onAuthStateChanged(auth, async (user) => {
         if (user) {
+            localStorage.setItem('userShortUID', user.uid.slice(0, 8).toUpperCase());
             document.getElementById('display-user-email').innerText = user.email;
             
             try {
@@ -243,18 +275,122 @@
                     document.getElementById('display-member-level').innerText = levelData.level;
                     document.getElementById('display-daily-bonus').innerText = levelData.bonus;
 
-                    // Member ID á€¡á€•á€­á€¯á€„á€ºá€¸ - YLG-2026(4 random digits)
+                    // Member ID
                     const userIndex = data.userIndex || Math.floor(Math.random() * 10000);
                     const mId = "YLG-2026" + String(userIndex).padStart(4, '0');
                     document.getElementById('display-ylg-id').innerText = mId;
 
-                    document.getElementById('display-full-name').innerText = data.fullname || user.displayName || "Not Set";
+                    const fullName = data.fullname || user.displayName || "Not Set";
+                    document.getElementById('display-full-name').innerText = fullName;
+
+                    // Store for mobile header
+                    localStorage.setItem('memberId', mId);
+                    localStorage.setItem('memberName', fullName);
                     document.getElementById('display-user-phone').innerText = data.phone || "Not Set";
+
+                    // PIN status
+                    updatePinBadge(!!data.withdrawPin);
                 }
             } catch (error) {
                 console.error("Error fetching Firestore data:", error);
                 document.getElementById('display-ylg-id').innerText = "ERROR-FETCH";
             }
+
+            // Load performance chart from trade history
+            try {
+                const tradesRef = collection(db, "users", user.uid, "trades");
+                const q = query(tradesRef, orderBy("timestamp", "asc"));
+                const snap = await getDocs(q);
+
+                if (snap.empty) {
+                    document.getElementById('perf-empty').style.display = 'block';
+                    document.getElementById('perfChart').style.display = 'none';
+                } else {
+                    let totalTrades = 0, totalWins = 0, cumPL = 0;
+                    const labels = [], data = [];
+
+                    snap.forEach((d) => {
+                        const t = d.data();
+                        totalTrades++;
+                        if (t.result === "WIN") {
+                            totalWins++;
+                            cumPL += (t.payout || 0) - (t.amount || 0);
+                        } else {
+                            cumPL -= (t.amount || 0);
+                        }
+                        const dt = t.date || (t.timestamp?.toDate ? t.timestamp.toDate().toLocaleDateString() : '');
+                        labels.push(dt);
+                        data.push(parseFloat(cumPL.toFixed(2)));
+                    });
+
+                    const winRate = Math.round((totalWins / totalTrades) * 100);
+                    document.getElementById('perf-total-trades').textContent = `Trades: ${totalTrades}`;
+                    document.getElementById('perf-win-rate').textContent = `Win Rate: ${winRate}%`;
+                    document.getElementById('perf-win-rate').style.color = winRate >= 50 ? '#00B050' : '#FF6B6B';
+                    const finalPL = data[data.length - 1] || 0;
+                    document.getElementById('perf-total-pl').textContent = `P&L: ${finalPL >= 0 ? '+' : ''}$${finalPL.toFixed(2)}`;
+                    document.getElementById('perf-total-pl').style.color = finalPL >= 0 ? '#00B050' : '#FF6B6B';
+
+                    const positive = finalPL >= 0;
+                    const lineColor = positive ? '#00B050' : '#FF6B6B';
+                    const fillColor = positive ? 'rgba(0,176,80,0.12)' : 'rgba(255,107,107,0.12)';
+
+                    new Chart(document.getElementById('perfChart'), {
+                        type: 'line',
+                        data: {
+                            labels,
+                            datasets: [{
+                                label: 'Cumulative P&L ($)',
+                                data,
+                                borderColor: lineColor,
+                                backgroundColor: fillColor,
+                                borderWidth: 2,
+                                pointRadius: data.length <= 30 ? 4 : 0,
+                                pointHoverRadius: 6,
+                                fill: true,
+                                tension: 0.35
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            interaction: { mode: 'index', intersect: false },
+                            plugins: {
+                                legend: { display: false },
+                                tooltip: {
+                                    backgroundColor: '#1e1e1e',
+                                    borderColor: '#333',
+                                    borderWidth: 1,
+                                    titleColor: '#aaa',
+                                    bodyColor: '#fff',
+                                    callbacks: {
+                                        label: (ctx) => ` P&L: ${ctx.raw >= 0 ? '+' : ''}$${ctx.raw.toFixed(2)}`
+                                    }
+                                }
+                            },
+                            scales: {
+                                x: {
+                                    ticks: { color: '#666', maxTicksLimit: 8, maxRotation: 0, font: { size: 11 } },
+                                    grid: { color: 'rgba(255,255,255,0.04)' }
+                                },
+                                y: {
+                                    ticks: {
+                                        color: '#666',
+                                        font: { size: 11 },
+                                        callback: (v) => `$${v}`
+                                    },
+                                    grid: { color: 'rgba(255,255,255,0.06)' }
+                                }
+                            }
+                        }
+                    });
+                }
+            } catch (e) {
+                console.error("Chart load error:", e);
+                document.getElementById('perf-empty').style.display = 'block';
+                document.getElementById('perfChart').style.display = 'none';
+            }
+
         } else {
             window.location.href = "login.html";
         }
@@ -273,6 +409,88 @@
     });
 
     // Logout removed from header
+
+    // ── Withdrawal PIN helpers ──
+    function updatePinBadge(hasPin) {
+        const badge = document.getElementById('pin-status-badge');
+        const label = document.getElementById('set-pin-label');
+        if (!badge) return;
+        if (hasPin) {
+            badge.textContent = 'Set';
+            badge.style.background = 'rgba(0,176,80,0.15)';
+            badge.style.color = '#00B050';
+            if (label) label.textContent = 'Change Withdrawal PIN';
+        } else {
+            badge.textContent = 'Not Set';
+            badge.style.background = 'rgba(255,107,107,0.15)';
+            badge.style.color = '#FF6B6B';
+            if (label) label.textContent = 'Set Withdrawal PIN';
+        }
+    }
+
+    window.openSetPin = async function () {
+        const user = auth.currentUser;
+        if (!user) return;
+
+        const { value: pin, isConfirmed } = await Swal.fire({
+            title: 'Set Withdrawal PIN',
+            html: `<p style="font-size:13px;color:#aaa;margin-bottom:16px;">Enter a 4-digit PIN. You will need this every time you withdraw.</p>
+                   <input id="swal-pin" type="password" inputmode="numeric" maxlength="4" pattern="[0-9]{4}"
+                     placeholder="• • • •"
+                     style="width:100%;padding:14px;font-size:24px;letter-spacing:12px;text-align:center;
+                            background:#222;border:1px solid #444;color:#fff;border-radius:8px;font-family:monospace;">`,
+            showCancelButton: true,
+            confirmButtonColor: '#C9A84C',
+            confirmButtonText: 'Save PIN',
+            cancelButtonText: 'Cancel',
+            background: '#1a1a1a',
+            color: '#fff',
+            focusConfirm: false,
+            preConfirm: () => {
+                const v = document.getElementById('swal-pin').value;
+                if (!/^\d{4}$/.test(v)) {
+                    Swal.showValidationMessage('PIN must be exactly 4 digits.');
+                    return false;
+                }
+                return v;
+            }
+        });
+
+        if (!isConfirmed || !pin) return;
+
+        // Confirm PIN
+        const { value: pin2, isConfirmed: c2 } = await Swal.fire({
+            title: 'Confirm PIN',
+            html: `<input id="swal-pin2" type="password" inputmode="numeric" maxlength="4" pattern="[0-9]{4}"
+                     placeholder="• • • •"
+                     style="width:100%;padding:14px;font-size:24px;letter-spacing:12px;text-align:center;
+                            background:#222;border:1px solid #444;color:#fff;border-radius:8px;font-family:monospace;">`,
+            showCancelButton: true,
+            confirmButtonColor: '#C9A84C',
+            confirmButtonText: 'Confirm',
+            background: '#1a1a1a',
+            color: '#fff',
+            focusConfirm: false,
+            preConfirm: () => {
+                const v = document.getElementById('swal-pin2').value;
+                if (v !== pin) {
+                    Swal.showValidationMessage('PINs do not match. Try again.');
+                    return false;
+                }
+                return v;
+            }
+        });
+
+        if (!c2) return;
+
+        try {
+            await updateDoc(doc(db, "users", user.uid), { withdrawPin: pin });
+            updatePinBadge(true);
+            Swal.fire({ icon: 'success', title: 'PIN Saved!', text: 'Your withdrawal PIN has been set.', confirmButtonColor: '#C9A84C', background: '#1a1a1a', color: '#fff', timer: 2000, showConfirmButton: false });
+        } catch (e) {
+            Swal.fire({ icon: 'error', title: 'Error', text: e.message, background: '#1a1a1a', color: '#fff' });
+        }
+    };
 </script>
 
     <script>
@@ -434,5 +652,7 @@
 })();
 </script>
 
+<script src="mobile-nav.js"></script>
+<script src="sidebar-user.js"></script>
 </body>
 </html>

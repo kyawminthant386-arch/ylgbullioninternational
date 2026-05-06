@@ -4,8 +4,8 @@
     <link rel="icon" type="image/png" href="favicon.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Account — YLG Bullion</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <title>YLG Bullion</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="dashboard-styles.css">
@@ -41,7 +41,7 @@
 
         /* ── Sidebar ── */
         .sidebar {
-            width: 240px;
+            width: 260px;
             height: 100vh;
             background: var(--card);
             border-right: 1px solid #333;
@@ -149,9 +149,9 @@
 
         /* ── Main Content ── */
         .main-content {
-            margin-left: 240px;
+            margin-left: 260px;
             padding: 32px 36px;
-            width: calc(100% - 240px);
+            width: calc(100% - 260px);
             min-height: 100vh;
         }
 
@@ -362,64 +362,55 @@
             <div class="info-grid">
                 <!-- Account Info -->
                 <div class="info-card">
-                    <h3><i class="fas fa-user-shield"></i> Account Details</h3>
+                    <h3 id="acc-card-title"><i class="fas fa-user-shield"></i> Account Details</h3>
                     <div class="info-row">
-                        <span class="label">Member ID</span>
+                        <span class="label" id="lbl-member-id">Member ID</span>
                         <span class="value gold" id="display-member-id">—</span>
                     </div>
                     <div class="info-row">
-                        <span class="label">Full Name</span>
+                        <span class="label" id="lbl-full-name">Full Name</span>
                         <span class="value" id="display-full-name">—</span>
                     </div>
                     <div class="info-row">
-                        <span class="label">Email</span>
+                        <span class="label" id="lbl-email">Email</span>
                         <span class="value" id="display-email" style="font-size:12px;">—</span>
                     </div>
                     <div class="info-row">
-                        <span class="label">Phone</span>
+                        <span class="label" id="lbl-phone">Phone</span>
                         <span class="value" id="display-phone">—</span>
                     </div>
                     <div class="info-row">
-                        <span class="label">KYC Status</span>
+                        <span class="label" id="lbl-kyc">KYC Status</span>
                         <span class="value" id="display-kyc">—</span>
                     </div>
                     <div class="info-row">
-                        <span class="label">Account Status</span>
-                        <span class="value green"><i class="fas fa-check-circle"></i> Active</span>
+                        <span class="label" id="lbl-acc-status">Account Status</span>
+                        <span class="value green" id="display-acc-status"><i class="fas fa-check-circle"></i> Active</span>
                     </div>
                 </div>
 
                 <!-- Balance Info -->
                 <div class="info-card">
-                    <h3><i class="fas fa-wallet"></i> Balance Overview</h3>
+                    <h3 id="bal-card-title"><i class="fas fa-wallet"></i> Balance Overview</h3>
                     <div class="info-row">
-                        <span class="label">Total Balance</span>
+                        <span class="label" id="lbl-total-bal">Total Balance</span>
                         <span class="value gold" id="display-balance">$ 0.00</span>
                     </div>
                     <div class="info-row">
-                        <span class="label">Deposited</span>
+                        <span class="label" id="lbl-deposited">Deposited</span>
                         <span class="value" id="display-deposit">$ 0.00</span>
                     </div>
                     <div class="info-row">
-                        <span class="label">Member Level</span>
+                        <span class="label" id="lbl-mem-level">Member Level</span>
                         <span class="value gold" id="display-level">—</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Quick Actions -->
+            <!-- Logout only -->
             <div class="actions-row">
-                <a href="wallet.html" class="action-btn action-btn-gold">
-                    <i class="fas fa-wallet"></i> My Wallet
-                </a>
-                <a href="trading.html" class="action-btn action-btn-outline">
-                    <i class="fas fa-chart-line"></i> Start Trading
-                </a>
-                <a href="kyc.html" class="action-btn action-btn-outline">
-                    <i class="fas fa-user-check"></i> KYC Verification
-                </a>
-                <button class="action-btn action-btn-outline" id="logout-main-btn">
-                    <i class="fas fa-sign-out-alt"></i> Logout
+                <button class="action-btn action-btn-outline" id="logout-main-btn" style="width:100%;max-width:400px;margin:0 auto;">
+                    <i class="fas fa-sign-out-alt"></i> <span id="lbl-logout">Logout</span>
                 </button>
             </div>
         </div>
@@ -480,6 +471,7 @@
             const sidebarLogged = document.getElementById('logged-in-sidebar');
 
             if (user) {
+                localStorage.setItem('userShortUID', user.uid.slice(0, 8).toUpperCase());
                 // Show logged-in UI
                 loggedInView.style.display  = 'block';
                 guestView.style.display     = 'none';
@@ -503,7 +495,12 @@
                         const mId = "YLG-2026" + String(userIndex).padStart(4, '0');
 
                         document.getElementById('display-member-id').innerText = mId;
-                        document.getElementById('display-full-name').innerText  = data.fullname || data.name || 'Not Set';
+                        const fullName = data.fullname || data.name || 'Not Set';
+                        document.getElementById('display-full-name').innerText  = fullName;
+
+                        // Store for mobile header
+                        localStorage.setItem('memberId', mId);
+                        localStorage.setItem('memberName', fullName);
                         document.getElementById('display-phone').innerText      = data.phone || 'Not Set';
                         document.getElementById('display-kyc').innerHTML        = getKycBadge(data.kycStatus);
 
@@ -543,6 +540,88 @@
     </script>
 
 <script>
+/* ═══ Account Page — Language ═══ */
+window.applyAccountLanguage = function(lang) {
+    const T = {
+        en: {
+            pageTitle:   'My Account',
+            accCard:     'Account Details',
+            balCard:     'Balance Overview',
+            memberId:    'Member ID',
+            fullName:    'Full Name',
+            email:       'Email',
+            phone:       'Phone',
+            kycStatus:   'KYC Status',
+            accStatus:   'Account Status',
+            active:      '<i class="fas fa-check-circle"></i> Active',
+            totalBal:    'Total Balance',
+            deposited:   'Deposited',
+            memLevel:    'Member Level',
+            logout:      'Logout',
+            welcome:     'Welcome!'
+        },
+        mm: {
+            pageTitle:   'ကျွန်ုပ်၏ အကောင့်',
+            accCard:     'အကောင့် အချက်အလက်',
+            balCard:     'လက်ကျန်ငွေ အကျဉ်းချုပ်',
+            memberId:    'အဖွဲ့ဝင် ID',
+            fullName:    'အမည်အပြည့်အစုံ',
+            email:       'အီးမေးလ်',
+            phone:       'ဖုန်းနံပါတ်',
+            kycStatus:   'KYC အခြေအနေ',
+            accStatus:   'အကောင့် အခြေအနေ',
+            active:      '<i class="fas fa-check-circle"></i> အသုံးပြုနေဆဲ',
+            totalBal:    'စုစုပေါင်း လက်ကျန်ငွေ',
+            deposited:   'အပ်ငွေ',
+            memLevel:    'အဖွဲ့ဝင် အဆင့်',
+            logout:      'ထွက်မည်',
+            welcome:     'ကြိုဆိုပါသည်!'
+        },
+        th: {
+            pageTitle:   'บัญชีของฉัน',
+            accCard:     'รายละเอียดบัญชี',
+            balCard:     'ภาพรวมยอดคงเหลือ',
+            memberId:    'รหัสสมาชิก',
+            fullName:    'ชื่อ-นามสกุล',
+            email:       'อีเมล',
+            phone:       'เบอร์โทร',
+            kycStatus:   'สถานะ KYC',
+            accStatus:   'สถานะบัญชี',
+            active:      '<i class="fas fa-check-circle"></i> ใช้งานอยู่',
+            totalBal:    'ยอดคงเหลือรวม',
+            deposited:   'ฝากเงิน',
+            memLevel:    'ระดับสมาชิก',
+            logout:      'ออกจากระบบ',
+            welcome:     'ยินดีต้อนรับ!'
+        }
+    };
+    const t = T[lang] || T.en;
+    const s = (id, val, isHtml) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        if (isHtml) el.innerHTML = val; else el.textContent = val;
+    };
+    s('acc-card-title',   '<i class="fas fa-user-shield"></i> ' + t.accCard,  true);
+    s('bal-card-title',   '<i class="fas fa-wallet"></i> ' + t.balCard,       true);
+    s('lbl-member-id',    t.memberId);
+    s('lbl-full-name',    t.fullName);
+    s('lbl-email',        t.email);
+    s('lbl-phone',        t.phone);
+    s('lbl-kyc',          t.kycStatus);
+    s('lbl-acc-status',   t.accStatus);
+    s('display-acc-status', t.active, true);
+    s('lbl-total-bal',    t.totalBal);
+    s('lbl-deposited',    t.deposited);
+    s('lbl-mem-level',    t.memLevel);
+    s('lbl-logout',       t.logout);
+    s('welcome-text',     t.welcome);
+
+    const h1 = document.querySelector('.page-header h1');
+    if (h1) h1.textContent = t.pageTitle;
+};
+</script>
+
+<script>
 /* ═══ YLG Language Sync — v2 ═══ */
 (function(){
     console.log('[YLG Sync] Initialising language sync');
@@ -578,5 +657,7 @@
 })();
 </script>
 
+<script src="mobile-nav.js"></script>
+<script src="sidebar-user.js"></script>
 </body>
 </html>

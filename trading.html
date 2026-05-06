@@ -5,8 +5,8 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gold Trading - YLG Bullion</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <title>YLG Bullion</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Myanmar:wght@400;700&family=Noto+Sans+Thai:wght@400;700&display=swap" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="dashboard-styles.css">
@@ -193,14 +193,6 @@
                 <h2 style="margin:0;">Gold Trading</h2>
                 <div id="head-user-name" style="color:var(--color-gold-accent); font-size: 13px; margin-top: 5px;">Checking...</div>
             </div>
-            <div id="auth-buttons" style="display: none; gap: 8px; align-items: center;">
-                <a href="login.html" style="color:var(--color-gold-accent); text-decoration:none; border:1px solid var(--color-gold-accent); padding: 6px 16px; border-radius: 4px; font-size: 14px;">Login</a>
-                <a href="register.html" style="color:#fff; text-decoration:none; background:var(--color-gold-accent); border-radius:4px; padding: 6px 16px; font-size: 14px;">Register</a>
-            </div>
-            <div id="logged-in-box" style="display:none; gap:10px; align-items:center; justify-content:flex-end;">
-                <span id="trading-user-name" style="font-size:13px;color:var(--color-gold-accent);font-weight:700;">Member</span>
-                <button id="logoutBtn" style="background:#b71c1c;color:#fff;border:none;padding:8px 14px;border-radius:6px;cursor:pointer;font-size:13px;">Logout</button>
-            </div>
         </header>
 
         <div class="trading-grid">
@@ -326,21 +318,25 @@
         setPersistence(auth, browserLocalPersistence).then(() => {
             onAuthStateChanged(auth, async (user) => {
                 if (user) {
+                    localStorage.setItem('userShortUID', user.uid.slice(0, 8).toUpperCase());
                     activeUser = user;
                     const userDoc = await getDoc(doc(db, "users", user.uid));
                     const userData = userDoc.exists() ? userDoc.data() : {};
                     userBalance = userData.balance || 0;
                     
                     const displayName = userData.fullname || localStorage.getItem('userName') || 'Member';
-                    document.getElementById('head-user-name').innerText = `Account: ${displayName} (Balance: $${userBalance.toLocaleString()})`;
+                    const hun = document.getElementById('head-user-name');
+                    if (hun) { hun.innerText = `${displayName} (Balance: $${userBalance.toLocaleString()})`; hun.style.display = ''; }
 
                     if (authButtons) authButtons.style.display = 'none';
                     if (loggedInBox) loggedInBox.style.display = 'flex';
                     if (tradingUserName) tradingUserName.innerText = displayName;
                     tradeButtons.forEach(btn => { if (btn) btn.disabled = false; });
+                    setupNotifications();
                 } else {
                     activeUser = null;
-                    document.getElementById('head-user-name').innerText = "Guest Mode";
+                    const hunG = document.getElementById('head-user-name');
+                    if (hunG) hunG.style.display = 'none';
 
                     if (authButtons) authButtons.style.display = 'flex';
                     if (loggedInBox) loggedInBox.style.display = 'none';
@@ -354,20 +350,39 @@
             const userDoc = await getDoc(doc(db, "users", activeUser.uid));
             const userData = userDoc.exists() ? userDoc.data() : {};
             const displayName = userData.fullname || localStorage.getItem('userName') || 'Member';
-            document.getElementById('head-user-name').innerText = `Account: ${displayName} (Balance: $${userBalance.toLocaleString()})`;
+            const hunU = document.getElementById('head-user-name');
+            if (hunU) { hunU.innerText = `${displayName} (Balance: $${userBalance.toLocaleString()})`; hunU.style.display = ''; }
+        }
+
+        /* ── Push Notification Setup ── */
+        async function setupNotifications() {
+            if (!('Notification' in window) || !('serviceWorker' in navigator)) return;
+            if (Notification.permission === 'default') {
+                await Notification.requestPermission();
+            }
+            if (Notification.permission === 'granted') {
+                navigator.serviceWorker.register('/notification-sw.js').catch(console.error);
+            }
+        }
+
+        function sendTradeNotification(isWin, amt, profit) {
+            if (!('Notification' in window) || Notification.permission !== 'granted') return;
+            const title = isWin ? '🏆 YLG — Trade Won!' : '❌ YLG — Trade Lost';
+            const body  = isWin
+                ? `ကံကောင်းပါတယ်! +$${profit.toFixed(2)} ရရှိသည်`
+                : `ကံမကောင်းပါ။ -$${amt.toFixed(2)} ဆုံးရှုံးသည်`;
+            if (navigator.serviceWorker.controller) {
+                navigator.serviceWorker.controller.postMessage(
+                    { type: 'TRADE_RESULT', title, body, isWin }
+                );
+            } else {
+                new Notification(title, { body, icon: '/logo.png' });
+            }
         }
 
         window.handleTrade = async (type) => {
             if (!activeUser) { alert("Please login to trade!"); window.location.href="login.html"; return; }
             if (isTrading) return;
-
-            // Check if user account is frozen
-            const userDoc = await getDoc(doc(db, "users", activeUser.uid));
-            const userData = userDoc.exists() ? userDoc.data() : {};
-            if (userData.frozen) {
-                Swal.fire({ icon: 'error', title: 'Account Frozen', text: 'Your account has been frozen. Please contact support.', background: '#1a1a1a', color: '#fff' });
-                return;
-            }
 
             const amt = parseFloat(document.getElementById('tradeAmount').value);
             const dur = parseInt(document.getElementById('tradeDuration').value);
@@ -389,16 +404,30 @@
             }
 
             isTrading = true;
-            
+
+            /* Show overlay & start countdown immediately */
             const overlay = document.getElementById('trading-overlay');
             overlay.style.display = 'flex';
-
             document.getElementById('btn-up').classList.add('btn-disabled');
             document.getElementById('btn-down').classList.add('btn-disabled');
-
             userBalance -= amt;
-            updateHeaderInfo(); // updateHeaderInfo á€á€±á€«á€ºá€œá€­á€¯á€€á€ºá€á€¬á€”á€²á€· á€”á€¬á€™á€Šá€ºá€›á€±á€¬ balance á€›á€±á€¬ update á€–á€¼á€…á€ºá€™á€šá€º
-            await updateDoc(doc(db, "users", activeUser.uid), { balance: increment(-amt) });
+            updateHeaderInfo();
+
+            /* Firebase frozen-check + balance deduct in background */
+            getDoc(doc(db, "users", activeUser.uid)).then(userDoc => {
+                const userData = userDoc.exists() ? userDoc.data() : {};
+                if (userData.frozen) {
+                    isTrading = false;
+                    userBalance += amt;
+                    updateHeaderInfo();
+                    overlay.style.display = 'none';
+                    document.getElementById('btn-up').classList.remove('btn-disabled');
+                    document.getElementById('btn-down').classList.remove('btn-disabled');
+                    Swal.fire({ icon: 'error', title: 'Account Frozen', text: 'Your account has been frozen. Please contact support.', background: '#1a1a1a', color: '#fff' });
+                    return;
+                }
+                updateDoc(doc(db, "users", activeUser.uid), { balance: increment(-amt) }).catch(console.error);
+            }).catch(console.error);
 
             startCountdown(dur, type, amt);
         };
@@ -441,6 +470,7 @@
                     userBalance += finalPayout;
                     await updateDoc(doc(db, "users", activeUser.uid), { balance: increment(finalPayout) });
 
+                    sendTradeNotification(true, amt, amt * pct);
                     Swal.fire({
                         title: '<i class="fas fa-trophy"></i> Congratulations!',
                         html: `<b style="font-size: 20px;">You WON $${(amt * pct).toFixed(2)}</b>`,
@@ -450,9 +480,10 @@
                         color: '#ffffff'
                     });
                 } else {
+                    sendTradeNotification(false, amt, 0);
                     Swal.fire({
                         title: 'Trade Lost!',
-                        html: `<b style="font-size: 20px;">You lost $${amt.toFixed(2)}</b>`, 
+                        html: `<b style="font-size: 20px;">You lost $${amt.toFixed(2)}</b>`,
                         icon: 'error',
                         confirmButtonColor: '#D93025',
                         background: '#1a1a1a',
@@ -643,5 +674,7 @@
 })();
 </script>
 
+<script src="mobile-nav.js"></script>
+<script src="sidebar-user.js"></script>
 </body>
 </html>

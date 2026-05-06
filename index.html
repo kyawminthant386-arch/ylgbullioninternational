@@ -9,8 +9,8 @@
 <meta property="og:image" content="https://www.ylgbullion.asia/og-image.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - YLG Bullion</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <title>YLG Bullion</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Myanmar:wght@400;700&family=Noto+Sans+Thai:wght@400;700&display=swap" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="dashboard-styles.css">
@@ -506,6 +506,7 @@
 </head>
 
 <body>
+
     <aside class="sidebar">
         <div class="logo-section">
             <img src="logo.png" class="logo-img" alt="YLG" onerror="this.src='https://ui-avatars.com/api/?name=YLG&background=FFD700&color=000&bold=true'">
@@ -583,203 +584,426 @@
             </div>
         </header>
 
-        <div class="dashboard-card" style="text-align: center; padding: 40px 20px;">
-            <img src="license.jpg" alt="YLG License" style="max-width:95%;width:100%;max-height:500px;border-radius:12px;border:3px solid var(--color-gold-accent);object-fit:contain;" onerror="this.style.display='none'">
+        <!-- ── Promo Slideshow (license + promo images) ── -->
+        <div class="dashboard-card" style="padding:0;overflow:hidden;border-radius:14px;border:2px solid rgba(201,168,76,0.35);">
+            <div class="promo-slider" id="promoSlider">
+                <div class="promo-track" id="promoTrack">
+                    <div class="promo-slide"><img src="license.jpg"  alt="YLG License"></div>
+                    <div class="promo-slide"><img src="promo1.jpg" alt="YLG Gold 1"></div>
+                    <div class="promo-slide"><img src="promo2.jpg" alt="YLG Gold 2"></div>
+                    <div class="promo-slide"><img src="promo3.jpg" alt="YLG Gold 3"></div>
+                    <div class="promo-slide"><img src="promo4.jpg" alt="YLG Gold 4"></div>
+                </div>
+                <div class="promo-dots" id="promoDots">
+                    <span class="promo-dot active" onclick="goSlide(0)"></span>
+                    <span class="promo-dot" onclick="goSlide(1)"></span>
+                    <span class="promo-dot" onclick="goSlide(2)"></span>
+                    <span class="promo-dot" onclick="goSlide(3)"></span>
+                    <span class="promo-dot" onclick="goSlide(4)"></span>
+                </div>
+            </div>
         </div>
 
-        <div class="dashboard-card">
-            <h3 id="about-title">About YLG Bullion</h3>
-            <p id="about-desc" style="color: var(--color-text-fade);">YLG Bullion International is a globally renowned gold trading company providing excellent services to our clients.</p>
-        </div>
+        <style>
+            .promo-slider {
+                position: relative;
+                width: 100%;
+                overflow: hidden;
+                border-radius: 12px;
+                background: #111;
+                height: 220px;
+                cursor: grab;
+            }
+            .promo-slider.dragging { cursor: grabbing; }
+            @media (min-width: 480px)  { .promo-slider { height: 280px; } }
+            @media (min-width: 768px)  { .promo-slider { height: 380px; } }
+            @media (min-width: 1024px) { .promo-slider { height: 440px; } }
 
-        <div class="dashboard-card" id="journey-card" style="padding: 40px 36px; background: linear-gradient(180deg, #111318 0%, #0C0D0F 100%);">
-            <!-- Section Header -->
-            <div style="text-align: center; margin-bottom: 48px;">
-                <div style="display: inline-block; padding: 6px 16px; border-radius: 99px; background: rgba(201,168,76,0.1); border: 1px solid rgba(201,168,76,0.28); color: var(--color-gold-accent, #C9A84C); font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 14px;">
-                    <i class="fas fa-award" style="margin-right: 6px;"></i>
-                    <span id="journey-badge">Our Heritage</span>
-                </div>
-                <h3 id="history-header" style="font-size: 32px; margin: 0 0 10px 0; color: #EDF0F7; font-weight: 700; letter-spacing: -0.5px;">
-                    <span style="color: var(--color-gold-accent, #C9A84C);">30+ Years</span> of Excellence
-                </h3>
-                <p id="journey-subtitle" style="color: var(--color-text-fade, #7A8196); font-size: 14px; margin: 0; max-width: 620px; margin: 0 auto; line-height: 1.6;">
-                    From a local metals company to a global bullion powerhouse — a journey of trust, innovation, and market leadership.
-                </p>
-            </div>
+            .promo-track {
+                display: flex;
+                width: 100%;
+                height: 100%;
+                transition: transform 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+                will-change: transform;
+            }
+            .promo-track.no-transition { transition: none; }
 
-            <!-- Timeline — zig-zag layout with center spine -->
-            <div class="journey-timeline" style="position: relative; max-width: 980px; margin: 0 auto;">
+            .promo-slide {
+                flex: 0 0 100%;
+                width: 100%;
+                height: 100%;
+                overflow: hidden;
+            }
+            .promo-slide img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                display: block;
+                pointer-events: none;
+                user-select: none;
+                -webkit-user-drag: none;
+            }
+            .promo-dots {
+                position: absolute;
+                bottom: 10px;
+                left: 50%;
+                transform: translateX(-50%);
+                display: flex;
+                gap: 8px;
+                z-index: 10;
+            }
+            .promo-dot {
+                width: 8px;
+                height: 8px;
+                border-radius: 50%;
+                background: rgba(255,255,255,0.4);
+                cursor: pointer;
+                transition: background 0.3s, transform 0.3s;
+                border: 1px solid rgba(255,255,255,0.2);
+            }
+            .promo-dot.active {
+                background: var(--color-gold-accent, #FFD700);
+                transform: scale(1.35);
+            }
+        </style>
 
-                <!-- Central vertical spine -->
-                <div class="timeline-spine" style="position: absolute; left: 50%; top: 30px; bottom: 30px; width: 2px; background: linear-gradient(180deg, transparent, rgba(201,168,76,0.4), rgba(201,168,76,0.4), transparent); transform: translateX(-50%); z-index: 0;"></div>
+        <script>
+        (function () {
+            var cur   = 0;
+            var TOTAL = 5;
+            var timer = null;
+            var track, slider, sliderW;
+            var dragStartX = 0, dragCurX = 0, isDragging = false;
 
-                <!-- ═══ 1993 — Founding (LEFT) ═══ -->
-                <div class="timeline-row" style="display: grid; grid-template-columns: 1fr 60px 1fr; gap: 0; margin-bottom: 40px; align-items: center;">
-                    <div class="timeline-content" style="text-align: right; padding-right: 24px;">
-                        <div style="display: inline-block; padding: 4px 12px; background: var(--color-gold-accent, #C9A84C); color: #000; border-radius: 6px; font-size: 13px; font-weight: 700; letter-spacing: 1px; margin-bottom: 10px;">1993</div>
-                        <h4 id="h-1993-t" style="font-size: 20px; color: #EDF0F7; margin: 0 0 8px; font-weight: 700;">The Beginning — Yollin</h4>
-                        <p id="h-1993-d" style="color: var(--color-text-fade, #7A8196); font-size: 13.5px; line-height: 1.7; margin: 0;">
-                            Founded as <strong style="color: #EDF0F7;">Yollin</strong>, a specialist precious metals company. A small team with a big vision — to build Thailand's most trusted name in bullion.
-                        </p>
-                    </div>
-                    <div class="timeline-node" style="display: flex; justify-content: center; align-items: center; position: relative; z-index: 1;">
-                        <div style="width: 16px; height: 16px; border-radius: 50%; background: var(--color-gold-accent, #C9A84C); box-shadow: 0 0 0 4px rgba(201,168,76,0.15), 0 0 20px rgba(201,168,76,0.4);"></div>
-                    </div>
-                    <div class="timeline-image-wrap" style="padding-left: 24px;">
-                        <div class="timeline-img" style="width: 100%; max-width: 320px; height: 180px; border-radius: 14px; overflow: hidden; border: 1px solid rgba(201,168,76,0.28); box-shadow: 0 10px 30px rgba(0,0,0,0.4); position: relative; background: linear-gradient(135deg, #1a1d24, #0C0D0F);">
-                            <img src="ylg-1993.PNG" alt="1993" style="width:100%; height:100%; object-fit:cover; display:block;" onerror="this.style.display='none'">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ═══ 2003 — Rebrand to YLG (RIGHT) ═══ -->
-                <div class="timeline-row" style="display: grid; grid-template-columns: 1fr 60px 1fr; gap: 0; margin-bottom: 40px; align-items: center;">
-                    <div class="timeline-image-wrap" style="padding-right: 24px;">
-                        <div class="timeline-img" style="width: 100%; max-width: 320px; height: 180px; border-radius: 14px; overflow: hidden; border: 1px solid rgba(201,168,76,0.28); box-shadow: 0 10px 30px rgba(0,0,0,0.4); margin-left: auto; background: linear-gradient(135deg, #1a1d24, #0C0D0F);">
-                            <img src="ylg-2003.PNG" alt="2003" style="width:100%; height:100%; object-fit:cover; display:block;" onerror="this.style.display='none'">
-                        </div>
-                    </div>
-                    <div class="timeline-node" style="display: flex; justify-content: center; align-items: center; position: relative; z-index: 1;">
-                        <div style="width: 16px; height: 16px; border-radius: 50%; background: var(--color-gold-accent, #C9A84C); box-shadow: 0 0 0 4px rgba(201,168,76,0.15), 0 0 20px rgba(201,168,76,0.4);"></div>
-                    </div>
-                    <div class="timeline-content" style="padding-left: 24px;">
-                        <div style="display: inline-block; padding: 4px 12px; background: var(--color-gold-accent, #C9A84C); color: #000; border-radius: 6px; font-size: 13px; font-weight: 700; letter-spacing: 1px; margin-bottom: 10px;">2003</div>
-                        <h4 id="h-2003-t" style="font-size: 20px; color: #EDF0F7; margin: 0 0 8px; font-weight: 700;">Becoming YLG — Entering Gold</h4>
-                        <p id="h-2003-d" style="color: var(--color-text-fade, #7A8196); font-size: 13.5px; line-height: 1.7; margin: 0;">
-                            Rebranded from Yollin to <strong style="color: var(--color-gold-accent, #C9A84C);">YLG</strong>, and stepped into the gold market. A decade of metals expertise became the foundation for our ascent into Thailand's fastest-growing bullion business.
-                        </p>
-                    </div>
-                </div>
-
-                <!-- ═══ 2009 — Trading Futures (LEFT) ═══ -->
-                <div class="timeline-row" style="display: grid; grid-template-columns: 1fr 60px 1fr; gap: 0; margin-bottom: 40px; align-items: center;">
-                    <div class="timeline-content" style="text-align: right; padding-right: 24px;">
-                        <div style="display: inline-block; padding: 4px 12px; background: var(--color-gold-accent, #C9A84C); color: #000; border-radius: 6px; font-size: 13px; font-weight: 700; letter-spacing: 1px; margin-bottom: 10px;">2009</div>
-                        <h4 id="h-2009-t" style="font-size: 20px; color: #EDF0F7; margin: 0 0 8px; font-weight: 700;">Entering the Trading World</h4>
-                        <p id="h-2009-d" style="color: var(--color-text-fade, #7A8196); font-size: 13.5px; line-height: 1.7; margin: 0;">
-                            Launched <strong style="color: #EDF0F7;">YLG Bullion and Futures</strong> — Thailand's SEC-licensed gold futures broker. Expanded from physical bullion into derivatives, equities, and global commodities trading.
-                        </p>
-                    </div>
-                    <div class="timeline-node" style="display: flex; justify-content: center; align-items: center; position: relative; z-index: 1;">
-                        <div style="width: 16px; height: 16px; border-radius: 50%; background: var(--color-gold-accent, #C9A84C); box-shadow: 0 0 0 4px rgba(201,168,76,0.15), 0 0 20px rgba(201,168,76,0.4);"></div>
-                    </div>
-                    <div class="timeline-image-wrap" style="padding-left: 24px;">
-                        <div class="timeline-img" style="width: 100%; max-width: 320px; height: 180px; border-radius: 14px; overflow: hidden; border: 1px solid rgba(201,168,76,0.28); box-shadow: 0 10px 30px rgba(0,0,0,0.4); background: linear-gradient(135deg, #1a1d24, #0C0D0F);">
-                            <img src="ylg-2009.PNG" alt="2009" style="width:100%; height:100%; object-fit:cover; display:block;" onerror="this.style.display='none'">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ═══ 2012 — Singapore (RIGHT) ═══ -->
-                <div class="timeline-row" style="display: grid; grid-template-columns: 1fr 60px 1fr; gap: 0; margin-bottom: 20px; align-items: center;">
-                    <div class="timeline-image-wrap" style="padding-right: 24px;">
-                        <div class="timeline-img" style="width: 100%; max-width: 320px; height: 180px; border-radius: 14px; overflow: hidden; border: 1px solid rgba(201,168,76,0.28); box-shadow: 0 10px 30px rgba(0,0,0,0.4); margin-left: auto; background: linear-gradient(135deg, #1a1d24, #0C0D0F);">
-                            <img src="ylg-2012.PNG" alt="2012" style="width:100%; height:100%; object-fit:cover; display:block;" onerror="this.style.display='none'">
-                        </div>
-                    </div>
-                    <div class="timeline-node" style="display: flex; justify-content: center; align-items: center; position: relative; z-index: 1;">
-                        <div style="width: 16px; height: 16px; border-radius: 50%; background: var(--color-gold-accent, #C9A84C); box-shadow: 0 0 0 4px rgba(201,168,76,0.15), 0 0 20px rgba(201,168,76,0.4);"></div>
-                    </div>
-                    <div class="timeline-content" style="padding-left: 24px;">
-                        <div style="display: inline-block; padding: 4px 12px; background: var(--color-gold-accent, #C9A84C); color: #000; border-radius: 6px; font-size: 13px; font-weight: 700; letter-spacing: 1px; margin-bottom: 10px;">2012</div>
-                        <h4 id="h-2012-t" style="font-size: 20px; color: #EDF0F7; margin: 0 0 8px; font-weight: 700;">Going Global — Singapore</h4>
-                        <p id="h-2012-d" style="color: var(--color-text-fade, #7A8196); font-size: 13.5px; line-height: 1.7; margin: 0;">
-                            Opened our first international branch in <strong style="color: #EDF0F7;">Singapore</strong> — Asia's financial hub. A decisive step in our global expansion, bringing YLG's expertise to investors across Southeast Asia and beyond.
-                        </p>
-                    </div>
-                </div>
-
-            </div>
-
-            <!-- Mobile responsive override -->
-            <style>
-                @media (max-width: 768px) {
-                    .journey-timeline .timeline-spine { display: none; }
-                    .journey-timeline .timeline-row {
-                        grid-template-columns: 1fr !important;
-                        gap: 16px !important;
-                        margin-bottom: 28px !important;
-                    }
-                    .journey-timeline .timeline-node { display: none !important; }
-                    .journey-timeline .timeline-content,
-                    .journey-timeline .timeline-image-wrap {
-                        padding: 0 !important;
-                        text-align: left !important;
-                    }
-                    .journey-timeline .timeline-img {
-                        max-width: 100% !important;
-                        margin-left: 0 !important;
-                        height: 200px !important;
-                    }
+            function setSlide(idx, animate) {
+                cur = ((idx % TOTAL) + TOTAL) % TOTAL;
+                if (animate === false) {
+                    track.classList.add('no-transition');
+                } else {
+                    track.classList.remove('no-transition');
                 }
-            </style>
+                track.style.transform = 'translateX(-' + (cur * 100) + '%)';
+                document.querySelectorAll('#promoDots .promo-dot').forEach(function(d, i) {
+                    d.classList.toggle('active', i === cur);
+                });
+            }
+
+            window.goSlide = function(idx) { setSlide(idx, true); };
+
+            function startAuto() {
+                if (timer) clearInterval(timer);
+                timer = setInterval(function () { setSlide(cur + 1, true); }, 4500);
+            }
+            function stopAuto() { clearInterval(timer); timer = null; }
+
+            /* ── Drag helpers ── */
+            function onDragStart(x) {
+                isDragging = true;
+                dragStartX = x;
+                dragCurX   = x;
+                sliderW    = slider.offsetWidth;
+                track.classList.add('no-transition');
+                slider.classList.add('dragging');
+                stopAuto();
+            }
+
+            function onDragMove(x) {
+                if (!isDragging) return;
+                dragCurX = x;
+                var offset = dragCurX - dragStartX;
+                /* clamp drag to ±80% of slider width */
+                offset = Math.max(-sliderW * 0.8, Math.min(sliderW * 0.8, offset));
+                track.style.transform = 'translateX(calc(-' + (cur * 100) + '% + ' + offset + 'px))';
+            }
+
+            function onDragEnd() {
+                if (!isDragging) return;
+                isDragging = false;
+                slider.classList.remove('dragging');
+                var diff = dragCurX - dragStartX;
+                track.classList.remove('no-transition');
+                if (Math.abs(diff) > sliderW * 0.18) {
+                    setSlide(diff < 0 ? cur + 1 : cur - 1, true);
+                } else {
+                    setSlide(cur, true); /* snap back */
+                }
+                startAuto();
+            }
+
+            function init() {
+                track  = document.getElementById('promoTrack');
+                slider = document.getElementById('promoSlider');
+                if (!slider || !track) return;
+
+                /* ── Touch events ── */
+                slider.addEventListener('touchstart', function(e) {
+                    onDragStart(e.touches[0].clientX);
+                }, { passive: true });
+                slider.addEventListener('touchmove', function(e) {
+                    onDragMove(e.touches[0].clientX);
+                }, { passive: true });
+                slider.addEventListener('touchend', function() { onDragEnd(); }, { passive: true });
+                slider.addEventListener('touchcancel', function() { onDragEnd(); }, { passive: true });
+
+                /* ── Mouse drag events ── */
+                slider.addEventListener('mousedown', function(e) {
+                    e.preventDefault();
+                    onDragStart(e.clientX);
+                });
+                window.addEventListener('mousemove', function(e) { onDragMove(e.clientX); });
+                window.addEventListener('mouseup',   function()   { onDragEnd(); });
+
+                /* ── Pause on hover (desktop) ── */
+                slider.addEventListener('mouseenter', stopAuto);
+                slider.addEventListener('mouseleave', function() {
+                    if (!isDragging) startAuto();
+                });
+
+                setSlide(0, false);
+                startAuto();
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', init);
+            } else {
+                init();
+            }
+        })();
+        </script>
+
+
+        <!-- ═══════════════════════════════════════════════
+             LIVE GOLD PRICE + MARKET STATUS
+             ═══════════════════════════════════════════════ -->
+        <style>
+            /* ── Gold Price Card ── */
+            .db-gold-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;}
+            .market-badge{font-size:11px;font-weight:700;padding:4px 12px;border-radius:99px;letter-spacing:.5px;}
+            .market-open{background:rgba(0,176,80,.15);color:#00B050;border:1px solid rgba(0,176,80,.3);}
+            .market-closed{background:rgba(217,48,37,.15);color:#FF6B6B;border:1px solid rgba(217,48,37,.3);}
+            .db-price-label{font-size:11px;color:#7A8196;margin-bottom:4px;letter-spacing:.5px;}
+            .db-price-big{font-size:34px;font-weight:800;letter-spacing:-1px;color:#EDF0F7;line-height:1;}
+            .db-change-box{text-align:right;padding:6px 12px;border-radius:8px;min-width:72px;}
+            .db-up{background:rgba(0,176,80,.1);}
+            .db-down{background:rgba(217,48,37,.1);}
+            .db-pct{font-size:15px;font-weight:700;}
+            .db-up .db-pct{color:#00B050;}
+            .db-down .db-pct{color:#FF6B6B;}
+            .db-up .db-chg{color:#00B050;}
+            .db-down .db-chg{color:#FF6B6B;}
+            .db-chg{font-size:11px;margin-top:2px;}
+            .db-gold-main{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:14px;}
+            .db-thb-row{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:rgba(201,168,76,.07);border-radius:8px;margin-bottom:8px;}
+            .db-thb-label{font-size:12px;color:#7A8196;}
+            .db-thb-val{font-size:15px;font-weight:700;color:#C9A84C;}
+            .db-updated{font-size:10px;color:#3A3D4A;text-align:right;}
+            /* ── Account Summary ── */
+            .db-section-title{font-size:12px;font-weight:700;color:#C9A84C;letter-spacing:1px;text-transform:uppercase;display:flex;align-items:center;gap:8px;margin-bottom:14px;}
+            .db-stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+            .db-stat-item{background:rgba(255,255,255,.04);border-radius:10px;padding:12px;border:1px solid rgba(255,255,255,.06);}
+            .db-stat-label{font-size:11px;color:#7A8196;margin-bottom:4px;}
+            .db-stat-val{font-size:20px;font-weight:800;color:#EDF0F7;}
+            /* ── Quick Actions ── */
+            .db-quick-actions{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+            .db-qa-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:20px 10px;border-radius:14px;text-decoration:none;font-weight:800;font-size:13px;letter-spacing:.5px;transition:transform .15s,box-shadow .15s;border:none;cursor:pointer;}
+            .db-qa-btn i{font-size:22px;}
+            .db-qa-btn:active{transform:scale(.97);}
+            .db-qa-buy{background:linear-gradient(135deg,#00B050,#00832E);color:#fff;box-shadow:0 8px 24px rgba(0,176,80,.25);}
+            .db-qa-sell{background:linear-gradient(135deg,#D93025,#A51E15);color:#fff;box-shadow:0 8px 24px rgba(217,48,37,.25);}
+            /* ── Recent Trades ── */
+            .db-trade-item{display:flex;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.05);}
+            .db-trade-item:last-child{border-bottom:none;}
+            .db-trade-type{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;padding:3px 8px;border-radius:4px;white-space:nowrap;flex-shrink:0;}
+            .db-t-buy{background:rgba(0,176,80,.15);color:#00B050;}
+            .db-t-sell{background:rgba(217,48,37,.15);color:#FF6B6B;}
+            .db-trade-info{flex:1;margin:0 12px;}
+            .db-trade-pair{font-size:13px;font-weight:600;color:#EDF0F7;}
+            .db-trade-date{font-size:10px;color:#7A8196;margin-top:1px;}
+            .db-trade-pnl{font-size:13px;font-weight:700;flex-shrink:0;}
+            .db-view-all{display:block;text-align:center;margin-top:14px;color:#C9A84C;font-size:13px;font-weight:600;text-decoration:none;padding:8px;border:1px solid rgba(201,168,76,.2);border-radius:8px;}
+            /* ── Referral ── */
+            .db-ref-inner{text-align:center;}
+            .db-ref-icon{font-size:28px;color:#C9A84C;margin-bottom:10px;}
+            .db-ref-title{font-size:16px;font-weight:700;color:#EDF0F7;margin-bottom:6px;}
+            .db-ref-desc{font-size:13px;color:#7A8196;margin:0 0 16px;}
+            .db-ref-code-row{display:flex;align-items:center;justify-content:center;gap:10px;background:rgba(0,0,0,.3);border:1px solid rgba(201,168,76,.25);border-radius:10px;padding:10px 16px;margin-bottom:12px;}
+            .db-ref-code{font-size:20px;font-weight:800;letter-spacing:4px;color:#C9A84C;font-family:monospace;}
+            .db-ref-copy-btn{background:none;border:none;color:#C9A84C;cursor:pointer;font-size:16px;padding:4px;}
+            .db-ref-share-btn{width:100%;padding:12px;background:linear-gradient(135deg,#C9A84C,#A88A3A);color:#000;font-weight:700;border:none;border-radius:10px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;gap:8px;}
+        </style>
+
+        <!-- Gold Price Card -->
+        <div class="dashboard-card">
+            <div class="db-gold-header">
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <i class="fas fa-coins" style="color:#C9A84C;font-size:16px;"></i>
+                    <span style="font-size:12px;font-weight:700;color:#C9A84C;letter-spacing:1.5px;text-transform:uppercase;" id="dbl-goldtitle">Live Gold Price</span>
+                </div>
+                <span id="market-badge" class="market-badge market-open">&#9679; OPEN</span>
+            </div>
+
+            <!-- TradingView Single Quote — exact same price as TradingView -->
+            <div class="tradingview-widget-container" style="margin:4px 0 10px;min-height:64px;">
+                <div class="tradingview-widget-container__widget"></div>
+                <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-single-quote.js" async>
+                {
+                    "symbol": "OANDA:XAUUSD",
+                    "width": "100%",
+                    "colorTheme": "dark",
+                    "isTransparent": true,
+                    "locale": "en"
+                }
+                </script>
+            </div>
+
+            <div class="db-thb-row">
+                <span class="db-thb-label">XAU / THB</span>
+                <span id="gp-thb" class="db-thb-val">—</span>
+            </div>
+            <div id="gp-updated" class="db-updated">Connecting...</div>
         </div>
 
-        <div class="dashboard-card">
-            <h3 id="license-main-title">YLG Bullion and Futures Co., Ltd.</h3>
-            <div id="license-full-desc" style="color: var(--color-text-fade); line-height: 1.8; margin-top: 15px;">
-                <p>YLG Bullion and Futures was established in 2009 as a broker for gold futures trading. The company holds a Full License, covering a wide range of products such as Precious Metals (Gold Online Futures, Gold Futures), Equity (SET50 Futures, Single Stock Futures), as well as Currencies and Agricultures.</p>
-                <p>YLG is certified by the Securities and Exchange Commission (SEC) and is a member of the Gold Traders Association. It operates in compliance with the Derivatives Act B.E. 2546 (2003).</p>
-                <p>In 2022, YLG expanded its market reach to Global Markets, offering world-class products such as COMEX, NYMEX, and S&P Dow Jones. Investors can trade 24/7 through leading platforms like CQG and MT5. Additionally, YLG became the first in Thailand to provide investor trading via TradingView, reaffirming its leadership in the Futures market both domestically and globally.</p>
-            </div>
-
-            <!-- ── YLG Promo Video ── -->
-            <div style="margin-top: 28px; border-radius: 14px; overflow: hidden; border: 1px solid rgba(255,255,255,0.07); box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
-                <video id="ylg-promo-video"
-                       style="width:100%; height:auto; display:block; background:#000;"
-                       autoplay muted loop playsinline
-                       controls preload="metadata">
-                    <source src="ylgvideo.mp4" type="video/mp4">
-                    Your browser does not support the video tag.
-                </video>
-            </div>
-
-            <!-- ── Risk Disclosure & Copyright ── -->
-            <div style="margin-top: 28px; padding-top: 22px; border-top: 1px solid rgba(255,255,255,0.07); font-size: 11px; line-height: 1.7; color: var(--color-text-fade, #7A8196);">
-                <p style="margin: 0 0 10px;">
-                    <strong style="color: var(--color-gold-accent, #C9A84C); font-size: 12px;">YLG Bullion and Futures Co., Ltd. (License No. S1-0035-01)</strong>
-                    holds a license to provide services in exchange traded derivative products (futures and options) by The Securities and Exchange Commission of Thailand. Trading in financial markets involves substantial risk and may not be suitable for all investors as it can lead to losses exceeding the initial investment. Please ensure that you fully understand the risks, fees, and costs involved by reviewing our Risk Disclosure Statement.
-                </p>
-                <p style="margin: 0 0 14px;">
-                    <strong style="color: var(--color-text-light, #EDF0F7);">Restricted Regions:</strong>
-                    YLG Bullion and Futures Co., Ltd. does not provide services to residents of certain countries identified by the FATF (Financial Action Task Force) as high-risk or non-cooperative jurisdictions.
-                </p>
-            </div>
-        </div>
-
-        <!-- ── Location & Address Section ── -->
-        <div class="dashboard-card">
-            <h3 style="margin-bottom: 24px;">Our Location</h3>
-            
-            <!-- Address Details -->
-            <div style="display: flex; flex-direction: column; justify-content: center;">
-                <div style="padding: 24px; background: rgba(255,215,0,0.05); border-radius: 10px; border-left: 4px solid var(--color-gold-accent);">
-                    <p style="margin: 0 0 16px; color: var(--color-text-light); font-weight: 600; font-size: 18px;">
-                        <i class="fas fa-map-marker-alt" style="margin-right: 10px; color: var(--color-gold-accent);"></i>YLG Bullion and Futures Co., Ltd.
-                    </p>
-                    <p style="margin: 0 0 12px; color: var(--color-text-fade); font-size: 15px; line-height: 1.8;">
-                        <strong style="color: var(--color-text-light); display: block; margin-bottom: 8px;">Address:</strong>
-                        653/19 (Between Narathiwat Soi 7–9)<br>
-                        Thung Maha Mek, Sathon<br>
-                        Bangkok 10120, Thailand
-                    </p>
-                    <a href="https://maps.app.goo.gl/fndEJLkLqvoDmsMt9" target="_blank" style="display: inline-flex; align-items: center; margin-top: 16px; padding: 10px 16px; background: var(--color-gold-accent); color: var(--color-dark-bg); text-decoration: none; font-weight: 600; border-radius: 6px; transition: 0.3s;">
-                        <i class="fas fa-external-link-alt" style="margin-right: 8px;"></i>View on Google Maps
-                    </a>
+        <!-- Account Summary Card (shown when logged in) -->
+        <div class="dashboard-card" id="db-account-card" style="display:none;">
+            <div class="db-section-title"><i class="fas fa-chart-pie"></i><span id="dbl-accsummary">Account Summary</span></div>
+            <div class="db-stats-grid">
+                <div class="db-stat-item">
+                    <div class="db-stat-label" id="dbl-balance">Balance</div>
+                    <div class="db-stat-val" id="dbs-balance">—</div>
+                </div>
+                <div class="db-stat-item">
+                    <div class="db-stat-label" id="dbl-pnl">Total P&amp;L</div>
+                    <div class="db-stat-val" id="dbs-pnl">—</div>
+                </div>
+                <div class="db-stat-item">
+                    <div class="db-stat-label" id="dbl-trades">Trades</div>
+                    <div class="db-stat-val" id="dbs-trades">—</div>
+                </div>
+                <div class="db-stat-item">
+                    <div class="db-stat-label" id="dbl-winrate">Win Rate</div>
+                    <div class="db-stat-val" id="dbs-winrate">—</div>
                 </div>
             </div>
-
-            <!-- Mobile Responsive -->
-            <style>
-                @media (max-width: 768px) {
-                    .location-grid {
-                        grid-template-columns: 1fr !important;
-                    }
-                }
-            </style>
         </div>
 
-        <!-- ── Copyright Footer ── -->
+        <!-- Quick Actions -->
+        <div class="db-quick-actions">
+            <a href="trading.html" class="db-qa-btn db-qa-buy">
+                <i class="fas fa-arrow-trend-up"></i>
+                <span id="dbl-buy">BUY GOLD</span>
+            </a>
+            <a href="trading.html" class="db-qa-btn db-qa-sell">
+                <i class="fas fa-arrow-trend-down"></i>
+                <span id="dbl-sell">SELL GOLD</span>
+            </a>
+        </div>
+
+        <!-- Recent Trades (shown when logged in) -->
+        <div class="dashboard-card" id="db-recent-card" style="display:none;">
+            <div class="db-section-title"><i class="fas fa-clock-rotate-left"></i><span id="dbl-recent">Recent Trades</span></div>
+            <div id="db-recent-list"></div>
+            <a href="history.html" class="db-view-all" id="dbl-viewall">View All History &#8594;</a>
+        </div>
+
+        <!-- Referral Card (shown when logged in) -->
+        <div class="dashboard-card" id="db-referral-card" style="display:none;background:linear-gradient(135deg,rgba(201,168,76,.08),rgba(201,168,76,.03));">
+            <div class="db-ref-inner">
+                <div class="db-ref-icon"><i class="fas fa-gift"></i></div>
+                <div class="db-ref-title" id="dbl-ref-title">Invite Friends</div>
+                <p class="db-ref-desc" id="dbl-ref-desc">Share your referral code and earn rewards</p>
+                <div class="db-ref-code-row">
+                    <span class="db-ref-code" id="db-ref-code">——</span>
+                    <button class="db-ref-copy-btn" onclick="copyRefCode()" title="Copy code">
+                        <i class="fas fa-copy" id="db-ref-copy-icon"></i>
+                    </button>
+                </div>
+                <button class="db-ref-share-btn" onclick="shareRefCode()">
+                    <i class="fas fa-share-nodes"></i><span id="dbl-ref-share">Share</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Gold Price Script — THB via metals.live, USD via TradingView widget above -->
+        <script>
+        (function(){
+            var thbRate = 34;
+
+            function isMarketOpen(){
+                var d=new Date(), day=d.getUTCDay(), hr=d.getUTCHours();
+                if(day===6) return false;
+                if(day===0 && hr<21) return false;
+                if(day===5 && hr>=21) return false;
+                return true;
+            }
+            function updateBadge(){
+                var b=document.getElementById('market-badge');
+                if(!b) return;
+                if(isMarketOpen()){ b.textContent='● OPEN'; b.className='market-badge market-open'; }
+                else { b.textContent='● CLOSED'; b.className='market-badge market-closed'; }
+            }
+            function fetchTHB(){
+                /* Exchange rate first */
+                fetch('https://open.er-api.com/v6/latest/USD')
+                    .then(function(r){ return r.json(); })
+                    .then(function(d){ if(d.rates&&d.rates.THB) thbRate=d.rates.THB; fetchGoldTHB(); })
+                    .catch(function(){ fetchGoldTHB(); });
+            }
+            function fetchGoldTHB(){
+                /* metals.live has CORS headers — no proxy needed */
+                fetch('https://api.metals.live/v1/spot')
+                    .then(function(r){ return r.json(); })
+                    .then(function(j){
+                        var usd = j[0]&&j[0].gold ? j[0].gold : 0;
+                        var thbEl  = document.getElementById('gp-thb');
+                        var updEl  = document.getElementById('gp-updated');
+                        if(thbEl && usd) thbEl.textContent = '฿'+(usd*thbRate).toLocaleString('th-TH',{maximumFractionDigits:0});
+                        if(updEl) updEl.textContent = 'Updated: '+new Date().toLocaleTimeString();
+                    })
+                    .catch(function(){
+                        var el=document.getElementById('gp-updated');
+                        if(el) el.textContent='THB unavailable';
+                    });
+            }
+
+            document.addEventListener('DOMContentLoaded', function(){
+                updateBadge();
+                fetchTHB();
+                setInterval(fetchTHB, 60000);
+                setInterval(updateBadge, 60000);
+            });
+
+            window.copyRefCode = function(){
+                var c=window._ylgRefCode||'—';
+                navigator.clipboard.writeText(c).catch(function(){});
+                var ic=document.getElementById('db-ref-copy-icon');
+                if(ic){ ic.className='fas fa-check'; setTimeout(function(){ ic.className='fas fa-copy'; },1200); }
+            };
+            window.shareRefCode = function(){
+                var c=window._ylgRefCode||'—';
+                var msg='Join YLG Bullion International! Use my referral code: '+c;
+                if(navigator.share){ navigator.share({title:'YLG Bullion',text:msg}); }
+                else { navigator.clipboard.writeText(msg).catch(function(){}); }
+            };
+        })();
+        </script>
+
+        <div class="dashboard-card" style="display:flex;flex-direction:column;gap:16px;">
+            <div style="display:flex;align-items:center;gap:14px;">
+                <div style="width:48px;height:48px;border-radius:50%;background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.3);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    <img src="logo.png" alt="YLG" style="width:32px;height:32px;object-fit:contain;" onerror="this.src='https://ui-avatars.com/api/?name=YLG&background=C9A84C&color=000&bold=true'">
+                </div>
+                <div>
+                    <h3 id="about-title" style="margin:0;font-size:17px;">About YLG Bullion</h3>
+                    <p style="margin:2px 0 0;color:var(--color-gold-accent);font-size:10px;letter-spacing:1.5px;font-weight:700;">EST. 1993 · BANGKOK, THAILAND</p>
+                </div>
+            </div>
+            <p id="about-desc" style="color:var(--color-text-fade);font-size:14px;line-height:1.7;margin:0;">YLG Bullion International is a globally renowned gold trading company providing excellent services to our clients.</p>
+            <a href="about.html" style="display:inline-flex;align-items:center;gap:8px;padding:11px 22px;background:var(--color-gold-accent);color:#000;font-weight:700;border-radius:8px;text-decoration:none;font-size:14px;align-self:flex-start;">
+                <span id="about-learn-more">Learn More</span> <i class="fas fa-arrow-right" style="font-size:12px;"></i>
+            </a>
+        </div>
+
+        <!-- Copyright Footer -->
         <div style="margin-top: 32px; padding: 24px; text-align: center; border-top: 1px solid rgba(255,255,255,0.07);">
             <p style="margin: 0; color: var(--color-gold-accent, #C9A84C); font-weight: 600; letter-spacing: 0.3px; font-size: 14px;">
                 &copy; Copyright 2023. YLG Bullion And Futures Co., Ltd.
@@ -795,61 +1019,61 @@
                 'welcome-subtitle': 'Welcome to YLG Bullion International',
                 'about-title': 'About YLG Bullion',
                 'about-desc': 'YLG Bullion International is a globally renowned gold trading company providing excellent services to our clients.',
-                'history-header': 'Company History',
-                'h-1993-t': 'The Beginning — Yollin',
-                'h-1993-d': 'Founded as <strong style="color:#EDF0F7;">Yollin</strong>, a specialist precious metals company. A small team with a big vision — to build Thailand\'s most trusted name in bullion.',
-                'h-2003-t': 'Becoming YLG — Entering Gold',
-                'h-2003-d': 'Rebranded from Yollin to <strong style="color:var(--color-gold-accent);">YLG</strong>, and stepped into the gold market. A decade of metals expertise became the foundation for our ascent into Thailand\'s fastest-growing bullion business.',
-                'h-2009-t': 'Entering the Trading World',
-                'h-2009-d': 'Launched <strong style="color:#EDF0F7;">YLG Bullion and Futures</strong> — Thailand\'s SEC-licensed gold futures broker. Expanded from physical bullion into derivatives, equities, and global commodities trading.',
-                'h-2012-t': 'Going Global — Singapore',
-                'h-2012-d': 'Opened our first international branch in <strong style="color:#EDF0F7;">Singapore</strong> — Asia\'s financial hub. A decisive step in our global expansion, bringing YLG\'s expertise to investors across Southeast Asia and beyond.',
-                'license-main-title': 'YLG Bullion and Futures Co., Ltd.'
+                'about-learn-more': 'Learn More',
+                'dbl-goldtitle': 'Live Gold Price',
+                'dbl-accsummary': 'Account Summary',
+                'dbl-balance': 'Balance',
+                'dbl-pnl': 'Total P&L',
+                'dbl-trades': 'Trades',
+                'dbl-winrate': 'Win Rate',
+                'dbl-buy': 'BUY GOLD',
+                'dbl-sell': 'SELL GOLD',
+                'dbl-recent': 'Recent Trades',
+                'dbl-viewall': 'View All History →',
+                'dbl-ref-title': 'Invite Friends',
+                'dbl-ref-desc': 'Share your referral code and earn rewards',
+                'dbl-ref-share': 'Share'
             },
             mm: {
                 'welcome-title': 'ပင်မစာမျက်နှာ',
                 'welcome-subtitle': 'YLG Bullion International သို့ ကြိုဆိုပါသည်။',
                 'about-title': 'ကျွန်ုပ်တို့အကြောင်း',
                 'about-desc': 'YLG Bullion International Co., Ltd. သည် ကမ္ဘာလုံးဆိုင်ရာ စံနှုန်းမြင့် ရွှေထုတ်ကုန် ကုန်သွယ်ရေး ကုမ္ပဏီဖြစ်ပြီး သာယာကောင်းမွန်သော ဝန်ဆောင်မှုများကို ဖောက်သည်များအား ပေးဆောင်သည်။',
-                'history-header': 'ကုမ္ပဏီ သမိုင်း',
-                'h-1993-t': 'အစပြုခြင်း — Yollin',
-                'h-1993-d': '<strong style="color:#EDF0F7;">Yollin</strong> အမည်ဖြင့် အဖိုးတန်သတ္တု အထူးပြု ကုမ္ပဏီအဖြစ် စတင်တည်ထောင်ခဲ့သည်။ အစိတ်အပိုင်းငယ် အဖွဲ့နှင့် ကြီးမားသော အမြင်ဖြင့် — ထိုင်းနိုင်ငံ၏ ယုံကြည်စိတ်ချရဆုံး ရွှေတုံး ကုန်သွယ်မှု အမည်ကို တည်ဆောက်ရန် ရည်ရွယ်ခဲ့သည်။',
-                'h-2003-t': 'YLG သို့ ပြောင်းလဲ — ရွှေဈေးကွက်သို့',
-                'h-2003-d': 'Yollin ကနေ <strong style="color:var(--color-gold-accent);">YLG</strong> သို့ ပြောင်းလဲခဲ့ပြီး ရွှေဈေးကွက်ထဲသို့ ဝင်ရောက်လာခဲ့သည်။ ဆယ်စုနှစ်တစ်ခုတာ သတ္တုကုန်သွယ်ရေး အတွေ့အကြုံသည် ထိုင်းနိုင်ငံ၏ အလျင်မြန်ဆုံး ကြီးထွားလာသော ရွှေတုံးလုပ်ငန်း ၏ အခြေခံ ဖြစ်လာခဲ့သည်။',
-                'h-2009-t': 'ကုန်သွယ်မှု လောကထဲသို့ ဝင်ရောက်ခြင်း',
-                'h-2009-d': '<strong style="color:#EDF0F7;">YLG Bullion and Futures</strong> ကို စတင်တည်ထောင်ခဲ့သည် — ထိုင်းနိုင်ငံ SEC လိုင်စင်ရ ရွှေ Futures ဘရော်ကာ။ ရုပ်ပိုင်းဆိုင်ရာ ရွှေတုံးများမှ derivatives၊ equities နှင့် ကမ္ဘာလုံးဆိုင်ရာ ကုန်စည်ကုန်သွယ်ရေး သို့ တိုးချဲ့ခဲ့သည်။',
-                'h-2012-t': 'ကမ္ဘာလုံး ရောက် — စင်ကာပူ',
-                'h-2012-d': 'အာရှ၏ ငွေကြေးဗဟို — <strong style="color:#EDF0F7;">စင်ကာပူ</strong> တွင် ပထမဆုံး နိုင်ငံတကာ ရုံးခွဲကို ဖွင့်လှစ်ခဲ့သည်။ YLG ၏ ကျွမ်းကျင်မှုကို အရှေ့တောင်အာရှနှင့် ထို့ထက်ပိုသော ဒေသများရှိ ရင်းနှီးမြှုပ်နှံသူများသို့ ရောက်ရှိစေရန် ကမ္ဘာလုံးဆိုင်ရာ တိုးချဲ့မှု ၏ အရေးပါသော ခြေလှမ်း တစ်ခု ဖြစ်ခဲ့သည်။',
-                'license-main-title': 'YLG Bullion နှင့် Futures Co., Ltd.'
+                'about-learn-more': 'ပိုမိုသိရှိရန်',
+                'dbl-goldtitle': 'ရွှေဈေးနှုန်း',
+                'dbl-accsummary': 'အကောင့်အကျဉ်းချုပ်',
+                'dbl-balance': 'လက်ကျန်ငွေ',
+                'dbl-pnl': 'အမြတ်/အရှုံး',
+                'dbl-trades': 'ကုန်သွယ်မှု',
+                'dbl-winrate': 'အနိုင်နှုန်း',
+                'dbl-buy': 'ရွှေဝယ်',
+                'dbl-sell': 'ရွှေရောင်း',
+                'dbl-recent': 'မကြာသေးမီ ကုန်သွယ်မှုများ',
+                'dbl-viewall': 'အားလုံးကြည့်ရန် →',
+                'dbl-ref-title': 'သူငယ်ချင်းများ ဖိတ်ကြားပါ',
+                'dbl-ref-desc': 'Referral code မျှဝေပြီး ဆုလာဘ်ရယူပါ',
+                'dbl-ref-share': 'မျှဝေ'
             },
             th: {
                 'welcome-title': 'แดชบอร์ด',
                 'welcome-subtitle': 'ยินดีต้อนรับสู่ YLG Bullion International',
                 'about-title': 'เกี่ยวกับเรา',
                 'about-desc': 'YLG Bullion International Co., Ltd. เป็นบริษัทเทรดทองคำมาตรฐานสากล ให้บริการที่ปลอดภัยและเชื่อถือได้แก่ลูกค้าของเรา.',
-                'history-header': 'ประวัติบริษัท',
-                'h-1993-t': 'จุดเริ่มต้น — Yollin',
-                'h-1993-d': 'ก่อตั้งในชื่อ <strong style="color:#EDF0F7;">Yollin</strong> บริษัทผู้เชี่ยวชาญด้านโลหะมีค่า ด้วยทีมเล็กๆ และวิสัยทัศน์ยิ่งใหญ่ — มุ่งสร้างชื่อเสียงด้านทองคำที่น่าเชื่อถือที่สุดในประเทศไทย',
-                'h-2003-t': 'เปลี่ยนเป็น YLG — ก้าวสู่ตลาดทองคำ',
-                'h-2003-d': 'เปลี่ยนชื่อจาก Yollin เป็น <strong style="color:var(--color-gold-accent);">YLG</strong> และก้าวเข้าสู่ตลาดทองคำอย่างเต็มตัว ประสบการณ์ด้านโลหะมีค่ากว่าทศวรรษกลายเป็นรากฐานของธุรกิจทองคำที่เติบโตเร็วที่สุดในไทย',
-                'h-2009-t': 'ก้าวสู่โลกการเทรด',
-                'h-2009-d': 'เปิดตัว <strong style="color:#EDF0F7;">YLG Bullion and Futures</strong> — โบรกเกอร์ทองคำฟิวเจอร์สที่ได้รับใบอนุญาตจาก ก.ล.ต. ไทย ขยายจากทองคำแท่งสู่ตราสารอนุพันธ์ หุ้น และสินค้าโภคภัณฑ์ระดับโลก',
-                'h-2012-t': 'ศูนย์กลางสิงคโปร์',
-                'h-2012-d': 'เปิดสำนักงานสิงคโปร์เพื่อเสริมความแข็งแกร่งในตลาดทองคำระดับโลก.',
-                'license-main-title': 'บริษัท YLG Bullion and Futures จำกัด'
+                'about-learn-more': 'เรียนรู้เพิ่มเติม',
+                'dbl-goldtitle': 'ราคาทองคำสด',
+                'dbl-accsummary': 'สรุปบัญชี',
+                'dbl-balance': 'ยอดคงเหลือ',
+                'dbl-pnl': 'กำไร/ขาดทุน',
+                'dbl-trades': 'การเทรด',
+                'dbl-winrate': 'อัตราชนะ',
+                'dbl-buy': 'ซื้อทอง',
+                'dbl-sell': 'ขายทอง',
+                'dbl-recent': 'การเทรดล่าสุด',
+                'dbl-viewall': 'ดูประวัติทั้งหมด →',
+                'dbl-ref-title': 'เชิญเพื่อน',
+                'dbl-ref-desc': 'แชร์รหัสแนะนำของคุณและรับรางวัล',
+                'dbl-ref-share': 'แชร์'
             }
-        };
-
-        const licenseDescriptions = {
-            en: `<p>YLG Bullion and Futures was established in 2009 as a broker for gold futures trading. The company holds a Full License, covering a wide range of products such as Precious Metals (Gold Online Futures, Gold Futures), Equity (SET50 Futures, Single Stock Futures), as well as Currencies and Agricultures.</p>
-                 <p>YLG is certified by the Securities and Exchange Commission (SEC) and is a member of the Gold Traders Association. It operates in compliance with the Derivatives Act B.E. 2546 (2003).</p>
-                 <p>In 2022, YLG expanded its market reach to Global Markets, offering world-class products such as COMEX, NYMEX, and S&P Dow Jones. Investors can trade 24/7 through leading platforms like CQG and MT5. Additionally, YLG became the first in Thailand to provide investor trading via TradingView, reaffirming its leadership in the Futures market both domestically and globally.</p>`,
-            mm: `<p>YLG Bullion and Futures သည် ၂၀၀၉ ခုနှစ်တွင် ရွှေ ဖျူးချန် ကုန်သွယ်ရေး ကုမ္ပဏီအဖြစ် စတင်တည်ထောင်ခဲ့ပြီး အရည်အသွေးမြင့် ဝန်ဆောင်မှုများကို ပေးဆောင်သည်။</p>
-                 <p>SEC မှ အတည်ပြုထားပြီး Gold Traders Association ၏ အဖွဲ့ဝင်ဖြစ်ပါသည်။</p>
-                 <p>၂၀၂၂ ခုနှစ်တွင် ကမ္ဘာ့စျေးကွက်သို့ ချဲ့ဖြန့်ပြီး COMEX, NYMEX သို့မဟုတ် S&P Dow Jones ကဲ့သို့ ကမ္ဘာမှ ရှေ့တန်းတကျ ထုတ်ကုန်များကို ပေးဆောင်သည်။ ရင်းနှီးမြုပ်နှံသူများသည် CQG နှင့် MT5 ကဲ့သို့ အင်္ဂါရပ် ပလက်ဖောင်းများမှတစ်ဆင့် နေ့စဉ် ၂၄ ယ ကုန်သွယ်ခွင့်ရှိသည်။</p>`,
-            th: `<p>YLG Bullion and Futures ก่อตั้งในปี 2009 ในฐานะผู้ให้บริการซื้อขายทองคำฟิวเจอร์ส โดยมีใบอนุญาตเต็มรูปแบบ ครอบคลุมผลิตภัณฑ์ทั้งทองคำออนไลน์ฟิวเจอร์ส ทองคำฟิวเจอร์ส SET50 Futures Single Stock Futures อัตราแลกเปลี่ยน และสินค้าเกษตร.</p>
-                 <p>YLG ได้รับการรับรองจากคณะกรรมการกำกับหลักทรัพย์และตลาดหลักทรัพย์ (ก.ล.ต.) และดำเนินงานตามพระราชบัญญัติว่าด้วยตลาดล่วงหน้า พ.ศ. 2546.</p>
-                 <p>ในปี 2022 YLG ขยายสู่ตลาดโลก โดยให้บริการผลิตภัณฑ์ระดับสากล เช่น COMEX, NYMEX และ S&P Dow Jones นักลงทุนสามารถซื้อขายได้ 24 ชั่วโมงผ่านแพลตฟอร์มชั้นนำอย่าง CQG และ MT5 พร้อมการใช้งาน TradingView ในประเทศไทย.</p>`
         };
 
         function toggleSidebarLang() {
@@ -899,13 +1123,8 @@
                 }
             });
 
-            // Apply license description
-            const licenseDesc = document.getElementById('license-full-desc');
-            if (licenseDesc && licenseDescriptions[lang]) {
-                licenseDesc.innerHTML = licenseDescriptions[lang];
-            }
 
-            // Update nav items
+            // Update sidebar nav items
             const navTexts = {
                 en: ['Dashboard', 'Trading', 'Portfolio', 'History', 'Wallet', 'KYC', 'Live Support'],
                 mm: ['ပင်မစာမျက်နှာ', 'ရွှေရောင်းဝယ်မှု', 'ပိုင်ဆိုင်မှုစာရင်း', 'မှတ်တမ်း', 'ကျွန်ုပ်၏ ပိုက်ဆံအိတ်', 'KYC စစ်ဆေးခြင်း', 'တိုက်ရိုက် အထောက်အပံ့'],
@@ -918,6 +1137,7 @@
                     item.innerText = navTexts[lang][idx];
                 }
             });
+
         }
 
         // Initialize language
@@ -929,7 +1149,8 @@
 
     <script type="module">
         import { app, auth, db } from './firebase-init.js';
-                import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { doc, getDoc, collection, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const authButtons = document.getElementById('auth-buttons');
         const loggedInBox = document.getElementById('logged-in-box');
@@ -940,18 +1161,131 @@
             if (user) {
                 const name = localStorage.getItem('userName') || user.displayName || user.email?.split('@')[0] || 'Member';
                 if (authButtons) authButtons.style.display = 'none';
-                if (loggedInBox) {
-                    loggedInBox.style.display = 'block';
-                    if (loggedInName) loggedInName.innerText = name;
+                if (loggedInBox) { loggedInBox.style.display = 'block'; if (loggedInName) loggedInName.innerText = name; }
+                const mobileUID = document.getElementById('mobile-uid-text');
+                if (mobileUID) {
+                    const shortUID = user.uid ? user.uid.slice(0, 8).toUpperCase() : '—';
+                    mobileUID.textContent = 'UID: ' + shortUID;
+                    localStorage.setItem('userShortUID', shortUID);
                 }
             } else {
                 if (authButtons) authButtons.style.display = 'block';
                 if (loggedInBox) loggedInBox.style.display = 'none';
+                const mobileUID = document.getElementById('mobile-uid-text');
+                if (mobileUID) mobileUID.textContent = 'UID: —';
+                hideDashWidgets();
             }
+        }
+
+        function hideDashWidgets() {
+            ['db-account-card','db-recent-card','db-referral-card'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.style.display = 'none';
+            });
+        }
+
+        async function loadDashData(user) {
+            // Show logged-in widgets
+            const accCard = document.getElementById('db-account-card');
+            const recCard = document.getElementById('db-recent-card');
+            const refCard = document.getElementById('db-referral-card');
+            if (accCard) accCard.style.display = '';
+            if (recCard) recCard.style.display = '';
+            if (refCard) refCard.style.display = '';
+
+            // Referral code = first 8 chars of UID
+            const refCode = user.uid.slice(0, 8).toUpperCase();
+            window._ylgRefCode = refCode;
+            const refEl = document.getElementById('db-ref-code');
+            if (refEl) refEl.textContent = refCode;
+
+            // ── User document: balance, depositBalance, profit ──
+            try {
+                const userSnap = await getDoc(doc(db, 'users', user.uid));
+                if (userSnap.exists()) {
+                    const d = userSnap.data();
+                    const bal = typeof d.balance === 'number' ? d.balance : 0;
+                    const balEl = document.getElementById('dbs-balance');
+                    if (balEl) balEl.textContent = '$' + bal.toFixed(2);
+                }
+            } catch(e) { console.warn('User doc error:', e); }
+
+            // ── Trades subcollection ──
+            // Fields: result("WIN"/"LOSS"), payout(number), amount(number),
+            //         type(string), pair(string), timestamp(Firestore Timestamp), date(string)
+            try {
+                const q = query(
+                    collection(db, 'users', user.uid, 'trades'),
+                    orderBy('timestamp', 'desc'),
+                    limit(50)
+                );
+                const snap = await getDocs(q);
+                let totalPnl = 0, wins = 0, total = 0, recentHTML = '';
+
+                snap.forEach((tdoc, idx) => {
+                    const t = tdoc.data();
+                    const isWin = (t.result || '').toUpperCase() === 'WIN';
+                    const amount = Number(t.amount || 0);
+                    const payout = Number(t.payout || 0);
+                    // Net P&L: WIN = payout - amount, LOSS = -amount
+                    const pnl = isWin ? (payout - amount) : -amount;
+
+                    totalPnl += pnl;
+                    total++;
+                    if (isWin) wins++;
+
+                    // Recent trades: show top 3
+                    if (idx < 3) {
+                        let dateStr = '—';
+                        if (t.timestamp && typeof t.timestamp.toDate === 'function') {
+                            dateStr = t.timestamp.toDate().toLocaleDateString();
+                        } else if (t.date) {
+                            dateStr = t.date;
+                        }
+                        const type = (t.type || 'BUY').toUpperCase();
+                        const isBuy = type === 'BUY';
+                        const pnlColor = pnl >= 0 ? '#00B050' : '#FF6B6B';
+                        const pnlStr  = (pnl >= 0 ? '+$' : '-$') + Math.abs(pnl).toFixed(2);
+                        recentHTML += `<div class="db-trade-item">
+                            <span class="db-trade-type ${isBuy ? 'db-t-buy' : 'db-t-sell'}">
+                                <i class="fas ${isBuy ? 'fa-arrow-trend-up' : 'fa-arrow-trend-down'}"></i> ${type}
+                            </span>
+                            <div class="db-trade-info">
+                                <div class="db-trade-pair">${t.pair || 'XAU/USD'}</div>
+                                <div class="db-trade-date">${dateStr}</div>
+                            </div>
+                            <div class="db-trade-pnl" style="color:${pnlColor};">${pnlStr}</div>
+                        </div>`;
+                    }
+                });
+
+                // Recent list
+                const listEl = document.getElementById('db-recent-list');
+                if (listEl) {
+                    listEl.innerHTML = recentHTML ||
+                        '<div style="text-align:center;color:#7A8196;padding:20px;font-size:13px;">No trades yet</div>';
+                }
+
+                // Stats
+                const winRate = total > 0 ? Math.round((wins / total) * 100) : 0;
+                const pnlEl = document.getElementById('dbs-pnl');
+                const trEl  = document.getElementById('dbs-trades');
+                const wrEl  = document.getElementById('dbs-winrate');
+                if (pnlEl) {
+                    pnlEl.textContent = (totalPnl >= 0 ? '+$' : '-$') + Math.abs(totalPnl).toFixed(2);
+                    pnlEl.style.color = totalPnl >= 0 ? '#00B050' : '#FF6B6B';
+                }
+                if (trEl)  trEl.textContent = total;
+                if (wrEl)  {
+                    wrEl.textContent = winRate + '%';
+                    wrEl.style.color = winRate >= 50 ? '#00B050' : '#FF6B6B';
+                }
+            } catch(e) { console.warn('Trades error:', e); }
         }
 
         onAuthStateChanged(auth, (user) => {
             showAuthState(user);
+            if (user) loadDashData(user);
         });
 
         if (logoutBtn) {
@@ -960,9 +1294,7 @@
                     localStorage.removeItem('userEmail');
                     localStorage.removeItem('userName');
                     window.location.href = 'index.html';
-                }).catch((error) => {
-                    console.error('Logout failed', error);
-                });
+                }).catch((error) => { console.error('Logout failed', error); });
             };
         }
     </script>
@@ -996,5 +1328,7 @@
 })();
 </script>
 
+<script src="mobile-nav.js"></script>
+<script src="sidebar-user.js"></script>
 </body>
 </html>

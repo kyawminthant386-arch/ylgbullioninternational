@@ -4,8 +4,8 @@
   <link rel="icon" type="image/png" href="favicon.png">
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Register — YLG Bullion</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <title>YLG Bullion</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Noto+Sans+Myanmar:wght@400;700&family=Noto+Sans+Thai:wght@400;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
       <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -36,7 +36,27 @@
     .small{font-size:12px;color:var(--muted)}
     .error{margin-top:10px;padding:10px;background:#3a1b1b;color:#ffd3d3;border-radius:8px;display:none}
     .debug{margin-top:10px;padding:10px;background:#071017;color:#9fefff;border-radius:8px;white-space:pre-wrap;display:none;font-size:13px}
-    .inline-row{display:flex;gap:10px;align-items:center}
+    .inline-row{display:flex;gap:8px;align-items:center;cursor:pointer}
+    input[type="checkbox"]{
+        appearance:none!important;-webkit-appearance:none!important;
+        width:15px!important;height:15px!important;
+        min-width:15px!important;max-width:15px!important;
+        min-height:15px!important;max-height:15px!important;
+        padding:0!important;margin:0!important;
+        box-sizing:border-box!important;
+        border:1.5px solid #555!important;border-radius:3px!important;
+        background:#1a1a1a!important;cursor:pointer;
+        transition:border-color 0.2s,background 0.2s;
+        position:relative;flex-shrink:0;display:inline-block!important;
+    }
+    input[type="checkbox"]:checked{
+        background:var(--accent)!important;border-color:var(--accent)!important;
+    }
+    input[type="checkbox"]:checked::after{
+        content:'✓';position:absolute;
+        font-size:10px;font-weight:800;color:#000;line-height:1;
+        top:50%;left:50%;transform:translate(-50%,-50%);
+    }
   </style>
 </head>
 <body>
@@ -78,7 +98,7 @@
         </div>
       </div>
 
-      <p style="margin-top:12px"><label class="inline-row"><input id="terms" type="checkbox" /> <span id="labelTerms" class="small">I agree to Terms and Privacy</span></label></p>
+      <p style="margin-top:12px"><label class="inline-row"><input id="terms" type="checkbox" /> <span id="labelTerms" class="small">I agree to the <a href="terms.html" target="_blank" style="color:var(--accent);text-decoration:underline;">Terms &amp; Conditions</a></span></label></p>
 
       <div class="actions">
         <button id="submitBtn" class="primary" type="submit"><i class="fa-solid fa-user-plus" style="margin-right:8px"></i> <span id="btnText">Register</span></button>
@@ -280,8 +300,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Register — YLG Bullion</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <title>YLG Bullion</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
     :root{--card:#141516;--accent:#FFD700;--muted:#9aa0a6;--input:#1e1e1e;--primary:#3498db}
@@ -364,8 +384,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YLG Bullion - Register</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <title>YLG Bullion</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Myanmar:wght@400;700&family=Noto+Sans+Thai:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     

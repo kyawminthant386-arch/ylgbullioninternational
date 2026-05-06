@@ -4,8 +4,8 @@
     <link rel="icon" type="image/png" href="favicon.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YLG - Withdrawal</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <title>YLG Bullion</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="dashboard-styles.css">
@@ -33,7 +33,7 @@
 
         /* Sidebar */
         .sidebar {
-            width: 240px;
+            width: 260px;
             height: 100vh;
             background: var(--card);
             position: fixed;
@@ -84,9 +84,9 @@
 
         /* Main */
         .main-content {
-            margin-left: 240px;
+            margin-left: 260px;
             padding: 32px 36px;
-            width: calc(100% - 240px);
+            width: calc(100% - 260px);
             min-height: 100vh;
         }
 
@@ -307,6 +307,10 @@
                 <i class="fas fa-paper-plane"></i> Submit Withdrawal Request
             </button>
 
+            <div id="pin-notice" style="display:none;background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.2);border-radius:8px;padding:10px 14px;font-size:12px;color:#C9A84C;margin-bottom:12px;">
+                <i class="fas fa-key" style="margin-right:6px;"></i>Withdrawal PIN is required. <a href="portfolio.html" style="color:#C9A84C;text-decoration:underline;">Set or change PIN</a>
+            </div>
+
             <div class="warning-box">
                 <i class="fas fa-info-circle"></i>
                 Minimum withdrawal: <strong>$10</strong>.
@@ -345,6 +349,7 @@
                 return;
             }
 
+            localStorage.setItem('userShortUID', user.uid.slice(0, 8).toUpperCase());
             currentUser = user;
             document.getElementById('user-display').innerText = user.email;
 
@@ -356,6 +361,9 @@
                     currentBalance = data.balance || 0;
                     document.getElementById('balance-display').innerText =
                         "$ " + currentBalance.toLocaleString(undefined, { minimumFractionDigits: 2 });
+                    if (data.withdrawPin) {
+                        document.getElementById('pin-notice').style.display = 'block';
+                    }
                 }
             } catch (e) {
                 console.error("Balance fetch error:", e);
@@ -401,6 +409,36 @@
             });
 
             if (!confirm.isConfirmed) return;
+
+            // ── Check if user has a withdrawal PIN ──
+            const userSnap = await getDoc(doc(db, "users", currentUser.uid));
+            const savedPin = userSnap.exists() ? userSnap.data().withdrawPin : null;
+
+            if (savedPin) {
+                const { value: enteredPin, isConfirmed: pinOk } = await Swal.fire({
+                    title: 'Enter Withdrawal PIN',
+                    html: `<p style="font-size:13px;color:#aaa;margin-bottom:12px;">Enter your 4-digit withdrawal PIN to continue.</p>
+                           <input id="swal-wd-pin" type="password" inputmode="numeric" maxlength="4"
+                             placeholder="• • • •"
+                             style="width:100%;padding:14px;font-size:24px;letter-spacing:12px;text-align:center;
+                                    background:#222;border:1px solid #444;color:#fff;border-radius:8px;font-family:monospace;">`,
+                    showCancelButton: true,
+                    confirmButtonColor: '#FFD700',
+                    confirmButtonText: 'Verify',
+                    background: '#1a1a1a',
+                    color: '#fff',
+                    focusConfirm: false,
+                    preConfirm: () => {
+                        const v = document.getElementById('swal-wd-pin').value;
+                        if (v !== savedPin) {
+                            Swal.showValidationMessage('Incorrect PIN. Please try again.');
+                            return false;
+                        }
+                        return v;
+                    }
+                });
+                if (!pinOk) return;
+            }
 
             // ── Disable button + spinner ──
             const btn = document.getElementById('wdBtn');
@@ -500,5 +538,7 @@
 })();
 </script>
 
+<script src="mobile-nav.js"></script>
+<script src="sidebar-user.js"></script>
 </body>
 </html>

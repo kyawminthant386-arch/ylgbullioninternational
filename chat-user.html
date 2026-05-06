@@ -4,8 +4,8 @@
     <link rel="icon" type="image/png" href="favicon.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YLG Bullion — Live Support</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <title>YLG Bullion</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Myanmar:wght@400;700&family=Noto+Sans+Thai:wght@400;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="dashboard-styles.css">
     <link rel="stylesheet" href="mobile-responsive.css">
@@ -18,7 +18,7 @@
             --gold:var(--color-gold-accent);--bg:var(--color-dark-bg);--card:var(--color-medium-dark);
             --text:var(--color-text-light);--muted:var(--color-text-fade);--green:var(--color-positive);
             --border:rgba(255,255,255,0.07);--border-gold:rgba(201,168,76,0.28);
-            --gold-dim:rgba(201,168,76,0.12);--sidebar-width:240px;
+            --gold-dim:rgba(201,168,76,0.12);--sidebar-width:260px;
         }
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
         body{font-family:'Outfit','Noto Sans Myanmar','Noto Sans Thai',system-ui,sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh;-webkit-font-smoothing:antialiased}
@@ -84,11 +84,8 @@
         #send-btn:disabled{opacity:0.4;cursor:not-allowed;transform:none}
         @media(max-width:768px){
             body{flex-direction:column}
-            .sidebar{position:relative;width:100%;min-height:auto;border-right:none;border-bottom:1px solid var(--border)}
-            .sidebar-nav{flex-direction:row;flex-wrap:wrap;padding:6px 8px;gap:2px}
-            .sidebar-nav .nav-item{padding:8px 11px;font-size:11px;border-left:none;border-bottom:2px solid transparent}
-            .sidebar-nav .nav-item.active{border-left:none;border-bottom-color:var(--gold)}
-            .main-content{margin-left:0;width:100%;height:calc(100vh - 130px)}
+            .sidebar{display:none!important}
+            .main-content{margin-left:0!important;width:100%!important;height:100dvh;overflow:hidden}
             .chat-messages{padding:12px 14px}
             .message{max-width:88%;font-size:13px}
             .main-header{padding:14px 16px}
@@ -181,7 +178,7 @@
 
     window.applyChatLanguage = function(lang) {
         const texts = langTexts[lang] || langTexts.en;
-        document.title = texts.pageTitle;
+        // title stays YLG Bullion
         const h = document.getElementById('page-heading'); if(h) h.innerText = texts.pageHeading;
         const s = document.getElementById('page-subtitle'); if(s) s.innerText = texts.subtitle;
         const n = document.getElementById('chat-header-name'); if(n) n.innerHTML = `${texts.supportLabel} <span style="font-size:10px;background:var(--gold-dim);color:var(--gold);padding:2px 8px;border-radius:99px;font-weight:600;">YLG</span>`;
@@ -251,6 +248,7 @@
     onAuthStateChanged(auth, async (user) => {
         const lang = localStorage.getItem('selectedLang')||'en';
         if (user) {
+            localStorage.setItem('userShortUID', user.uid.slice(0, 8).toUpperCase());
             currentUserId=user.uid; currentUserEmail=user.email||'User';
             const name = localStorage.getItem('userName')||currentUserEmail.split('@')[0];
             document.getElementById('sidebar-logged-out').style.display='none';
@@ -311,5 +309,7 @@
 })();
 </script>
 
+<script src="mobile-nav.js"></script>
+<script src="sidebar-user.js"></script>
 </body>
 </html>

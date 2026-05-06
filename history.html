@@ -4,8 +4,8 @@
     <link rel="icon" type="image/png" href="favicon.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trade History - YLG Bullion</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <title>YLG Bullion</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
         <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="dashboard-styles.css">
     <link rel="stylesheet" href="theme.css">
@@ -276,6 +276,7 @@
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
+                localStorage.setItem('userShortUID', user.uid.slice(0, 8).toUpperCase());
                 const fullName = localStorage.getItem('userName') || user.displayName || 'Member';
                 document.getElementById('head-user-display').innerText = "Account: " + fullName;
 
@@ -310,6 +311,7 @@
                     });
 
                     // Display statistics
+                    const winRate = totalTrades > 0 ? Math.round((totalWins / totalTrades) * 100) : 0;
                     statsDiv.innerHTML = `
                         <div class="stat-item">
                             <i class="fas fa-chart-bar"></i>
@@ -322,6 +324,10 @@
                         <div class="stat-item">
                             <i class="fas fa-times-circle" style="color: #FF6B6B;"></i>
                             <span>Losses: <span class="stat-value">${totalLosses}</span></span>
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-percentage" style="color: #FFD700;"></i>
+                            <span>Win Rate: <span class="stat-value" style="color: ${winRate >= 50 ? '#00B050' : '#FF6B6B'};">${winRate}%</span></span>
                         </div>
                         <div class="stat-item">
                             <i class="fas fa-coins" style="color: ${totalProfit >= 0 ? '#00B050' : '#FF6B6B'};"></i>
@@ -407,5 +413,7 @@
 })();
 </script>
 
+<script src="mobile-nav.js"></script>
+<script src="sidebar-user.js"></script>
 </body>
 </html>

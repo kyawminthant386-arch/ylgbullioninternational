@@ -4,8 +4,8 @@
     <link rel="icon" type="image/png" href="favicon.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Wallet - YLG Bullion</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <title>YLG Bullion</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Myanmar:wght@400;700&family=Noto+Sans+Thai:wght@400;700&display=swap" rel="stylesheet">
     
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -258,6 +258,15 @@
             <input type="text" id="bank-acc" placeholder="Account Number">
             <input type="text" id="bank-user" placeholder="Account Name">
             <input type="number" id="with-amount-input" placeholder="Amount ($)">
+            <div id="pin-field-row" style="display:none;">
+                <div style="display:flex;align-items:center;gap:6px;margin:10px 0 4px;">
+                    <i class="fas fa-key" style="color:#C9A84C;font-size:12px;"></i>
+                    <label style="font-size:12px;color:#aaa;margin:0;">Withdrawal PIN</label>
+                </div>
+                <input type="password" id="withdraw-pin-input" inputmode="numeric" maxlength="4"
+                    placeholder="Enter 4-digit PIN"
+                    style="letter-spacing:6px;font-size:18px;text-align:center;">
+            </div>
             <div class="modal-btns">
                 <button class="btn-cancel" onclick="closeModal()">Cancel</button>
                 <button class="btn-confirm" onclick="submitWithdraw()">Confirm</button>
@@ -286,6 +295,7 @@
         // --- Auth & Profile Logic ---
         onAuthStateChanged(auth, (user) => {
             if (user) {
+                localStorage.setItem('userShortUID', user.uid.slice(0, 8).toUpperCase());
                 currentUid = user.uid;
                 currentUserEmail = user.email;
 
@@ -362,12 +372,18 @@
         // --- Transaction Logic ---
         window.requestTransaction = async function(type) {
             if (type === 'WITHDRAW') {
-                // Check if user account is frozen
                 const userDoc = await getDoc(doc(db, "users", auth.currentUser.uid));
                 const userData = userDoc.exists() ? userDoc.data() : {};
                 if (userData.frozen) {
                     Swal.fire({ icon: 'error', title: 'Account Frozen', text: 'Your account has been frozen. Please contact support.', background: '#1a1a1a', color: '#fff' });
                     return;
+                }
+                // Show PIN field only if user has set a PIN
+                const hasPIN = !!userData.withdrawPin;
+                document.getElementById('pin-field-row').style.display = hasPIN ? 'block' : 'none';
+                if (document.getElementById('withdraw-pin-input')) {
+                    document.getElementById('withdraw-pin-input').value = '';
+                    document.getElementById('withdraw-pin-input').dataset.savedPin = hasPIN ? userData.withdrawPin : '';
                 }
                 document.getElementById('withdrawModal').style.display = 'flex';
             }
@@ -397,6 +413,21 @@
 
             const details = `Bank: ${bank}, Acc: ${acc}, Name: ${user}`;
             
+
+            // Withdrawal PIN check (field is inside modal)
+            const pinInput = document.getElementById("withdraw-pin-input");
+            const savedPin = pinInput ? pinInput.dataset.savedPin : "";
+            if (savedPin) {
+                if (pinInput.value !== savedPin) {
+                    pinInput.style.borderColor = "#FF6B6B";
+                    pinInput.placeholder = "Incorrect PIN — try again";
+                    pinInput.value = "";
+                    setTimeout(() => { pinInput.style.borderColor = ""; pinInput.placeholder = "Enter 4-digit PIN"; }, 2000);
+                    return;
+                }
+            }
+
+
             try {
                 // [PROMPT FIX 2]: á€„á€½á€±á€•á€™á€¬á€á€€á€­á€¯ Database á€‘á€²á€™á€¾ á€á€…á€ºá€á€«á€á€Šá€ºá€¸ á€”á€¾á€¯á€á€ºá€šá€°á€á€¼á€„á€ºá€¸ (Auto-deduct)
                 const userRef = doc(db, "users", currentUid);
@@ -583,5 +614,7 @@
 })();
 </script>
 
+<script src="mobile-nav.js"></script>
+<script src="sidebar-user.js"></script>
 </body>
 </html>
