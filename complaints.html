@@ -1,8 +1,15 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="my">
 <head>
-    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png"><link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
     <meta charset="UTF-8">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#FFD700">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="YLG Bullion">
+    <link rel="apple-touch-icon" sizes="192x192" href="/icon-192.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>YLG Bullion</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
@@ -169,19 +176,19 @@
         .btn-submit {
             width: 100%;
             padding: 15px;
-            background: #1a3a6b;
-            color: #fff;
+            background: linear-gradient(135deg, #C9A84C, #FFD700);
+            color: #000;
             border: none;
-            border-radius: 10px;
+            border-radius: 12px;
             font-size: 15px;
             font-weight: 700;
             cursor: pointer;
             font-family: inherit;
-            transition: background 0.2s, transform 0.15s;
+            transition: opacity 0.2s, transform 0.15s;
             margin-top: 6px;
             display: flex; align-items: center; justify-content: center; gap: 8px;
         }
-        .btn-submit:hover { background: #22479e; transform: translateY(-1px); }
+        .btn-submit:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: 0 4px 20px rgba(201,168,76,0.35); }
         .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
         .spinner-sm {
@@ -202,6 +209,8 @@
             .form-body { padding: 20px; }
         }
     </style>
+<script src="/pwa-register.js" defer></script>
+    <link rel="stylesheet" href="/skeleton.css">
 </head>
 <body>
 
@@ -361,7 +370,9 @@
                 Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to submit. Please try again.', background: '#1a1a1a', color: '#fff' });
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit';
+                const submitLang = localStorage.getItem('selectedLang') || 'en';
+                const submitLabel = {en:'Submit', mm:'တင်သွင်းမည်', th:'ส่งคำร้อง'};
+                btn.innerHTML = `<i class="fas fa-paper-plane"></i> ${submitLabel[submitLang] || 'Submit'}`;
             }
         };
     </script>
@@ -460,5 +471,10 @@
 
     <script src="mobile-nav.js"></script>
     <script src="sidebar-user.js"></script>
+<script src="/toast.js"></script>
 </body>
 </html>
+
+
+
+

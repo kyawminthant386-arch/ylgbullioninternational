@@ -1,8 +1,15 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="my">
 <head>
-    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png"><link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
     <meta charset="UTF-8">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#FFD700">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="YLG Bullion">
+    <link rel="apple-touch-icon" sizes="192x192" href="/icon-192.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>YLG Bullion</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
@@ -241,6 +248,8 @@
         .logo-subtext   { font-size: 11px !important; font-weight: 700 !important; color: #fff !important; letter-spacing: 2px !important; display: block !important; margin-top: 2px !important; }
         .logo-company   { font-size: 9px !important; color: var(--muted, #7A8196) !important; display: block !important; margin-top: 3px !important; letter-spacing: 0.6px !important; }
     </style>
+<script src="/pwa-register.js" defer></script>
+    <link rel="stylesheet" href="/skeleton.css">
 </head>
 <body>
 
@@ -540,5 +549,11 @@
 
 <script src="mobile-nav.js"></script>
 <script src="sidebar-user.js"></script>
+<script src="/toast.js"></script>
+<script type="module" src="notifications-bell.js"></script>
 </body>
 </html>
+
+
+
+

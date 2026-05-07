@@ -1,8 +1,15 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
-	<link rel="icon" type="image/png" href="favicon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png"><link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 	<meta charset="utf-8" />
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#FFD700">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="YLG Bullion">
+    <link rel="apple-touch-icon" sizes="192x192" href="/icon-192.png">
 	<meta name="viewport" content="width=device-width,initial-scale=1" />
 	<title>YLG Bullion</title>
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
@@ -38,6 +45,8 @@
 		
 		@media (max-width:480px){.card{padding:18px;border-radius:10px}}
 	</style>
+<script src="/pwa-register.js" defer></script>
+    <link rel="stylesheet" href="/skeleton.css">
 </head>
 <body>
 	<main class="card" role="main">
@@ -91,6 +100,7 @@
 	<script type="module">
         import { app, auth, db } from './firebase-init.js';
 				import { signInWithEmailAndPassword, setPersistence, browserLocalPersistence } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { collection, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
 		// Firebase config (kept same)
 
@@ -147,6 +157,16 @@
 				const cred = await signInWithEmailAndPassword(auth, email, password);
 				localStorage.setItem('userEmail', email);
 				localStorage.setItem('userName', cred.user.displayName || email.split('@')[0]);
+				// Record login history
+				try {
+					const ua = navigator.userAgent;
+					const browser = ua.includes('Chrome') ? 'Chrome' : ua.includes('Firefox') ? 'Firefox' : ua.includes('Safari') ? 'Safari' : ua.includes('Edge') ? 'Edge' : 'Browser';
+					const os = ua.includes('Windows') ? 'Windows' : ua.includes('Mac') ? 'macOS' : ua.includes('Android') ? 'Android' : ua.includes('iPhone') || ua.includes('iPad') ? 'iOS' : 'Unknown';
+					await addDoc(collection(db, 'users', cred.user.uid, 'loginHistory'), {
+						at: serverTimestamp(), browser, os,
+						device: /Mobi|Android/i.test(ua) ? 'Mobile' : 'Desktop'
+					});
+				} catch(_) {}
 				// preserve language
 				await new Promise(r=>setTimeout(r,300));
 				window.location.replace('index.html');
@@ -225,5 +245,10 @@
 })();
 </script>
 
+<script src="/toast.js"></script>
 </body>
 </html>
+
+
+
+

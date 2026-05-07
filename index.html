@@ -1,13 +1,20 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="my">
 <head>
-    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png"><link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
     <meta property="og:type" content="website">
 <meta property="og:url" content="https://www.ylgbullion.asia/">
 <meta property="og:title" content="Dashboard - YLG Bullion">
 <meta property="og:description" content="YLG Bullion International သို့ ကြိုဆိုပါသည်။">
 <meta property="og:image" content="https://www.ylgbullion.asia/og-image.png">
     <meta charset="UTF-8">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#FFD700">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="YLG Bullion">
+    <link rel="apple-touch-icon" sizes="192x192" href="/icon-192.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>YLG Bullion</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
@@ -263,7 +270,7 @@
             .logo-company { font-size: 8px !important; }
 
             /* ── Language switcher — inline with logo ── */
-            #sidebar-lang-box,
+            .sidebar-lang-box,
             .sidebar > div:nth-child(2) {
                 padding: 8px 16px !important;
                 border-bottom: 1px solid rgba(255,255,255,0.07) !important;
@@ -481,6 +488,87 @@
             .logo-y-text { font-size: 15px !important; }
         }
 
+        /* ── Announcement Banner ── */
+        .announce-bar {
+            display: flex; align-items: center; gap: 12px;
+            background: linear-gradient(135deg, rgba(201,168,76,0.12), rgba(201,168,76,0.06));
+            border: 1px solid rgba(201,168,76,0.3);
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        .announce-bar i { color: var(--color-gold-accent,#C9A84C); font-size: 16px; flex-shrink: 0; }
+        .announce-bar span { font-size: 13px; color: #EDF0F7; flex: 1; line-height: 1.5; }
+        .announce-bar a { color: var(--color-gold-accent,#C9A84C); font-weight: 700; text-decoration: none; white-space: nowrap; }
+        .announce-close {
+            background: none; border: none; color: rgba(255,255,255,0.35);
+            cursor: pointer; font-size: 14px; padding: 2px 4px; flex-shrink: 0;
+            transition: color 0.15s;
+        }
+        .announce-close:hover { color: #fff; }
+
+        /* ── Page Footer ── */
+        .page-footer {
+            margin-top: 36px;
+            padding: 28px 0 20px;
+            border-top: 1px solid rgba(255,255,255,0.07);
+        }
+        .footer-brand {
+            display: flex; align-items: center; gap: 12px;
+            margin-bottom: 20px;
+        }
+        .footer-logo {
+            width: 36px; height: 36px; border-radius: 50%;
+            object-fit: cover; border: 1px solid rgba(201,168,76,0.35);
+            flex-shrink: 0;
+        }
+        .footer-brand-name {
+            font-size: 14px; font-weight: 800;
+            color: var(--color-gold-accent, #C9A84C); letter-spacing: 1px;
+        }
+        .footer-brand-sub {
+            font-size: 9px; color: rgba(255,255,255,0.3);
+            letter-spacing: 1px; margin-top: 2px;
+        }
+        .footer-links {
+            display: flex; flex-wrap: wrap; gap: 4px 0;
+            margin-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.06);
+            padding-bottom: 16px;
+        }
+        .footer-links a {
+            font-size: 12px; color: rgba(255,255,255,0.4);
+            text-decoration: none; padding: 4px 14px;
+            border-right: 1px solid rgba(255,255,255,0.1);
+            transition: color 0.18s;
+        }
+        .footer-links a:first-child { padding-left: 0; }
+        .footer-links a:last-child  { border-right: none; }
+        .footer-links a:hover { color: var(--color-gold-accent, #C9A84C); }
+        .footer-badges {
+            display: flex; flex-wrap: wrap; gap: 8px;
+            margin-bottom: 16px;
+        }
+        .footer-badge {
+            display: inline-flex; align-items: center; gap: 5px;
+            font-size: 10px; font-weight: 600; letter-spacing: 0.5px;
+            color: rgba(255,255,255,0.3);
+            padding: 4px 10px;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 999px;
+        }
+        .footer-badge i { font-size: 9px; color: var(--color-gold-accent, #C9A84C); }
+        .footer-divider { display: none; }
+        .footer-bottom { text-align: center; }
+        .footer-copy {
+            margin: 0 0 4px;
+            font-size: 11px; color: rgba(255,255,255,0.25);
+        }
+        .footer-note {
+            margin: 0;
+            font-size: 10px; color: rgba(255,255,255,0.15);
+        }
+
         /* ── LANDSCAPE PHONES ── */
         @media (max-width: 768px) and (orientation: landscape) {
             .sidebar {
@@ -503,6 +591,8 @@
 
 </style>
     <link rel="stylesheet" href="mobile-responsive.css">
+<script src="/pwa-register.js" defer></script>
+    <link rel="stylesheet" href="/skeleton.css">
 </head>
 
 <body>
@@ -583,6 +673,14 @@
                 <p id="welcome-subtitle" style="color: var(--color-text-fade); margin: 0;">Welcome to YLG Bullion International</p>
             </div>
         </header>
+
+        <!-- ── Announcement Banner ── -->
+        <div class="announce-bar" id="announce-bar">
+            <i class="fas fa-bullhorn"></i>
+            <span id="announce-text">Complete your <strong>KYC verification</strong> to unlock full trading features and higher withdrawal limits.</span>
+            <a href="kyc.html" id="announce-link">Verify Now &rarr;</a>
+            <button class="announce-close" onclick="dismissAnnounce()" title="Dismiss"><i class="fas fa-times"></i></button>
+        </div>
 
         <!-- ── Promo Slideshow (license + promo images) ── -->
         <div class="dashboard-card" style="padding:0;overflow:hidden;border-radius:14px;border:2px solid rgba(201,168,76,0.35);">
@@ -842,31 +940,54 @@
                 <span id="market-badge" class="market-badge market-open">&#9679; OPEN</span>
             </div>
 
-            <!-- TradingView Single Quote — exact same price as TradingView -->
-            <div class="tradingview-widget-container" style="margin:4px 0 10px;min-height:64px;">
-                <div class="tradingview-widget-container__widget"></div>
-                <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-single-quote.js" async>
-                {
-                    "symbol": "OANDA:XAUUSD",
-                    "width": "100%",
-                    "colorTheme": "dark",
-                    "isTransparent": true,
-                    "locale": "en"
-                }
-                </script>
+            <!-- Price row: TradingView quote (left) + mini chart (right) -->
+            <div style="display:flex;align-items:stretch;gap:10px;margin:4px 0 10px;">
+                <!-- TradingView single-quote (reliable price source) -->
+                <div class="tradingview-widget-container" style="flex:1;min-width:0;min-height:64px;">
+                    <div class="tradingview-widget-container__widget"></div>
+                    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-single-quote.js" async>
+                    {
+                        "symbol": "OANDA:XAUUSD",
+                        "width": "100%",
+                        "colorTheme": "dark",
+                        "isTransparent": true,
+                        "locale": "en"
+                    }
+                    </script>
+                </div>
+                <!-- Mini sparkline chart -->
+                <div style="flex-shrink:0;width:120px;border-radius:10px;overflow:hidden;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);">
+                    <canvas id="gold-sparkline" width="120" height="70" style="display:block;"></canvas>
+                </div>
             </div>
 
             <div class="db-thb-row">
-                <span class="db-thb-label">XAU / THB</span>
-                <span id="gp-thb" class="db-thb-val">—</span>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span style="font-size:18px;">🇹🇭</span>
+                    <div>
+                        <div class="db-thb-label" style="margin-bottom:1px;">XAU / THB</div>
+                        <div id="gp-thb-usd" style="font-size:10px;color:#555;">Loading...</div>
+                    </div>
+                </div>
+                <div style="text-align:right;">
+                    <div id="gp-thb" class="db-thb-val">—</div>
+                    <div id="gp-updated" class="db-updated" style="margin-top:2px;">Connecting...</div>
+                </div>
             </div>
-            <div id="gp-updated" class="db-updated">Connecting...</div>
         </div>
 
         <!-- Account Summary Card (shown when logged in) -->
         <div class="dashboard-card" id="db-account-card" style="display:none;">
             <div class="db-section-title"><i class="fas fa-chart-pie"></i><span id="dbl-accsummary">Account Summary</span></div>
-            <div class="db-stats-grid">
+            <!-- Skeleton shown while data loads -->
+            <div id="db-account-skel" class="db-stats-grid">
+                <div class="db-stat-item"><span class="skel skel-text-sm skel-w40" style="margin-bottom:8px;"></span><span class="skel skel-val"></span></div>
+                <div class="db-stat-item"><span class="skel skel-text-sm skel-w40" style="margin-bottom:8px;"></span><span class="skel skel-val"></span></div>
+                <div class="db-stat-item"><span class="skel skel-text-sm skel-w40" style="margin-bottom:8px;"></span><span class="skel skel-val"></span></div>
+                <div class="db-stat-item"><span class="skel skel-text-sm skel-w40" style="margin-bottom:8px;"></span><span class="skel skel-val"></span></div>
+            </div>
+            <!-- Real data (hidden until loaded) -->
+            <div id="db-account-data" class="db-stats-grid" style="display:none;">
                 <div class="db-stat-item">
                     <div class="db-stat-label" id="dbl-balance">Balance</div>
                     <div class="db-stat-val" id="dbs-balance">—</div>
@@ -901,9 +1022,45 @@
         <!-- Recent Trades (shown when logged in) -->
         <div class="dashboard-card" id="db-recent-card" style="display:none;">
             <div class="db-section-title"><i class="fas fa-clock-rotate-left"></i><span id="dbl-recent">Recent Trades</span></div>
-            <div id="db-recent-list"></div>
+            <div id="db-recent-list">
+                <!-- Skeleton rows while trades load -->
+                <div class="db-trade-item">
+                    <span class="skel" style="width:46px;height:22px;border-radius:4px;flex-shrink:0;"></span>
+                    <div class="db-trade-info">
+                        <span class="skel skel-text skel-w60" style="margin-bottom:5px;"></span>
+                        <span class="skel skel-text-sm skel-w40"></span>
+                    </div>
+                    <span class="skel skel-text" style="width:52px;"></span>
+                </div>
+                <div class="db-trade-item">
+                    <span class="skel" style="width:46px;height:22px;border-radius:4px;flex-shrink:0;"></span>
+                    <div class="db-trade-info">
+                        <span class="skel skel-text skel-w60" style="margin-bottom:5px;"></span>
+                        <span class="skel skel-text-sm skel-w30"></span>
+                    </div>
+                    <span class="skel skel-text" style="width:52px;"></span>
+                </div>
+                <div class="db-trade-item">
+                    <span class="skel" style="width:46px;height:22px;border-radius:4px;flex-shrink:0;"></span>
+                    <div class="db-trade-info">
+                        <span class="skel skel-text skel-w60" style="margin-bottom:5px;"></span>
+                        <span class="skel skel-text-sm skel-w40"></span>
+                    </div>
+                    <span class="skel skel-text" style="width:52px;"></span>
+                </div>
+            </div>
             <a href="history.html" class="db-view-all" id="dbl-viewall">View All History &#8594;</a>
         </div>
+
+        <!-- Show account cards immediately if user is likely logged in (avoids flash) -->
+        <script>
+        if (localStorage.getItem('userEmail')) {
+            ['db-account-card','db-recent-card','db-referral-card'].forEach(function(id){
+                var el = document.getElementById(id);
+                if (el) el.style.display = '';
+            });
+        }
+        </script>
 
         <!-- Referral Card (shown when logged in) -->
         <div class="dashboard-card" id="db-referral-card" style="display:none;background:linear-gradient(135deg,rgba(201,168,76,.08),rgba(201,168,76,.03));">
@@ -923,10 +1080,77 @@
             </div>
         </div>
 
-        <!-- Gold Price Script — THB via metals.live, USD via TradingView widget above -->
+        <!-- Gold Price Script — USD + THB via metals.live, sparkline canvas -->
         <script>
         (function(){
             var thbRate = 34;
+            var priceHistory = [];
+            var prevUsd = 0;
+            var MAX_PTS = 40;
+
+            /* ── Sparkline renderer ── */
+            function drawSparkline(prices) {
+                var canvas = document.getElementById('gold-sparkline');
+                if (!canvas || prices.length < 2) return;
+                var ctx = canvas.getContext('2d');
+                var W = canvas.width, H = canvas.height;
+                ctx.clearRect(0, 0, W, H);
+
+                var mn = Math.min.apply(null, prices);
+                var mx = Math.max.apply(null, prices);
+                var range = mx - mn || 1;
+                var isUp = prices[prices.length - 1] >= prices[0];
+                var clr = isUp ? '#00B050' : '#FF6B6B';
+
+                var pts = prices.map(function(p, i) {
+                    return {
+                        x: (i / (prices.length - 1)) * W,
+                        y: H - 4 - ((p - mn) / range) * (H - 12)
+                    };
+                });
+
+                /* gradient fill */
+                var grad = ctx.createLinearGradient(0, 0, 0, H);
+                grad.addColorStop(0, isUp ? 'rgba(0,176,80,0.25)' : 'rgba(255,107,107,0.25)');
+                grad.addColorStop(1, 'rgba(0,0,0,0)');
+
+                ctx.beginPath();
+                ctx.moveTo(pts[0].x, H);
+                for (var i = 0; i < pts.length; i++) ctx.lineTo(pts[i].x, pts[i].y);
+                ctx.lineTo(pts[pts.length - 1].x, H);
+                ctx.closePath();
+                ctx.fillStyle = grad;
+                ctx.fill();
+
+                /* smooth line */
+                ctx.beginPath();
+                ctx.moveTo(pts[0].x, pts[0].y);
+                for (var i = 1; i < pts.length; i++) {
+                    var cx = (pts[i-1].x + pts[i].x) / 2;
+                    ctx.bezierCurveTo(cx, pts[i-1].y, cx, pts[i].y, pts[i].x, pts[i].y);
+                }
+                ctx.strokeStyle = clr;
+                ctx.lineWidth = 2;
+                ctx.lineJoin = 'round';
+                ctx.stroke();
+
+                /* dot at latest price */
+                var last = pts[pts.length - 1];
+                ctx.beginPath();
+                ctx.arc(last.x, last.y, 3, 0, Math.PI * 2);
+                ctx.fillStyle = clr;
+                ctx.fill();
+            }
+
+            /* seed sparkline with simulated intraday history on first load */
+            function seedHistory(basePrice) {
+                priceHistory = [];
+                var p = basePrice * 0.998;
+                for (var i = 0; i < 20; i++) {
+                    p += (Math.random() - 0.48) * (basePrice * 0.0008);
+                    priceHistory.push(parseFloat(p.toFixed(2)));
+                }
+            }
 
             function isMarketOpen(){
                 var d=new Date(), day=d.getUTCDay(), hr=d.getUTCHours();
@@ -942,47 +1166,90 @@
                 else { b.textContent='● CLOSED'; b.className='market-badge market-closed'; }
             }
             function fetchTHB(){
-                /* Exchange rate first */
                 fetch('https://open.er-api.com/v6/latest/USD')
                     .then(function(r){ return r.json(); })
-                    .then(function(d){ if(d.rates&&d.rates.THB) thbRate=d.rates.THB; fetchGoldTHB(); })
-                    .catch(function(){ fetchGoldTHB(); });
+                    .then(function(d){ if(d.rates&&d.rates.THB) thbRate=d.rates.THB; fetchGoldPrice(); })
+                    .catch(function(){ fetchGoldPrice(); });
             }
-            function fetchGoldTHB(){
-                /* metals.live has CORS headers — no proxy needed */
+
+            /* Try gold-api.com first, fallback to metals.live */
+            function fetchGoldPrice(){
+                fetch('https://api.gold-api.com/price/XAU')
+                    .then(function(r){ return r.json(); })
+                    .then(function(d){
+                        var usd = d && d.price ? parseFloat(d.price) : 0;
+                        if(usd > 100){ applyGoldPrice(usd); }
+                        else { fetchGoldFallback(); }
+                    })
+                    .catch(function(){ fetchGoldFallback(); });
+            }
+            function fetchGoldFallback(){
                 fetch('https://api.metals.live/v1/spot')
                     .then(function(r){ return r.json(); })
                     .then(function(j){
-                        var usd = j[0]&&j[0].gold ? j[0].gold : 0;
-                        var thbEl  = document.getElementById('gp-thb');
-                        var updEl  = document.getElementById('gp-updated');
-                        if(thbEl && usd) thbEl.textContent = '฿'+(usd*thbRate).toLocaleString('th-TH',{maximumFractionDigits:0});
-                        if(updEl) updEl.textContent = 'Updated: '+new Date().toLocaleTimeString();
+                        var usd = 0;
+                        if(Array.isArray(j) && j[0] && j[0].gold) usd = j[0].gold;
+                        else if(j && j.gold) usd = parseFloat(j.gold);
+                        if(usd > 100){ applyGoldPrice(usd); }
+                        else { showThbError(); }
                     })
-                    .catch(function(){
-                        var el=document.getElementById('gp-updated');
-                        if(el) el.textContent='THB unavailable';
-                    });
+                    .catch(function(){ showThbError(); });
+            }
+
+            function applyGoldPrice(usd){
+                /* sparkline */
+                if(priceHistory.length === 0) seedHistory(usd);
+                else if(Math.abs(usd - priceHistory[priceHistory.length-1]) > usd * 0.05) seedHistory(usd);
+                priceHistory.push(usd);
+                if(priceHistory.length > MAX_PTS) priceHistory.shift();
+                drawSparkline(priceHistory);
+                prevUsd = usd;
+                localStorage.setItem('_ylgLastGold', usd);
+
+                /* THB display */
+                var thb = usd * thbRate;
+                var thbEl  = document.getElementById('gp-thb');
+                var thbUsd = document.getElementById('gp-thb-usd');
+                var updEl  = document.getElementById('gp-updated');
+                if(thbEl)  thbEl.textContent  = '฿' + thb.toLocaleString('th-TH', {maximumFractionDigits:0});
+                if(thbUsd) thbUsd.textContent = '$' + usd.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+                if(updEl)  updEl.textContent  = 'Updated: ' + new Date().toLocaleTimeString();
+            }
+            function showThbError(){
+                var el = document.getElementById('gp-updated');
+                if(el) el.textContent = 'THB unavailable';
             }
 
             document.addEventListener('DOMContentLoaded', function(){
                 updateBadge();
+                /* draw sparkline immediately with seeded data so canvas is never blank */
+                var seed = parseFloat(localStorage.getItem('_ylgLastGold')) || 3300;
+                seedHistory(seed);
+                drawSparkline(priceHistory);
                 fetchTHB();
-                setInterval(fetchTHB, 60000);
+                setInterval(fetchTHB, 30000);
                 setInterval(updateBadge, 60000);
             });
 
             window.copyRefCode = function(){
                 var c=window._ylgRefCode||'—';
-                navigator.clipboard.writeText(c).catch(function(){});
+                navigator.clipboard.writeText(c)
+                    .then(function(){ showToast('Referral code copied!', 'success'); })
+                    .catch(function(){});
                 var ic=document.getElementById('db-ref-copy-icon');
                 if(ic){ ic.className='fas fa-check'; setTimeout(function(){ ic.className='fas fa-copy'; },1200); }
             };
             window.shareRefCode = function(){
                 var c=window._ylgRefCode||'—';
-                var msg='Join YLG Bullion International! Use my referral code: '+c;
-                if(navigator.share){ navigator.share({title:'YLG Bullion',text:msg}); }
-                else { navigator.clipboard.writeText(msg).catch(function(){}); }
+                var url='https://www.ylgbullion.asia/register.html?ref='+c;
+                var msg='Join YLG Bullion International!\nUse my referral code: '+c+'\nRegister here: '+url;
+                if(navigator.share){
+                    navigator.share({title:'YLG Bullion International',text:msg,url:url});
+                } else {
+                    navigator.clipboard.writeText(msg)
+                        .then(function(){ showToast('Referral link copied!', 'success'); })
+                        .catch(function(){});
+                }
             };
         })();
         </script>
@@ -1003,12 +1270,37 @@
             </a>
         </div>
 
-        <!-- Copyright Footer -->
-        <div style="margin-top: 32px; padding: 24px; text-align: center; border-top: 1px solid rgba(255,255,255,0.07);">
-            <p style="margin: 0; color: var(--color-gold-accent, #C9A84C); font-weight: 600; letter-spacing: 0.3px; font-size: 14px;">
-                &copy; Copyright 2023. YLG Bullion And Futures Co., Ltd.
-            </p>
-        </div>
+        <!-- ── Page Footer ── -->
+        <footer class="page-footer">
+            <div class="footer-brand">
+                <img src="logo.png" alt="YLG" class="footer-logo" onerror="this.src='https://ui-avatars.com/api/?name=YLG&background=C9A84C&color=000&bold=true'">
+                <div>
+                    <div class="footer-brand-name">YLG BULLION</div>
+                    <div class="footer-brand-sub">INTERNATIONAL CO., LTD.</div>
+                </div>
+            </div>
+
+            <div class="footer-links">
+                <a href="about.html" id="ftl-about">About Us</a>
+                <a href="terms.html" id="ftl-terms">Terms &amp; Conditions</a>
+                <a href="faq.html" id="ftl-faq">FAQ</a>
+                <a href="complaints.html" id="ftl-complaints">Complaints</a>
+                <a href="chat-user.html" id="ftl-support">Live Support</a>
+            </div>
+
+            <div class="footer-badges">
+                <span class="footer-badge"><i class="fas fa-shield-halved"></i> <span id="ftl-regulated">Licensed &amp; Regulated</span></span>
+                <span class="footer-badge"><i class="fas fa-lock"></i> <span id="ftl-secure">Secure &amp; Encrypted</span></span>
+                <span class="footer-badge"><i class="fas fa-headset"></i> <span id="ftl-support-badge">24/7 Support</span></span>
+            </div>
+
+            <div class="footer-divider"></div>
+
+            <div class="footer-bottom">
+                <p class="footer-copy" id="ftl-copy">© 2025 YLG Bullion International Co., Ltd. All rights reserved.</p>
+                <p class="footer-note" id="ftl-note">Est. 1993 · Bangkok, Thailand · Gold Trading Platform</p>
+            </div>
+        </footer>
     </main>
 
     <script>
@@ -1032,7 +1324,15 @@
                 'dbl-viewall': 'View All History →',
                 'dbl-ref-title': 'Invite Friends',
                 'dbl-ref-desc': 'Share your referral code and earn rewards',
-                'dbl-ref-share': 'Share'
+                'dbl-ref-share': 'Share',
+                'ftl-about': 'About Us', 'ftl-terms': 'Terms & Conditions',
+                'ftl-faq': 'FAQ', 'ftl-complaints': 'Complaints', 'ftl-support': 'Live Support',
+                'ftl-regulated': 'Licensed & Regulated', 'ftl-secure': 'Secure & Encrypted',
+                'ftl-support-badge': '24/7 Support',
+                'ftl-copy': '© 2025 YLG Bullion International Co., Ltd. All rights reserved.',
+                'ftl-note': 'Est. 1993 · Bangkok, Thailand · Gold Trading Platform',
+                'announce-text': 'Complete your KYC verification to unlock full trading features and higher withdrawal limits.',
+                'announce-link': 'Verify Now →'
             },
             mm: {
                 'welcome-title': 'ပင်မစာမျက်နှာ',
@@ -1052,7 +1352,15 @@
                 'dbl-viewall': 'အားလုံးကြည့်ရန် →',
                 'dbl-ref-title': 'သူငယ်ချင်းများ ဖိတ်ကြားပါ',
                 'dbl-ref-desc': 'Referral code မျှဝေပြီး ဆုလာဘ်ရယူပါ',
-                'dbl-ref-share': 'မျှဝေ'
+                'dbl-ref-share': 'မျှဝေ',
+                'ftl-about': 'ကျွန်ုပ်တို့အကြောင်း', 'ftl-terms': 'စည်းမျဉ်းနှင့် စည်းကမ်းများ',
+                'ftl-faq': 'မေးလေ့မေးထ', 'ftl-complaints': 'တိုင်ကြားမှုများ', 'ftl-support': 'တိုက်ရိုက် ပံ့ပိုးမှု',
+                'ftl-regulated': 'လိုင်စင်ရပြီး ထိန်းချုပ်ထားသည်', 'ftl-secure': 'လုံခြုံပြီး ကုဒ်ဝှက်ထားသည်',
+                'ftl-support-badge': '24/7 ပံ့ပိုးမှု',
+                'ftl-copy': '© 2025 YLG Bullion International Co., Ltd. မူပိုင်ခွင့်အားလုံး ထိန်းသိမ်းသည်။',
+                'ftl-note': 'ထူထောင်သည် 1993 · ဘန်ကောက်၊ ထိုင်းနိုင်ငံ · ရွှေကုန်သွယ်မှု ပလပ်ဖောင်း',
+                'announce-text': 'KYC စစ်ဆေးခြင်းကို ပြုလုပ်ပြီး ကုန်သွယ်မှု လုပ်ဆောင်ချက် အပြည့်အဝ ရယူပါ။',
+                'announce-link': 'ယခုစစ်ဆေးရန် →'
             },
             th: {
                 'welcome-title': 'แดชบอร์ด',
@@ -1072,8 +1380,38 @@
                 'dbl-viewall': 'ดูประวัติทั้งหมด →',
                 'dbl-ref-title': 'เชิญเพื่อน',
                 'dbl-ref-desc': 'แชร์รหัสแนะนำของคุณและรับรางวัล',
-                'dbl-ref-share': 'แชร์'
+                'dbl-ref-share': 'แชร์',
+                'ftl-about': 'เกี่ยวกับเรา', 'ftl-terms': 'ข้อกำหนดและเงื่อนไข',
+                'ftl-faq': 'คำถามที่พบบ่อย', 'ftl-complaints': 'ข้อร้องเรียน', 'ftl-support': 'สนับสนุนสด',
+                'ftl-regulated': 'ได้รับใบอนุญาตและการควบคุม', 'ftl-secure': 'ปลอดภัยและเข้ารหัส',
+                'ftl-support-badge': 'สนับสนุน 24/7',
+                'ftl-copy': '© 2025 YLG Bullion International Co., Ltd. สงวนลิขสิทธิ์ทุกประการ',
+                'ftl-note': 'ก่อตั้งปี 1993 · กรุงเทพฯ, ประเทศไทย · แพลตฟอร์มซื้อขายทองคำ',
+                'announce-text': 'ยืนยัน KYC ของคุณเพื่อปลดล็อคฟีเจอร์เทรดทั้งหมดและวงเงินถอนที่สูงขึ้น',
+                'announce-link': 'ยืนยันตอนนี้ →'
             }
+        };
+
+        /* ── Announcement Banner ── */
+        (function() {
+            var bar = document.getElementById('announce-bar');
+            if (bar && localStorage.getItem('announce_dismissed_v1') === '1') {
+                bar.style.display = 'none';
+            }
+            // Hide banner when KYC is approved
+            window.addEventListener('DOMContentLoaded', function() {
+                var kycDone = localStorage.getItem('kycStatus') === 'approved';
+                if (bar && kycDone) bar.style.display = 'none';
+            });
+        })();
+        window.dismissAnnounce = function() {
+            var bar = document.getElementById('announce-bar');
+            if (!bar) return;
+            bar.style.transition = 'opacity 0.3s, max-height 0.3s, margin 0.3s, padding 0.3s';
+            bar.style.opacity = '0'; bar.style.maxHeight = '0'; bar.style.overflow = 'hidden';
+            bar.style.marginBottom = '0'; bar.style.padding = '0';
+            setTimeout(function() { bar.style.display = 'none'; }, 320);
+            localStorage.setItem('announce_dismissed_v1', '1');
         };
 
         function toggleSidebarLang() {
@@ -1150,7 +1488,15 @@
     <script type="module">
         import { app, auth, db } from './firebase-init.js';
         import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { doc, getDoc, collection, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { doc, collection, query, orderBy, limit, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        let _unsubUser   = null;
+        let _unsubTrades = null;
+
+        function teardownListeners() {
+            if (_unsubUser)   { _unsubUser();   _unsubUser   = null; }
+            if (_unsubTrades) { _unsubTrades(); _unsubTrades = null; }
+        }
 
         const authButtons = document.getElementById('auth-buttons');
         const loggedInBox = document.getElementById('logged-in-box');
@@ -1162,17 +1508,9 @@
                 const name = localStorage.getItem('userName') || user.displayName || user.email?.split('@')[0] || 'Member';
                 if (authButtons) authButtons.style.display = 'none';
                 if (loggedInBox) { loggedInBox.style.display = 'block'; if (loggedInName) loggedInName.innerText = name; }
-                const mobileUID = document.getElementById('mobile-uid-text');
-                if (mobileUID) {
-                    const shortUID = user.uid ? user.uid.slice(0, 8).toUpperCase() : '—';
-                    mobileUID.textContent = 'UID: ' + shortUID;
-                    localStorage.setItem('userShortUID', shortUID);
-                }
             } else {
                 if (authButtons) authButtons.style.display = 'block';
                 if (loggedInBox) loggedInBox.style.display = 'none';
-                const mobileUID = document.getElementById('mobile-uid-text');
-                if (mobileUID) mobileUID.textContent = 'UID: —';
                 hideDashWidgets();
             }
         }
@@ -1184,108 +1522,136 @@
             });
         }
 
-        async function loadDashData(user) {
-            // Show logged-in widgets
-            const accCard = document.getElementById('db-account-card');
-            const recCard = document.getElementById('db-recent-card');
-            const refCard = document.getElementById('db-referral-card');
-            if (accCard) accCard.style.display = '';
-            if (recCard) recCard.style.display = '';
-            if (refCard) refCard.style.display = '';
+        function escHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
 
-            // Referral code = first 8 chars of UID
+        function loadDashData(user) {
+            // Show logged-in widgets immediately
+            ['db-account-card','db-recent-card','db-referral-card'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.style.display = '';
+            });
+
+            // Referral code
             const refCode = user.uid.slice(0, 8).toUpperCase();
             window._ylgRefCode = refCode;
             const refEl = document.getElementById('db-ref-code');
             if (refEl) refEl.textContent = refCode;
 
-            // ── User document: balance, depositBalance, profit ──
-            try {
-                const userSnap = await getDoc(doc(db, 'users', user.uid));
-                if (userSnap.exists()) {
-                    const d = userSnap.data();
+            // ── Real-time: user doc → balance + P&L (balance - deposit) ──
+            _unsubUser = onSnapshot(
+                doc(db, 'users', user.uid),
+                (snap) => {
+                    if (!snap.exists()) return;
+                    const d   = snap.data();
                     const bal = typeof d.balance === 'number' ? d.balance : 0;
+                    const dep = typeof d.depositBalance === 'number' ? d.depositBalance : 0;
+                    const pnl = bal - dep;
+
                     const balEl = document.getElementById('dbs-balance');
-                    if (balEl) balEl.textContent = '$' + bal.toFixed(2);
-                }
-            } catch(e) { console.warn('User doc error:', e); }
+                    if (balEl) balEl.textContent = '$' + bal.toLocaleString(undefined, { minimumFractionDigits: 2 });
 
-            // ── Trades subcollection ──
-            // Fields: result("WIN"/"LOSS"), payout(number), amount(number),
-            //         type(string), pair(string), timestamp(Firestore Timestamp), date(string)
-            try {
-                const q = query(
-                    collection(db, 'users', user.uid, 'trades'),
-                    orderBy('timestamp', 'desc'),
-                    limit(50)
-                );
-                const snap = await getDocs(q);
-                let totalPnl = 0, wins = 0, total = 0, recentHTML = '';
+                    const pnlEl = document.getElementById('dbs-pnl');
+                    if (pnlEl) {
+                        pnlEl.textContent = (pnl >= 0 ? '+$' : '-$') + Math.abs(pnl).toLocaleString(undefined, { minimumFractionDigits: 2 });
+                        pnlEl.style.color = pnl >= 0 ? '#00B050' : '#FF6B6B';
+                    }
 
-                snap.forEach((tdoc, idx) => {
-                    const t = tdoc.data();
-                    const isWin = (t.result || '').toUpperCase() === 'WIN';
+                    const fullName = d.fullname || d.fullName || d.name || '';
+                    if (fullName) localStorage.setItem('memberName', fullName);
+                    const mId = 'YLG-2026' + String(d.userIndex || 0).padStart(4, '0');
+                    localStorage.setItem('memberId', mId);
+
+                    if (d.kycStatus === 'approved') {
+                        localStorage.setItem('kycStatus', 'approved');
+                        const bar = document.getElementById('announce-bar');
+                        if (bar) bar.style.display = 'none';
+                    }
+
+                    // Show data panel as soon as user doc loads
+                    const skelEl = document.getElementById('db-account-skel');
+                    const dataEl = document.getElementById('db-account-data');
+                    if (skelEl) skelEl.style.display = 'none';
+                    if (dataEl) dataEl.style.display = '';
+                },
+                (e) => {}
+            );
+
+            // ── Real-time: trades → count, win rate, recent list ──
+            const q = query(
+                collection(db, 'users', user.uid, 'trades'),
+                orderBy('timestamp', 'desc'),
+                limit(500)
+            );
+            _unsubTrades = onSnapshot(q, (snap) => {
+                let wins = 0, total = 0, recentHTML = '';
+
+                snap.forEach((tdoc) => {
+                    const t      = tdoc.data();
+                    const isWin  = (t.result || '').toUpperCase() === 'WIN';
                     const amount = Number(t.amount || 0);
                     const payout = Number(t.payout || 0);
-                    // Net P&L: WIN = payout - amount, LOSS = -amount
-                    const pnl = isWin ? (payout - amount) : -amount;
+                    const pnl    = isWin ? (payout - amount) : -amount;
 
-                    totalPnl += pnl;
-                    total++;
-                    if (isWin) wins++;
-
-                    // Recent trades: show top 3
-                    if (idx < 3) {
+                    if (total < 3) {
                         let dateStr = '—';
                         if (t.timestamp && typeof t.timestamp.toDate === 'function') {
                             dateStr = t.timestamp.toDate().toLocaleDateString();
                         } else if (t.date) {
                             dateStr = t.date;
                         }
-                        const type = (t.type || 'BUY').toUpperCase();
-                        const isBuy = type === 'BUY';
+                        const type     = (t.type || 'BUY').toUpperCase();
+                        const isBuy    = type === 'BUY';
                         const pnlColor = pnl >= 0 ? '#00B050' : '#FF6B6B';
-                        const pnlStr  = (pnl >= 0 ? '+$' : '-$') + Math.abs(pnl).toFixed(2);
+                        const pnlStr   = (pnl >= 0 ? '+$' : '-$') + Math.abs(pnl).toFixed(2);
                         recentHTML += `<div class="db-trade-item">
                             <span class="db-trade-type ${isBuy ? 'db-t-buy' : 'db-t-sell'}">
                                 <i class="fas ${isBuy ? 'fa-arrow-trend-up' : 'fa-arrow-trend-down'}"></i> ${type}
                             </span>
                             <div class="db-trade-info">
-                                <div class="db-trade-pair">${t.pair || 'XAU/USD'}</div>
-                                <div class="db-trade-date">${dateStr}</div>
+                                <div class="db-trade-pair">${escHtml(t.pair || 'XAU/USD')}</div>
+                                <div class="db-trade-date">${escHtml(dateStr)}</div>
                             </div>
                             <div class="db-trade-pnl" style="color:${pnlColor};">${pnlStr}</div>
                         </div>`;
                     }
+
+                    total++;
+                    if (isWin) wins++;
                 });
 
-                // Recent list
+                // Recent trades list
                 const listEl = document.getElementById('db-recent-list');
                 if (listEl) {
                     listEl.innerHTML = recentHTML ||
                         '<div style="text-align:center;color:#7A8196;padding:20px;font-size:13px;">No trades yet</div>';
                 }
 
-                // Stats
+                // Trades count + win rate
                 const winRate = total > 0 ? Math.round((wins / total) * 100) : 0;
-                const pnlEl = document.getElementById('dbs-pnl');
-                const trEl  = document.getElementById('dbs-trades');
-                const wrEl  = document.getElementById('dbs-winrate');
-                if (pnlEl) {
-                    pnlEl.textContent = (totalPnl >= 0 ? '+$' : '-$') + Math.abs(totalPnl).toFixed(2);
-                    pnlEl.style.color = totalPnl >= 0 ? '#00B050' : '#FF6B6B';
-                }
-                if (trEl)  trEl.textContent = total;
-                if (wrEl)  {
+                const trEl = document.getElementById('dbs-trades');
+                const wrEl = document.getElementById('dbs-winrate');
+                if (trEl) trEl.textContent = total;
+                if (wrEl) {
                     wrEl.textContent = winRate + '%';
                     wrEl.style.color = winRate >= 50 ? '#00B050' : '#FF6B6B';
                 }
-            } catch(e) { console.warn('Trades error:', e); }
+            }, (e) => {});
         }
 
         onAuthStateChanged(auth, (user) => {
             showAuthState(user);
-            if (user) loadDashData(user);
+            if (user) {
+                loadDashData(user);
+            } else {
+                teardownListeners();
+            }
         });
 
         if (logoutBtn) {
@@ -1330,5 +1696,11 @@
 
 <script src="mobile-nav.js"></script>
 <script src="sidebar-user.js"></script>
+<script src="/toast.js"></script>
+<script type="module" src="notifications-bell.js"></script>
 </body>
 </html>
+
+
+
+

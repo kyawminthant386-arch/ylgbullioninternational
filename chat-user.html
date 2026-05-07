@@ -1,8 +1,15 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="my">
 <head>
-    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png"><link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
     <meta charset="UTF-8">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#FFD700">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="YLG Bullion">
+    <link rel="apple-touch-icon" sizes="192x192" href="/icon-192.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>YLG Bullion</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
@@ -93,6 +100,8 @@
             #send-btn{padding:11px 14px}
         }
     </style>
+<script src="/pwa-register.js" defer></script>
+    <link rel="stylesheet" href="/skeleton.css">
 </head>
 <body>
     <aside class="sidebar">
@@ -168,7 +177,7 @@
     import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
     import { collection, addDoc, serverTimestamp, query, where, onSnapshot, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    let currentUserId = null, currentUserEmail = null;
+    let currentUserId = null, currentUserEmail = null, authResolved = false;
 
     const langTexts = {
         en: { pageTitle:'YLG Bullion - Live Support', pageHeading:'Live Support Chat', subtitle:'Connect with our support team instantly • Send messages and images', supportLabel:'Support Agent (Online)', inputPlaceholder:'Type your message here...', sendButton:'Send', loginPromptHtml:'Please <a href="login.html">login</a> to access live support chat.', welcomeLabel:'Welcome! Thanks for reaching out. Our support team is here to help. How can we assist you today?', youLabel:'You', supportLabelShort:'Support', nav:['Dashboard', 'Trading', 'Portfolio', 'History', 'Wallet', 'KYC', 'Live Support'] },
@@ -184,8 +193,10 @@
         const n = document.getElementById('chat-header-name'); if(n) n.innerHTML = `${texts.supportLabel} <span style="font-size:10px;background:var(--gold-dim);color:var(--gold);padding:2px 8px;border-radius:99px;font-weight:600;">YLG</span>`;
         const inp = document.getElementById('chat-input-field'); if(inp) inp.placeholder = texts.inputPlaceholder;
         const btn = document.getElementById('send-btn'); if(btn) btn.innerHTML = `<i class="fas fa-paper-plane"></i> ${texts.sendButton}`;
-        const msgs = document.getElementById('chat-messages');
-        if(msgs && !currentUserId) msgs.innerHTML = `<div class="empty-state"><i class="fas fa-lock"></i><p>${texts.loginPromptHtml}</p></div>`;
+        if (authResolved) {
+            const msgs = document.getElementById('chat-messages');
+            if(msgs && !currentUserId) msgs.innerHTML = `<div class="empty-state"><i class="fas fa-lock"></i><p>${texts.loginPromptHtml}</p></div>`;
+        }
         const navItems = document.querySelectorAll('.sidebar-nav .nav-item');
         navItems.forEach((item, idx) => { const ico = item.querySelector('i') ? item.querySelector('i').outerHTML : ''; if(texts.nav[idx]) item.innerHTML = `${ico} ${texts.nav[idx]}`; });
     }
@@ -246,6 +257,7 @@
     document.getElementById('chat-input-field').addEventListener('keypress',(e)=>{ if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();} });
 
     onAuthStateChanged(auth, async (user) => {
+        authResolved = true;
         const lang = localStorage.getItem('selectedLang')||'en';
         if (user) {
             localStorage.setItem('userShortUID', user.uid.slice(0, 8).toUpperCase());
@@ -276,28 +288,19 @@
 <script>
 /* ═══ YLG Language Sync — v2 ═══ */
 (function(){
-    console.log('[YLG Sync] Initialising language sync');
     function triggerApply(lang){
         const fns = ['applyLanguage','applyChatLanguage','applyHistoryLanguage',
                      'applyKycLanguage','applyWalletLanguage','applyPortfolioLanguage',
                      'applyTradingLanguage','applyAccountLanguage','applyLang'];
-        let foundAny = false;
         for (const fn of fns) {
-            if (typeof window[fn] === 'function') {
-                foundAny = true;
-                console.log('[YLG Sync] Calling window.' + fn + '(' + lang + ')');
-                try { window[fn](lang); } catch(e) { console.error('[YLG Sync]', e); }
-            }
+            if (typeof window[fn] === 'function') try { window[fn](lang); } catch(e) {}
         }
-        if (!foundAny) console.warn('[YLG Sync] No apply function found on window for lang=' + lang);
     }
     window.addEventListener('storage', function(e){
         if (e.key === 'selectedLang' && e.newValue) triggerApply(e.newValue);
     });
     function initialApply(){
-        const lang = localStorage.getItem('selectedLang') || 'en';
-        console.log('[YLG Sync] Initial apply for lang=' + lang);
-        triggerApply(lang);
+        triggerApply(localStorage.getItem('selectedLang') || 'en');
     }
     if (document.readyState === 'loading') {
         window.addEventListener('DOMContentLoaded', function(){ setTimeout(initialApply, 50); });
@@ -305,11 +308,16 @@
         setTimeout(initialApply, 50);
     }
     setTimeout(initialApply, 500);
-    setTimeout(initialApply, 1500);
 })();
 </script>
 
 <script src="mobile-nav.js"></script>
 <script src="sidebar-user.js"></script>
+<script src="/toast.js"></script>
+<script type="module" src="notifications-bell.js"></script>
 </body>
 </html>
+
+
+
+

@@ -10,25 +10,26 @@
     var page = (window.location.pathname.split('/').pop() || 'index.html').toLowerCase();
     var isDash    = (page === 'index.html' || page === '');
     var isTrading = (page === 'trading.html' || page === 'trading-interface.html');
-    var isAssets  = !isDash && !isTrading;
+    var isWallet  = (page === 'wallet.html' || page === 'withdraw.html');
+    var isAccount = !isDash && !isTrading && !isWallet;
 
     /* ── Nav labels (3 languages) ── */
     var L = {
-        en: { dash:'Dashboard', trade:'Trading', assets:'Manage account',
+        en: { dash:'Dashboard', trade:'Trading', wall:'Wallet', acct:'Manage account', acctItem:'Account',
               panel:'My Account', port:'Portfolio', hist:'History',
-              wall:'Wallet', kyc:'KYC', comp:'Complaints', faq:'FAQ', sup:'Live Support', about:'About Us' },
-        mm: { dash:'ပင်မ', trade:'ရောင်းဝယ်', assets:'အကောင့်စီမံ',
+              kyc:'KYC', comp:'Complaints', faq:'FAQ', sup:'Live Support', about:'About Us' },
+        mm: { dash:'ပင်မ', trade:'ရောင်းဝယ်', wall:'ပိုက်ဆံအိတ်', acct:'အကောင့်စီမံ', acctItem:'အကောင့်',
               panel:'ကျွန်ုပ်အကောင့်', port:'ပိုင်ဆိုင်မှုစာရင်း', hist:'မှတ်တမ်း',
-              wall:'ပိုက်ဆံအိတ်', kyc:'KYC', comp:'တိုင်ကြားစာ', faq:'FAQ', sup:'အွန်လိုင်းဝန်ဆောင်မှု', about:'ကျွန်ုပ်တို့အကြောင်း' },
-        th:  { dash:'หน้าหลัก', trade:'เทรด', assets:'จัดการบัญชี',
+              kyc:'KYC', comp:'တိုင်ကြားစာ', faq:'FAQ', sup:'အွန်လိုင်းဝန်ဆောင်မှု', about:'ကျွန်ုပ်တို့အကြောင်း' },
+        th:  { dash:'หน้าหลัก', trade:'เทรด', wall:'กระเป๋า', acct:'จัดการบัญชี', acctItem:'บัญชี',
                panel:'บัญชีของฉัน', port:'พอร์ตโฟลิโอ', hist:'ประวัติ',
-               wall:'กระเป๋า', kyc:'KYC', comp:'ร้องเรียน', faq:'FAQ', sup:'ซัพพอร์ต', about:'เกี่ยวกับเรา' }
+               kyc:'KYC', comp:'ร้องเรียน', faq:'FAQ', sup:'ซัพพอร์ต', about:'เกี่ยวกับเรา' }
     };
 
     function lbl(lang) { return L[lang] || L.en; }
 
     /* ── Read stored user info ── */
-    function getMemberName() { return localStorage.getItem('memberName') || ''; }
+    function getMemberName() { return localStorage.getItem('memberName') || localStorage.getItem('userName') || ''; }
     function getMemberId()   { return localStorage.getItem('memberId')   || localStorage.getItem('userShortUID') || '—'; }
 
     /* ── HTML builders ── */
@@ -60,6 +61,10 @@
             '    <button class="mobile-hdr-btn" id="mobile-lang-trigger" onclick="toggleMobileLang()" title="Language">',
             '      <i class="fas fa-globe"></i>',
             '    </button>',
+            '    <button class="mobile-hdr-btn" id="mobile-bell-btn" onclick="window._ylgBellToggle&&window._ylgBellToggle()" title="Notifications" style="position:relative;">',
+            '      <i class="fas fa-bell"></i>',
+            '      <span id="mobile-bell-dot" style="display:none;position:absolute;top:3px;right:3px;width:8px;height:8px;border-radius:50%;background:#FF4444;pointer-events:none;"></span>',
+            '    </button>',
             '    <a href="chat-user.html" class="mobile-hdr-btn" title="Live Support">',
             '      <i class="fas fa-headphones"></i>',
             '    </a>',
@@ -85,9 +90,13 @@
             '    <i class="fas fa-chart-line"></i>',
             '    <span id="mbn-trade">' + l.trade + '</span>',
             '  </a>',
-            '  <button class="mbn-item' + (isAssets  ? ' active' : '') + '" onclick="toggleAssetsPanel()">',
-            '    <i class="fas fa-layer-group"></i>',
-            '    <span id="mbn-assets">' + l.assets + '</span>',
+            '  <a href="wallet.html" class="mbn-item' + (isWallet  ? ' active' : '') + '">',
+            '    <i class="fas fa-wallet"></i>',
+            '    <span id="mbn-wall">' + l.wall + '</span>',
+            '  </a>',
+            '  <button class="mbn-item' + (isAccount ? ' active' : '') + '" onclick="toggleAssetsPanel()">',
+            '    <i class="fas fa-user-circle"></i>',
+            '    <span id="mbn-acct">' + l.acct + '</span>',
             '  </button>',
             '</nav>',
 
@@ -97,9 +106,9 @@
             '  <div class="assets-panel-handle"></div>',
             '  <div class="assets-panel-title" id="ap-title">' + l.panel + '</div>',
             '  <div class="assets-panel-list">',
-            '    <a href="portfolio.html" class="assets-list-item"><i class="fas fa-briefcase"></i><span id="ap-port">' + l.port + '</span><i class="fas fa-chevron-right ap-arrow"></i></a>',
-            '    <a href="history.html"   class="assets-list-item"><i class="fas fa-history"></i><span id="ap-hist">' + l.hist + '</span><i class="fas fa-chevron-right ap-arrow"></i></a>',
-            '    <a href="wallet.html"    class="assets-list-item"><i class="fas fa-wallet"></i><span id="ap-wall">' + l.wall + '</span><i class="fas fa-chevron-right ap-arrow"></i></a>',
+            '    <a href="account.html"      class="assets-list-item"><i class="fas fa-user"></i><span id="ap-acct">' + l.acctItem + '</span><i class="fas fa-chevron-right ap-arrow"></i></a>',
+            '    <a href="portfolio.html"    class="assets-list-item"><i class="fas fa-briefcase"></i><span id="ap-port">' + l.port + '</span><i class="fas fa-chevron-right ap-arrow"></i></a>',
+            '    <a href="history.html"      class="assets-list-item"><i class="fas fa-history"></i><span id="ap-hist">' + l.hist + '</span><i class="fas fa-chevron-right ap-arrow"></i></a>',
             '    <a href="kyc.html"          class="assets-list-item"><i class="fas fa-user-check"></i><span id="ap-kyc">' + l.kyc + '</span><i class="fas fa-chevron-right ap-arrow"></i></a>',
             '    <a href="complaints.html"   class="assets-list-item"><i class="fas fa-flag"></i><span id="ap-comp">' + l.comp + '</span><i class="fas fa-chevron-right ap-arrow"></i></a>',
             '    <a href="faq.html"          class="assets-list-item"><i class="fas fa-question-circle"></i><span id="ap-faq">' + l.faq + '</span><i class="fas fa-chevron-right ap-arrow"></i></a>',
@@ -114,18 +123,19 @@
     function applyMobileLabels(lang) {
         var l = lbl(lang);
         function s(id, txt) { var el = document.getElementById(id); if (el) el.textContent = txt; }
-        s('mbn-dash',   l.dash);
-        s('mbn-trade',  l.trade);
-        s('mbn-assets', l.assets);
-        s('ap-title',   l.panel);
-        s('ap-port',    l.port);
-        s('ap-hist',    l.hist);
-        s('ap-wall',    l.wall);
-        s('ap-kyc',     l.kyc);
-        s('ap-comp',    l.comp);
-        s('ap-faq',     l.faq);
-        s('ap-sup',     l.sup);
-        s('ap-about',   l.about);
+        s('mbn-dash',  l.dash);
+        s('mbn-trade', l.trade);
+        s('mbn-wall',  l.wall);
+        s('mbn-acct',  l.acct);
+        s('ap-title',  l.panel);
+        s('ap-acct',   l.acctItem);
+        s('ap-port',   l.port);
+        s('ap-hist',   l.hist);
+        s('ap-kyc',    l.kyc);
+        s('ap-comp',   l.comp);
+        s('ap-faq',    l.faq);
+        s('ap-sup',    l.sup);
+        s('ap-about',  l.about);
     }
 
     /* ── User info display updater ── */
@@ -221,13 +231,13 @@
     var _origSet = localStorage.setItem.bind(localStorage);
     localStorage.setItem = function (key, val) {
         _origSet(key, val);
-        if (key === 'memberId' || key === 'memberName' || key === 'userShortUID') updateMobileUserInfo();
+        if (key === 'memberId' || key === 'memberName' || key === 'userShortUID' || key === 'userName') updateMobileUserInfo();
         if (key === 'selectedLang') applyMobileLabels(val);
     };
 
     /* Cross-tab updates */
     window.addEventListener('storage', function (e) {
-        if (e.key === 'memberId' || e.key === 'memberName' || e.key === 'userShortUID') updateMobileUserInfo();
+        if (e.key === 'memberId' || e.key === 'memberName' || e.key === 'userShortUID' || e.key === 'userName') updateMobileUserInfo();
         if (e.key === 'selectedLang') applyMobileLabels(e.newValue || 'en');
     });
 

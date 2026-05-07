@@ -1,8 +1,15 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="my">
 <head>
-    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png"><link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
     <meta charset="UTF-8">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#FFD700">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="YLG Bullion">
+    <link rel="apple-touch-icon" sizes="192x192" href="/icon-192.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>YLG Bullion</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
@@ -125,9 +132,12 @@
         .kyc-container { margin-top: 25px; }
         
         .kyc-header {
-            background: linear-gradient(135deg, #2A2A2A 0%, #1A1A1A 100%);
-            padding: 30px; border-radius: 12px; border-left: 4px solid var(--color-gold-accent);
+            background: linear-gradient(135deg, #1a1610 0%, #141414 60%, #0e0e0e 100%);
+            padding: 28px 30px; border-radius: 16px;
+            border: 1px solid rgba(201,168,76,0.2);
+            border-left: 4px solid var(--color-gold-accent);
             margin-bottom: 25px;
+            box-shadow: 0 0 30px rgba(201,168,76,0.05);
         }
         
         .kyc-header h2 {
@@ -145,8 +155,9 @@
         }
         
         .kyc-card {
-            background: var(--color-medium-dark);
-            padding: 30px; border-radius: 12px; border: 1px solid #333;
+            background: #141414;
+            padding: 30px; border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.06);
         }
         
         .form-section {
@@ -187,11 +198,11 @@
         }
 
         .upload-area {
-            border: 2px dashed #555; padding: 30px 20px; text-align: center;
-            border-radius: 12px; cursor: pointer; transition: 0.3s;
+            border: 2px dashed rgba(255,255,255,0.12); padding: 30px 20px; text-align: center;
+            border-radius: 14px; cursor: pointer; transition: 0.3s;
             position: relative; min-height: 200px;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
-            background: #1a1a1a;
+            background: rgba(255,255,255,0.02);
         }
         
         .upload-area:hover { 
@@ -230,6 +241,8 @@
         .logo-subtext   { font-size: 11px !important; font-weight: 700 !important; color: #fff !important; letter-spacing: 2px !important; display: block !important; margin-top: 2px !important; }
         .logo-company   { font-size: 9px !important; color: var(--muted, #7A8196) !important; display: block !important; margin-top: 3px !important; letter-spacing: 0.6px !important; }
     </style>
+<script src="/pwa-register.js" defer></script>
+    <link rel="stylesheet" href="/skeleton.css">
 </head>
 <body>
 
@@ -241,7 +254,6 @@
                 <div class="logo-subtext">BULLION</div>
                 <div class="logo-company">INTERNATIONAL CO., LTD.</div>
             </div>
-        </div>
         </div>
         <nav>
             <a href="index.html" class="nav-item"><i class="fas fa-th-large"></i> Dashboard</a>
@@ -257,20 +269,6 @@
     <main class="main-content">
         <header>
             <h2 id="pageTitle" style="margin:0;">KYC Verification</h2>
-            <div style="display: flex; align-items: center; gap: 14px;">
-                <div id="head-user-display" style="color:var(--color-gold-accent); font-size: 13px;">Guest Mode</div>
-                <div class="lang-switcher">
-                    <button class="lang-btn-trigger" onclick="toggleLangList()" type="button">
-                        <i class="fas fa-globe"></i>
-                        <span id="display-lang-name">English</span>
-                    </button>
-                    <div id="sidebar-lang-list" class="lang-list">
-                        <button type="button" onclick="handleLangChange('en')">English</button>
-                        <button type="button" onclick="handleLangChange('mm')">မြန်မာ (Myanmar)</button>
-                        <button type="button" onclick="handleLangChange('th')">ไทย (Thai)</button>
-                    </div>
-                </div>
-            </div>
         </header>
 
         <div class="kyc-container">
@@ -335,8 +333,8 @@
                 </div>
 
                 <!-- Submit Button -->
-                <button id="submitKyc" style="width: 100%; padding: 16px; background: linear-gradient(135deg, var(--color-gold-accent) 0%, #FFC700 100%); border:none; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 16px; color: #000; margin-top: 25px; transition: 0.3s;">
-                    Submit Verification
+                <button id="submitKyc" style="width: 100%; padding: 16px; background: linear-gradient(135deg, #C9A84C, #FFD700); border:none; border-radius: 12px; font-weight: 700; cursor: pointer; font-size: 15px; color: #000; margin-top: 25px; transition: 0.2s; font-family: inherit; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <i class="fas fa-shield-alt"></i> Submit Verification
                 </button>
                 <p id="statusMsg" style="text-align:center; font-size:12px; margin-top:12px; color: var(--color-text-fade);"></p>
             </div>
@@ -648,5 +646,11 @@
 
 <script src="mobile-nav.js"></script>
 <script src="sidebar-user.js"></script>
+<script src="/toast.js"></script>
+<script type="module" src="notifications-bell.js"></script>
 </body>
 </html>
+
+
+
+

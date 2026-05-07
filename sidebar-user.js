@@ -9,6 +9,37 @@
     function getMemberName() { return localStorage.getItem('memberName') || localStorage.getItem('userName') || ''; }
     function getMemberId()   { return localStorage.getItem('memberId') || localStorage.getItem('userShortUID') || '—'; }
 
+    /* ── Build legal links footer (all pages) ── */
+    function buildLegalLinks() {
+        var links = [
+            { href: 'about.html',      label: 'About' },
+            { href: 'faq.html',        label: 'FAQ' },
+            { href: 'terms.html',      label: 'Terms' },
+            { href: 'complaints.html', label: 'Complaints' },
+        ];
+        var linkHtml = links.map(function(l) {
+            return '<a href="' + l.href + '" style="' +
+                'font-size:11px;color:rgba(255,255,255,0.25);text-decoration:none;' +
+                'transition:color 0.18s;white-space:nowrap;' +
+                '" onmouseover="this.style.color=\'#C9A84C\'" onmouseout="this.style.color=\'rgba(255,255,255,0.25)\'">' +
+                l.label + '</a>';
+        }).join('<span style="color:rgba(255,255,255,0.1);">·</span>');
+
+        return [
+            '<div id="sidebar-legal" style="',
+                'padding:12px 16px 14px;',
+                'border-top:1px solid rgba(255,255,255,0.06);',
+            '">',
+            '  <div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;margin-bottom:8px;">',
+                linkHtml,
+            '  </div>',
+            '  <div style="font-size:10px;color:rgba(255,255,255,0.15);line-height:1.5;">',
+            '    © 2025 YLG Bullion International<br>Co., Ltd. All rights reserved.',
+            '  </div>',
+            '</div>'
+        ].join('');
+    }
+
     /* ── Build unified bottom block ── */
     function buildBox() {
         var name = getMemberName();
@@ -109,9 +140,14 @@
         if (!sidebar) return;
         /* Hide old auth on all pages */
         hideOldAuth(sidebar);
-        /* Only inject user box on dashboard */
-        if (!isDash || document.getElementById('sidebar-user-box')) return;
-        sidebar.insertAdjacentHTML('beforeend', buildBox());
+        /* Inject user box only on dashboard */
+        if (isDash && !document.getElementById('sidebar-user-box')) {
+            sidebar.insertAdjacentHTML('beforeend', buildBox());
+        }
+        /* Inject legal links on ALL pages */
+        if (!document.getElementById('sidebar-legal')) {
+            sidebar.insertAdjacentHTML('beforeend', buildLegalLinks());
+        }
     }
 
     /* ── Update existing box ── */
