@@ -299,13 +299,9 @@
     </main>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut, updatePassword, EmailAuthProvider, reauthenticateWithCredential } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, collection, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-        const app  = initializeApp({ apiKey:"AIzaSyBCvOnGL0ptipChgxuCtHzviZb9DZ3MAIk", authDomain:"ylg-bullion-7dac6.firebaseapp.com", projectId:"ylg-bullion-7dac6", storageBucket:"ylg-bullion-7dac6.firebasestorage.app", messagingSenderId:"1076979932884", appId:"1:1076979932884:web:8755edb4ccac71f69b6541" });
-        const auth = getAuth(app);
-        const db   = getFirestore(app);
+        import { auth, db } from './firebase-init.js';
+        import { onAuthStateChanged, signOut, updatePassword, EmailAuthProvider, reauthenticateWithCredential } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { doc, getDoc, collection, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         function getMemberLevel(d) {
             if (d >= 500000) return 'Supreme'; if (d >= 100000) return 'Diamond';
