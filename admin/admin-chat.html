@@ -1,0 +1,477 @@
+﻿<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Live Chat Inbox</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <style>
+        /* Base Admin Styles (Reused) */
+        :root {
+            --color-dark-bg: #121212;
+            --color-panel-bg: #1E1E1E;
+            --color-gold-accent: #FFD700;
+            --color-text-light: #E0E0E0;
+            --color-text-fade: #A0A0A0;
+            --color-positive: #00B050;
+            --color-negative: #D93025;
+            --color-info: #3498db;
+            --color-warning: #FFC107;
+            --color-sidebar: #1A1A1A;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--color-dark-bg);
+            color: var(--color-text-light);
+            margin: 0;
+            padding: 0;
+        }
+
+        .admin-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Admin Sidebar Styling (Same as others) */
+        .admin-sidebar {
+            width: 250px;
+            background-color: var(--color-sidebar);
+            padding: 20px 0 20px 0;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+        }
+
+        .admin-logo-section {
+            padding: 0 20px 20px 20px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #3A3A3A;
+        }
+
+        .admin-logo-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--color-gold-accent);
+        }
+        
+        .admin-nav-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            color: var(--color-text-fade);
+            text-decoration: none;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        
+        .admin-nav-item:hover, .admin-nav-item.active {
+            background-color: #383838;
+            color: var(--color-text-light);
+            border-left: 5px solid var(--color-gold-accent);
+        }
+
+        /* Admin Main Content */
+        .admin-main-content {
+            flex-grow: 1;
+            padding: 30px 40px;
+        }
+
+        .admin-header {
+            margin-bottom: 30px;
+        }
+        
+        /* Chat Inbox Layout */
+        .inbox-layout {
+            display: flex;
+            height: calc(100vh - 150px);
+            background-color: var(--color-panel-bg);
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+            overflow: hidden;
+        }
+        
+        .ticket-list {
+            width: 300px;
+            border-right: 1px solid #3A3A3A;
+            overflow-y: auto;
+            background-color: #1A1A1A; /* Slightly darker list background */
+        }
+        
+        .ticket-item {
+            padding: 15px;
+            border-bottom: 1px solid #3A3A3A;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .ticket-item:hover {
+            background-color: #2A2A2A;
+        }
+
+        .ticket-item.active {
+            background-color: #333333;
+            border-left: 4px solid var(--color-gold-accent);
+        }
+
+        .ticket-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        
+        .ticket-subject {
+            font-weight: bold;
+            color: var(--color-text-light);
+        }
+        
+        .ticket-status {
+            font-size: 12px;
+            color: var(--color-warning);
+        }
+        
+        .ticket-preview {
+            font-size: 12px;
+            color: var(--color-text-fade);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        /* Message Area (Reused Chat Styles) */
+        .message-area {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .chat-header {
+            background-color: #2A2A2A;
+            padding: 15px 20px;
+            font-weight: bold;
+            border-bottom: 1px solid #444;
+            color: var(--color-info);
+        }
+        
+        .chat-messages {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            max-width: 70%;
+            padding: 10px 15px;
+            border-radius: 15px;
+            line-height: 1.4;
+            font-size: 14px;
+        }
+        
+        /* Admin is sending (User is receiving) */
+        .admin-message { 
+            background-color: var(--color-positive);
+            color: var(--color-white);
+            align-self: flex-end; 
+            border-bottom-right-radius: 0;
+        }
+        
+        /* User is sending (Admin is receiving) */
+        .user-message {
+            background-color: #444444;
+            color: var(--color-text-light);
+            align-self: flex-start; 
+            border-bottom-left-radius: 0;
+        }
+        
+        .message-time {
+            display: block;
+            margin-top: 5px;
+            font-size: 10px;
+            color: #AAAAAA;
+            text-align: right;
+        }
+
+        .user-message .message-time {
+             text-align: left;
+        }
+        
+        .chat-input {
+            padding: 15px 20px;
+            border-top: 1px solid #444;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .chat-input input[type="text"] {
+            flex-grow: 1;
+            padding: 10px;
+            background-color: #333;
+            border: 1px solid #555;
+            color: var(--color-white);
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        
+        .chat-input button {
+            padding: 10px 15px;
+            background-color: var(--color-info);
+            color: var(--color-white);
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+    </style>
+    <link rel="stylesheet" href="../mobile-responsive.css">
+    </head>
+<body>
+
+    <div class="admin-container">
+
+        <aside class="admin-sidebar">
+            <div class="admin-logo-section">
+                <div class="admin-logo-title">ADMIN PANEL</div>
+                <div class="admin-logo-sub">YLG BULLION PLATFORM</div>
+            </div>
+
+            <nav class="admin-nav">
+                <a href="admin.html" class="admin-nav-item"><i class="fas fa-gauge-high"></i> Dashboard</a>
+                <a href="admin-users.html" class="admin-nav-item"><i class="fas fa-users"></i> User Management</a>
+                <a href="admin-trades.html" class="admin-nav-item"><i class="fas fa-hand-holding-usd"></i> Trades & Orders</a>
+                <a href="admin-finance.html" class="admin-nav-item"><i class="fas fa-money-bill-transfer"></i> Finance & KYC</a>
+                <a href="admin-reports.html" class="admin-nav-item"><i class="fas fa-chart-bar"></i> Reporting</a>
+                <a href="admin-settings.html" class="admin-nav-item"><i class="fas fa-cogs"></i> System Settings</a>
+                <a href="admin-chat.html" class="admin-nav-item active"><i class="fas fa-comment-dots"></i> Live Chat Inbox</a> 
+            </nav>
+            </aside>
+
+        <main class="admin-main-content">
+            <header class="admin-header">
+                <h1>Live Chat Inbox</h1>
+                <p>Manage and respond to user support requests (5 Active Tickets)</p>
+            </header>
+            
+            <section class="inbox-layout">
+                <div class="ticket-list">
+                    
+                </div>
+                
+                <div class="message-area">
+                    <div class="chat-header">
+                        Currently Chatting with: #4567 - Mg Mg (Topic: Withdrawal Issue)
+                    </div>
+                    
+                    <div class="chat-messages" id="admin-chat-messages"></div>
+                    
+                    <div class="chat-input">
+                        <input type="text" placeholder="Reply to Mg Mg...">
+                        <button><i class="fas fa-paper-plane"></i> Send Reply</button>
+                        <button style="background-color: var(--color-positive);"><i class="fas fa-check"></i> Close Ticket</button>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+
+
+<script type="module">
+        import { auth, db } from '../firebase-init.js';
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { collection, query, where, orderBy, onSnapshot, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const ADMIN_EMAIL = "junalama463@gmail.com";
+let currentUserId = null;        // selected user's UID
+let currentUserLabel = '';
+let messagesUnsub = null;
+let allChatDocs = [];            // every chat message in DB
+
+onAuthStateChanged(auth, (user) => {
+    if (!user) { window.location.href = 'admin-login.html'; return; }
+    if (user.email !== ADMIN_EMAIL) { alert('Admin access only'); window.location.href = '../index.html'; return; }
+    initChat();
+});
+
+function initChat() {
+    // Listen to ALL chat messages so we can group by userId
+    const q = query(collection(db, 'chats'), orderBy('timestamp', 'desc'));
+    onSnapshot(q, (snap) => {
+        allChatDocs = [];
+        snap.forEach(d => allChatDocs.push({ id: d.id, ...d.data() }));
+        renderTicketList();
+        if (currentUserId) renderMessages();
+    });
+}
+
+function renderTicketList() {
+    const ticketList = document.querySelector('.ticket-list');
+    if (!ticketList) return;
+    
+    // Group by userId — track latest message per user
+    const userMap = new Map();
+    allChatDocs.forEach(m => {
+        if (!m.userId) return;
+        if (!userMap.has(m.userId)) {
+            userMap.set(m.userId, {
+                userId: m.userId,
+                userEmail: m.userEmail || '',
+                lastMessage: m.message || '[Image]',
+                lastTimestamp: m.timestamp,
+                lastIsAdmin: m.isAdmin || false,
+                unreadCount: 0,
+                messageCount: 0
+            });
+        }
+        const entry = userMap.get(m.userId);
+        entry.messageCount++;
+        // Count unread = messages from user that came after last admin reply
+        if (!m.isAdmin && !m.adminRead) {
+            entry.unreadCount++;
+        }
+    });
+    
+    // Sort: users with unread first, then by latest timestamp
+    const users = Array.from(userMap.values()).sort((a, b) => {
+        if (a.unreadCount > 0 && b.unreadCount === 0) return -1;
+        if (b.unreadCount > 0 && a.unreadCount === 0) return 1;
+        const tA = a.lastTimestamp?.toDate?.() || 0;
+        const tB = b.lastTimestamp?.toDate?.() || 0;
+        return tB - tA;
+    });
+    
+    // Update header count
+    const totalUnread = users.reduce((sum, u) => sum + u.unreadCount, 0);
+    const header = document.querySelector('.admin-header p');
+    if (header) header.innerText = `Manage user support requests — ${users.length} conversations${totalUnread > 0 ? ' • ' + totalUnread + ' unread' : ''}`;
+    
+    ticketList.innerHTML = users.map(u => {
+        const time = u.lastTimestamp?.toDate ? u.lastTimestamp.toDate().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : '';
+        const preview = (u.lastIsAdmin ? 'You: ' : '') + (u.lastMessage || '').slice(0, 45);
+        const userLabel = (u.userEmail || u.userId.slice(0, 8)).replace(/"/g, '&quot;');
+        const unreadBadge = u.unreadCount > 0 ? `<span style="background:#FF4444; color:#fff; border-radius:99px; padding:2px 8px; font-size:11px; font-weight:700; margin-left:6px;">${u.unreadCount}</span>` : '';
+        const isActive = currentUserId === u.userId ? 'active' : '';
+        const hasUnread = u.unreadCount > 0 ? 'style="border-left:3px solid #FF4444;"' : '';
+        
+        return `<div class="ticket-item ${isActive}" data-user-id="${u.userId}" data-user-label="${userLabel}" ${hasUnread}>
+            <div class="ticket-info">
+                <span class="ticket-subject">${u.userEmail || u.userId.slice(0,8)}${unreadBadge}</span>
+                <span class="ticket-status" style="color:${u.unreadCount > 0 ? '#FF4444' : 'var(--color-text-fade)'};">${time}</span>
+            </div>
+            <div class="ticket-preview">${preview}</div>
+        </div>`;
+    }).join('') || '<div style="padding:30px; text-align:center; color:var(--color-text-fade);">No chats yet</div>';
+    
+    // Click handler
+    ticketList.querySelectorAll('.ticket-item').forEach(item => {
+        item.onclick = () => selectChat(item.dataset.userId, item.dataset.userLabel);
+    });
+    
+    // Auto-select first if none selected
+    if (!currentUserId && users.length > 0) {
+        selectChat(users[0].userId, users[0].userEmail || users[0].userId.slice(0,8));
+    }
+}
+
+function selectChat(userId, userLabel) {
+    currentUserId = userId;
+    currentUserLabel = userLabel;
+    
+    document.querySelectorAll('.ticket-item').forEach(t => {
+        t.classList.toggle('active', t.dataset.userId === userId);
+    });
+    
+    const chatHeader = document.querySelector('.chat-header');
+    if (chatHeader) chatHeader.innerText = `Chatting with: ${userLabel}`;
+    
+    renderMessages();
+    
+    // Mark all unread messages from this user as read
+    markAsRead(userId);
+}
+
+function renderMessages() {
+    const msgBox = document.getElementById('admin-chat-messages');
+    if (!msgBox) return;
+    
+    const userMessages = allChatDocs
+        .filter(m => m.userId === currentUserId)
+        .sort((a, b) => {
+            const tA = a.timestamp?.toDate?.() || 0;
+            const tB = b.timestamp?.toDate?.() || 0;
+            return tA - tB;
+        });
+    
+    msgBox.innerHTML = userMessages.map(m => {
+        const time = m.timestamp?.toDate ? m.timestamp.toDate().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : '';
+        const cls = m.isAdmin ? 'admin-message' : 'user-message';
+        
+        if (m.chatImageUrl || m.imageUrl) {
+            const img = m.chatImageUrl || m.imageUrl;
+            return `<div class="message ${cls}"><img src="${img}" style="max-width:200px; border-radius:8px; display:block; cursor:zoom-in;" onclick="window.open(this.src, '_blank')">${m.message && m.message !== '[Image]' ? '<div style="margin-top:6px;">' + m.message + '</div>' : ''}<span class="message-time">${time}</span></div>`;
+        }
+        return `<div class="message ${cls}">${m.message || ''}<span class="message-time">${time}</span></div>`;
+    }).join('') || '<div style="text-align:center; padding:30px; color:var(--color-text-fade);">No messages yet</div>';
+    
+    msgBox.scrollTop = msgBox.scrollHeight;
+}
+
+async function markAsRead(userId) {
+    const { doc, updateDoc, getDocs, query: q2, where: w2, collection: c2 } = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js");
+    try {
+        const unreadQ = q2(c2(db, 'chats'), w2('userId', '==', userId), w2('isAdmin', '==', false), w2('adminRead', '==', false));
+        const snap = await getDocs(unreadQ);
+        const promises = [];
+        snap.forEach(d => promises.push(updateDoc(doc(db, 'chats', d.id), { adminRead: true })));
+        await Promise.all(promises);
+    } catch (e) {
+        // adminRead field might not exist on old docs - ignore
+        console.log('mark read:', e.message);
+    }
+}
+
+// Send reply
+const input = document.querySelector('.chat-input input[type="text"]');
+const buttons = document.querySelectorAll('.chat-input button');
+const sendBtn = buttons[0];
+const closeBtn = buttons[1];
+
+if (input) input.placeholder = "Type your reply...";
+
+async function sendReply() {
+    if (!currentUserId) { alert('Select a chat first'); return; }
+    const text = input.value.trim();
+    if (!text) return;
+    
+    try {
+        await addDoc(collection(db, 'chats'), {
+            userId: currentUserId,
+            userEmail: currentUserLabel.includes('@') ? currentUserLabel : '',
+            message: text,
+            isAdmin: true,
+            adminRead: true,
+            timestamp: serverTimestamp()
+        });
+        input.value = '';
+    } catch (e) {
+        alert('Send error: ' + e.message);
+    }
+}
+
+if (sendBtn) sendBtn.onclick = sendReply;
+if (closeBtn) closeBtn.style.display = 'none';  // No close ticket needed for flat chat
+if (input) input.addEventListener('keypress', e => {
+    if (e.key === 'Enter') { e.preventDefault(); sendReply(); }
+});
+</script>
+
+
+</body>
+</html>

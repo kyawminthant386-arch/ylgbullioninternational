@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YLG Admin - Login</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root { --bg: #111111; --gold: #FFD700; --card: #1A1A1A; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--bg);
+            color: white;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+        }
+        .login-card {
+            background: var(--card);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 0 30px rgba(0,0,0,0.7);
+            width: 100%;
+            max-width: 350px;
+            border-top: 4px solid var(--gold);
+            text-align: center;
+        }
+        .login-card h2 { color: var(--gold); margin-bottom: 25px; font-size: 24px; }
+        .input-group { position: relative; margin-bottom: 20px; }
+        .input-group i { position: absolute; left: 15px; top: 12px; color: var(--gold); }
+        input {
+            width: 100%;
+            padding: 12px 15px 12px 45px;
+            background: #000;
+            border: 1px solid #333;
+            color: white;
+            border-radius: 8px;
+            box-sizing: border-box;
+            outline: none;
+            transition: 0.3s;
+            font-size: 14px;
+        }
+        input:focus { border-color: var(--gold); box-shadow: 0 0 5px rgba(255, 215, 0, 0.3); }
+        input::placeholder { color: #555; }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: var(--gold);
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 16px;
+            color: #000;
+            margin-top: 10px;
+        }
+        button:hover { background: #e6c200; transform: translateY(-2px); }
+        button:disabled { background: #555; cursor: not-allowed; transform: none; }
+        .demo-creds {
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 20px;
+            font-size: 12px;
+            color: #ccc;
+        }
+        .demo-creds strong { color: var(--gold); }
+        .back-link { margin-top: 20px; display: block; color: #888; text-decoration: none; font-size: 13px; }
+        .back-link:hover { color: var(--gold); }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <i class="fas fa-user-shield fa-3x" style="color: var(--gold); margin-bottom: 15px;"></i>
+        <h2>Admin Panel</h2>
+        <form id="loginForm">
+            <div class="input-group">
+                <i class="fas fa-envelope"></i>
+                <input type="email" id="email" placeholder="Admin Email" required>
+            </div>
+            <div class="input-group">
+                <i class="fas fa-lock"></i>
+                <input type="password" id="password" placeholder="Password" required>
+            </div>
+            <button type="submit" id="loginBtn">LOGIN TO PANEL</button>
+        </form>
+        <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> Back to Website</a>
+    </div>
+
+    <script type="module">
+        import { auth } from '../firebase-init.js';
+        import { signInWithEmailAndPassword, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+const ADMIN_EMAIL = 'junalama463@gmail.com';
+
+onAuthStateChanged(auth, (user) => {
+    if (user && user.email === ADMIN_EMAIL) {
+        console.log("Already logged in as admin");
+        // Ensure sessionStorage flags are set so admin-index gate passes
+        sessionStorage.setItem('adminLoggedIn', 'true');
+        sessionStorage.setItem('adminEmail', user.email);
+        window.location.href = 'admin-index.html';
+    }
+});
+
+document.getElementById('loginForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const loginBtn = document.getElementById('loginBtn');
+
+    if (email !== ADMIN_EMAIL) {
+        Swal.fire({
+            icon: 'error', title: 'Access Denied',
+            text: 'Only admin email can log in here.',
+            background: '#1a1a1a', color: '#fff',
+            confirmButtonColor: '#FFD700'
+        });
+        return;
+    }
+
+    loginBtn.disabled = true;
+    loginBtn.innerText = "Verifying...";
+
+    try {
+        await setPersistence(auth, browserLocalPersistence);
+        await signInWithEmailAndPassword(auth, email, password);
+        
+        // Set sessionStorage flags so admin-index gate passes
+        sessionStorage.setItem('adminLoggedIn', 'true');
+        sessionStorage.setItem('adminEmail', email);
+
+        Swal.fire({
+            icon: 'success', title: 'Welcome Back!',
+            text: 'Redirecting to Admin Dashboard...',
+            timer: 1500, showConfirmButton: false,
+            background: '#1a1a1a', color: '#fff'
+        }).then(() => {
+            window.location.href = 'admin-index.html';
+        });
+    } catch (error) {
+        console.error(error);
+        loginBtn.disabled = false;
+        loginBtn.innerText = "LOGIN TO PANEL";
+
+        let errorMsg = "Login failed. Please check your credentials.";
+        if (error.code === 'auth/network-request-failed') errorMsg = "Network error. Please check your internet connection.";
+        if (error.code === 'auth/too-many-requests') errorMsg = "Too many failed attempts. Try again later.";
+        if (error.code === 'auth/user-not-found') errorMsg = "User not found.";
+        if (error.code === 'auth/wrong-password') errorMsg = "Incorrect password.";
+        if (error.code === 'auth/invalid-credential') errorMsg = "Invalid credentials.";
+
+        Swal.fire({
+            icon: 'error', title: 'Login Failed', text: errorMsg,
+            background: '#1a1a1a', color: '#fff',
+            confirmButtonColor: '#FFD700'
+        });
+    }
+});
+</script>
+</body>
+</html>

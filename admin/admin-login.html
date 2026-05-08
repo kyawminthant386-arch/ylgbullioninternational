@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YLG Admin — Login</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        *{ box-sizing:border-box; margin:0; padding:0; }
+        body{
+            font-family:'Segoe UI',sans-serif;
+            background:#0c0c0c;
+            color:#e0e0e0;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            min-height:100vh;
+            padding:20px;
+        }
+        .card{
+            background:#1a1a1a;
+            border:1px solid rgba(255,215,0,0.25);
+            border-radius:12px;
+            padding:36px 32px;
+            width:100%;
+            max-width:400px;
+            box-shadow:0 12px 40px rgba(0,0,0,0.6);
+        }
+        .logo-row{
+            display:flex;
+            align-items:center;
+            gap:14px;
+            margin-bottom:24px;
+        }
+        .logo-box{
+            width:48px;
+            height:48px;
+            border-radius:10px;
+            background:linear-gradient(135deg,#FFD700,#e6b800);
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-weight:900;
+            font-size:18px;
+            color:#111;
+            flex-shrink:0;
+        }
+        h1{ font-size:18px; color:#FFD700; margin-bottom:4px; }
+        .sub{ font-size:12px; color:#888; }
+        label{ display:block; font-size:13px; color:#999; margin-bottom:6px; }
+        .field{ margin-bottom:16px; }
+        input[type=email],
+        input[type=password]{
+            width:100%;
+            padding:11px 14px;
+            background:#111;
+            border:1px solid rgba(255,255,255,0.07);
+            border-radius:8px;
+            color:#fff;
+            font-size:14px;
+            outline:none;
+            transition:border-color .2s;
+        }
+        input:focus{ border-color:rgba(255,215,0,0.45); }
+        .pw-row{ display:flex; gap:8px; align-items:center; }
+        .pw-row input{ flex:1; }
+        .toggle-pw{
+            background:none;
+            border:none;
+            color:#888;
+            cursor:pointer;
+            font-size:17px;
+            padding:4px 6px;
+            flex-shrink:0;
+        }
+        .btn{
+            width:100%;
+            padding:12px;
+            background:#FFD700;
+            color:#111;
+            font-weight:700;
+            font-size:15px;
+            border:none;
+            border-radius:10px;
+            cursor:pointer;
+            transition:opacity .15s;
+        }
+        .btn:disabled{ opacity:.6; cursor:default; }
+        .error-box{
+            margin-top:14px;
+            padding:10px 14px;
+            background:#3a1010;
+            color:#ffb3b3;
+            border-radius:8px;
+            font-size:13px;
+            display:none;
+        }
+        .shield{
+            text-align:center;
+            margin-top:20px;
+            font-size:11px;
+            color:#555;
+        }
+        .shield i{ margin-right:5px; }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="logo-row">
+        <div class="logo-box">YLG</div>
+        <div>
+            <h1>Admin Control Panel</h1>
+            <p class="sub">Authorized personnel only</p>
+        </div>
+    </div>
+
+    <form id="loginForm">
+        <div class="field">
+            <label for="email">Admin Email</label>
+            <input type="email" id="email" autocomplete="email" required placeholder="admin@example.com">
+        </div>
+        <div class="field">
+            <label for="password">Password</label>
+            <div class="pw-row">
+                <input type="password" id="password" autocomplete="current-password" required placeholder="••••••••">
+                <button type="button" class="toggle-pw" id="togglePw" aria-label="Show/hide password">
+                    <i class="fas fa-eye"></i>
+                </button>
+            </div>
+        </div>
+        <button type="submit" class="btn" id="submitBtn">
+            <i class="fas fa-sign-in-alt"></i> Sign In
+        </button>
+        <div class="error-box" id="errorBox"></div>
+    </form>
+
+    <p class="shield"><i class="fas fa-shield-halved"></i>Access is logged and monitored</p>
+</div>
+
+<script type="module">
+    import { auth } from '../firebase-init.js';
+    import { signInWithEmailAndPassword, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+
+    const ADMIN_EMAILS = [
+        'junalama463@gmail.com'
+    ];
+
+    const form      = document.getElementById('loginForm');
+    const emailEl   = document.getElementById('email');
+    const passEl    = document.getElementById('password');
+    const submitBtn = document.getElementById('submitBtn');
+    const errorBox  = document.getElementById('errorBox');
+    const togglePw  = document.getElementById('togglePw');
+
+    function showError(msg) {
+        errorBox.textContent = msg;
+        errorBox.style.display = msg ? 'block' : 'none';
+    }
+
+    togglePw.addEventListener('click', () => {
+        const isHidden = passEl.type === 'password';
+        passEl.type = isHidden ? 'text' : 'password';
+        togglePw.querySelector('i').className = isHidden ? 'fas fa-eye-slash' : 'fas fa-eye';
+    });
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        showError('');
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Signing in...';
+
+        const email    = emailEl.value.trim().toLowerCase();
+        const password = passEl.value;
+
+        // Step 1: check whitelist before even attempting Firebase login
+        if (!ADMIN_EMAILS.includes(email)) {
+            showError('Access denied. This email is not authorized as admin.');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Sign In';
+            return;
+        }
+
+        try {
+            const cred = await signInWithEmailAndPassword(auth, email, password);
+
+            // Step 2: double-check after Firebase auth (guards against whitelist tampering)
+            if (!ADMIN_EMAILS.includes(cred.user.email.toLowerCase())) {
+                await signOut(auth);
+                showError('Access denied.');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Sign In';
+                return;
+            }
+
+            // Authenticated + authorized
+            sessionStorage.setItem('adminLoggedIn', 'true');
+            sessionStorage.setItem('adminEmail', cred.user.email);
+            window.location.replace('admin-index.html');
+
+        } catch (err) {
+            const code = err.code || '';
+            let msg = 'Login failed. Please try again.';
+            if (code === 'auth/wrong-password' || code === 'auth/invalid-credential' || code === 'auth/invalid-login-credentials') {
+                msg = 'Incorrect email or password.';
+            } else if (code === 'auth/user-not-found') {
+                msg = 'No account found with this email.';
+            } else if (code === 'auth/too-many-requests') {
+                msg = 'Too many failed attempts. Try again later.';
+            } else if (code === 'auth/user-disabled') {
+                msg = 'This account has been disabled.';
+            }
+            showError(msg);
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Sign In';
+        }
+    });
+
+    [emailEl, passEl].forEach(el => el.addEventListener('input', () => showError('')));
+</script>
+</body>
+</html>

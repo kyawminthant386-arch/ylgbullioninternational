@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//d/Ylg-bullion international/**)",
+      "Bash(python3 -c ' *)",
+      "Bash(node -e ' *)",
+      "PowerShell(Get-ChildItem \"d:\\\\Ylg-bullion international\\\\ylg-bullion\" | Where-Object { !$_.PSIsContainer } | Select-Object -ExpandProperty Name | Sort-Object)",
+      "PowerShell($lines = \\(Get-Content \"d:\\\\Ylg-bullion international\\\\ylg-bullion\\\\index.html\"\\).Count; Write-Output \"Total lines: $lines\")",
+      "PowerShell(\\(Get-Content \"d:\\\\Ylg-bullion international\\\\ylg-bullion\\\\register.html\"\\).Count)",
+      "PowerShell(\\(Get-Content \"d:\\\\Ylg-bullion international\\\\ylg-bullion\\\\register.html\"\\).Count; \\(Get-Content \"d:\\\\Ylg-bullion international\\\\ylg-bullion\\\\history.html\"\\).Count)",
+      "PowerShell(Remove-Item \"d:\\\\Ylg-bullion international\\\\ylg-bullion\\\\login-debug.html\" -Confirm:$false)",
+      "PowerShell($env:PATH = $env:PATH + \";C:\\\\Program Files\\\\Git\\\\cmd;C:\\\\Program Files\\\\Git\\\\bin\"; git --version)",
+      "PowerShell(winget install --id Git.Git -e --source winget --accept-package-agreements --accept-source-agreements)",
+      "PowerShell($env:PATH = \"C:\\\\Program Files\\\\Git\\\\cmd;\" + $env:PATH; git --version)",
+      "PowerShell($env:PATH = \"C:\\\\Program Files\\\\Git\\\\cmd;\" + $env:PATH; cd \"d:\\\\Ylg-bullion international\\\\ylg-bullion\"; git remote -v)",
+      "PowerShell($env:PATH = \"C:\\\\Program Files\\\\Git\\\\cmd;\" + $env:PATH; cd \"d:\\\\Ylg-bullion international\\\\ylg-bullion\"; git init; git config user.email \"nver86406@gmail.com\"; git config user.name \"kyawminthant386-arch\")",
+      "PowerShell($env:PATH = \"C:\\\\Program Files\\\\Git\\\\cmd;\" + $env:PATH; Set-Location \"d:\\\\Ylg-bullion international\\\\ylg-bullion\"; git config user.email \"nver86406@gmail.com\"; git config user.name \"kyawminthant386-arch\"; git status)",
+      "PowerShell($env:PATH = \"C:\\\\Program Files\\\\Git\\\\cmd;\" + $env:PATH; git config --global --add safe.directory \"D:/Ylg-bullion international/ylg-bullion\"; Set-Location \"d:\\\\Ylg-bullion international\\\\ylg-bullion\"; git config user.email \"nver86406@gmail.com\"; git config user.name \"kyawminthant386-arch\"; git status --short | Select-Object -First 20)",
+      "PowerShell($env:PATH = \"C:\\\\Program Files\\\\Git\\\\cmd;\" + $env:PATH; Set-Location \"d:\\\\Ylg-bullion international\\\\ylg-bullion\"; git remote add origin \"https://github.com/kyawminthant386-arch/ylgbullioninternational.git\"; git remote -v)",
+      "PowerShell($env:PATH = \"C:\\\\Program Files\\\\Git\\\\cmd;\" + $env:PATH; Set-Location \"d:\\\\Ylg-bullion international\\\\ylg-bullion\"; git add .; git commit -m \"Initial commit: YLG Bullion website with deposit management, payment accounts, privacy/risk pages, login disclaimer\")"
+    ]
+  }
+}

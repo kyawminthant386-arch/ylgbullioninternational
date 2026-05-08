@@ -1,0 +1,2134 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YLG Admin - Control Panel</title>
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline' https://www.gstatic.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com;">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <style>
+        :root {
+            --bg-dark: #111111;
+            --card-bg: #1A1A1A;
+            --gold: #FFD700;
+            --green: #00B050;
+            --red: #D93025;
+            --orange: #FF9800;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            display: flex;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-dark);
+            color: #e0e0e0;
+            overflow: hidden;
+        }
+        
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            height: 100vh;
+            overflow-y: auto;
+            margin-right: 380px;
+        }
+        
+        .sidebar-right {
+            width: 380px;
+            background: #151515;
+            border-left: 2px solid var(--gold);
+            height: 100vh;
+            position: fixed;
+            right: 0;
+            top: 0;
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--gold);
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+        
+        header h2 {
+            font-size: 24px;
+            color: var(--gold);
+        }
+        
+        header small {
+            color: var(--gold);
+            font-weight: bold;
+            font-size: 12px;
+            margin-top: 5px;
+            display: block;
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 10px;
+        }
+        
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 12px;
+            transition: 0.2s all;
+        }
+        
+        button:hover {
+            opacity: 0.85;
+            transform: scale(1.02);
+        }
+        
+        .refresh-btn {
+            background: var(--gold);
+            color: black;
+            font-weight: bold;
+        }
+        
+        .logout-btn {
+            background: #333;
+            color: #fff;
+            border: 1px solid #444;
+        }
+        
+        .section {
+            margin-top: 25px;
+        }
+        
+        .section h3 {
+            font-size: 18px;
+            color: var(--gold);
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #333;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #444;
+            border-radius: 5px;
+            background: #000;
+            color: #fff;
+            outline: none;
+        }
+        
+        .search-input:focus {
+            border-color: var(--gold);
+            box-shadow: 0 0 5px rgba(255, 215, 0, 0.3);
+        }
+        
+        .user-card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 12px;
+            border-left: 5px solid #333;
+            display: grid;
+            grid-template-columns: 1.4fr 1.1fr 1.1fr 1.1fr 1.2fr 1fr;
+            gap: 12px;
+            align-items: center;
+            transition: 0.3s;
+        }
+        
+        .user-card:hover, .withdraw-card:hover {
+            background: #222;
+            border-left-color: var(--gold);
+        }
+        
+        .withdraw-card { background: var(--card-bg); border-radius: 8px; padding: 15px; margin-bottom: 12px; border-left: 5px solid var(--orange, #FF9800); display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: 15px; }
+        
+        .info h4 {
+            margin: 0 0 5px 0;
+            color: var(--gold);
+            font-size: 14px;
+            word-break: break-word;
+        }
+        
+        .info p {
+            margin: 3px 0;
+            font-size: 11px;
+            color: #999;
+        }
+        
+        .kyc-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+            margin-top: 5px;
+            text-transform: uppercase;
+        }
+        
+        .kyc-pending {
+            background: #444;
+            color: #fff;
+        }
+        
+        .kyc-verified {
+            background: var(--green);
+            color: #fff;
+        }
+        
+        .kyc-rejected {
+            background: var(--red);
+            color: #fff;
+        }
+        
+        .btn-action {
+            padding: 8px 12px;
+            font-size: 11px;
+            margin: 4px 2px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            display: inline-block;
+            transition: 0.2s all;
+        }
+        
+        .btn-action:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+        
+        .btn-action:active {
+            transform: translateY(0);
+        }
+        
+        .btn-approve {
+            background: var(--green);
+            color: white;
+        }
+        
+        .btn-reject {
+            background: var(--red);
+            color: white;
+        }
+        
+        .btn-view {
+            background: #2196F3;
+            color: white;
+        }
+        
+        .btn-verify {
+            background: var(--green);
+            color: white;
+        }
+        
+        .btn-delete {
+            background: transparent;
+            color: var(--red);
+            border: 1px solid var(--red);
+            width: 100%;
+            margin-top: 8px;
+        }
+        
+        .chat-header {
+            padding: 15px;
+            background: var(--card-bg);
+            border-bottom: 1px solid #333;
+            text-align: center;
+            color: var(--gold);
+            font-weight: bold;
+        }
+        
+        #chatContainer {
+            flex: 1;
+            padding: 12px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .chat-msg {
+            padding: 10px;
+            background: #222;
+            border-radius: 6px;
+            border-left: 4px solid transparent;
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+        
+        .chat-msg.admin {
+            border-left-color: var(--gold);
+        }
+        
+        .chat-msg.user {
+            border-left-color: #2196F3;
+        }
+        
+        .chat-input-group {
+            padding: 12px;
+            display: flex;
+            gap: 8px;
+            border-top: 1px solid #333;
+        }
+        
+        .chat-input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #444;
+            border-radius: 4px;
+            background: #000;
+            color: #fff;
+            outline: none;
+            font-size: 12px;
+        }
+        
+        .chat-input:focus {
+            border-color: var(--gold);
+        }
+        
+        .chat-send-btn {
+            padding: 8px 15px;
+            background: var(--gold);
+            color: black;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .empty-state {
+            text-align: center;
+            color: #666;
+            padding: 30px 15px;
+        }
+        
+        .tab-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .tab-btn {
+            padding: 8px 15px;
+            background: #333;
+            color: #ccc;
+            border: 1px solid #444;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+        
+        .tab-btn.active {
+            background: var(--gold);
+            color: black;
+            border-color: var(--gold);
+        }
+        
+        @media (max-width: 1200px) {
+            .main-content {
+                margin-right: 0;
+            }
+            
+            body {
+                flex-direction: column;
+            }
+            
+            .sidebar-right {
+                width: 100%;
+                height: 400px;
+                bottom: 0;
+                top: auto;
+                right: 0;
+                border-left: none;
+                border-top: 2px solid var(--gold);
+            }
+        }
+        
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #000;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #444;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #666;
+        }
+    
+        @media (max-width: 1100px) {
+            .user-card { grid-template-columns: 1fr 1fr 1fr; }
+        }
+        @media (max-width: 700px) {
+            .user-card { grid-template-columns: 1fr; }
+            .withdraw-card { grid-template-columns: 1fr; }
+        }
+
+        </style>
+</head>
+<body>
+    <audio id="notifSound" src="https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3" preload="auto"></audio>
+    
+    <div class="main-content">
+        <header>
+            <div>
+                <h2><i class="fas fa-user-shield"></i> YLG Admin Control Panel</h2>
+                <small id="adminEmailDisplay">Authenticating...</small>
+            </div>
+            <div class="btn-group">
+                <button onclick="window.refreshAll()" class="refresh-btn"><i class="fas fa-sync"></i> Refresh</button>
+                <button onclick="window.adminLogout()" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </div>
+        </header>
+        
+        <!-- ── Platform Stats ── -->
+        <div class="section" id="platform-stats-section">
+            <h3><i class="fas fa-chart-bar"></i> Platform Stats</h3>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;">
+                <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:16px 18px;">
+                    <div style="font-size:11px;color:#666;margin-bottom:6px;"><i class="fas fa-users" style="color:#2196F3;margin-right:5px;"></i>Total Users</div>
+                    <div id="stat-total-users" style="font-size:24px;font-weight:800;color:#fff;">—</div>
+                </div>
+                <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:16px 18px;">
+                    <div style="font-size:11px;color:#666;margin-bottom:6px;"><i class="fas fa-arrow-down" style="color:#4CAF50;margin-right:5px;"></i>Total Deposited</div>
+                    <div id="stat-total-dep" style="font-size:24px;font-weight:800;color:#4CAF50;">—</div>
+                </div>
+                <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:16px 18px;">
+                    <div style="font-size:11px;color:#666;margin-bottom:6px;"><i class="fas fa-wallet" style="color:#FFD700;margin-right:5px;"></i>Total Balance</div>
+                    <div id="stat-total-bal" style="font-size:24px;font-weight:800;color:#FFD700;">—</div>
+                </div>
+                <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:16px 18px;">
+                    <div style="font-size:11px;color:#666;margin-bottom:6px;"><i class="fas fa-hourglass-half" style="color:#FF9800;margin-right:5px;"></i>Pending Deposits</div>
+                    <div id="stat-pending-dep" style="font-size:24px;font-weight:800;color:#FF9800;">—</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Payment Accounts ── -->
+        <div class="section">
+            <h3><i class="fas fa-university" style="color:#C9A84C;"></i> Payment Accounts
+                <button onclick="window.openAddPaymentAccount()" class="refresh-btn" style="margin-left:12px;padding:6px 14px;font-size:12px;">
+                    <i class="fas fa-plus"></i> Add Account
+                </button>
+            </h3>
+            <div id="paymentAccountsList" class="empty-state">Loading...</div>
+        </div>
+
+        <!-- ── Deposit Requests ── -->
+        <div class="section">
+            <h3><i class="fas fa-arrow-circle-down" style="color:#4CAF50;"></i> Deposit Requests</h3>
+            <div class="tab-buttons" id="depositReqTabs">
+                <button class="tab-btn active" onclick="filterDepositReqs('pending')">Pending</button>
+                <button class="tab-btn" onclick="filterDepositReqs('approved')">Approved</button>
+                <button class="tab-btn" onclick="filterDepositReqs('rejected')">Rejected</button>
+            </div>
+            <div id="depositReqList" class="empty-state">Loading deposit requests...</div>
+        </div>
+
+        <div class="section">
+            <h3><i class="fas fa-hand-holding-usd"></i> Withdrawal Requests</h3>
+            <div class="tab-buttons" id="withdrawalTabs">
+                <button class="tab-btn active" onclick="filterWithdrawals('pending')">Pending</button>
+                <button class="tab-btn" onclick="filterWithdrawals('approved')">Approved</button>
+                <button class="tab-btn" onclick="filterWithdrawals('rejected')">Rejected</button>
+            </div>
+            <div id="withdrawList" class="empty-state">Loading withdrawal requests...</div>
+        </div>
+        
+        <div class="section">
+            <h3><i class="fas fa-certificate"></i> KYC Verification</h3>
+            <div class="tab-buttons" id="kycTabs">
+                <button class="tab-btn active" onclick="filterKYC('pending')">Pending</button>
+                <button class="tab-btn" onclick="filterKYC('verified')">Verified</button>
+                <button class="tab-btn" onclick="filterKYC('rejected')">Rejected</button>
+            </div>
+            <div id="kycList" class="empty-state">Loading KYC requests...</div>
+        </div>
+        
+        <!-- Send Notification -->
+        <div class="section">
+            <h3><i class="fas fa-bullhorn"></i> Send Notification</h3>
+            <div style="max-width:600px;display:grid;gap:12px;">
+                <input id="notif-title" type="text" class="search-input" placeholder="Notification title..." style="margin:0;">
+                <textarea id="notif-msg" class="search-input" placeholder="Message body..." style="margin:0;height:80px;resize:vertical;font-family:inherit;"></textarea>
+                <div style="display:flex;gap:12px;flex-wrap:wrap;">
+                    <select id="notif-type" style="flex:1;min-width:140px;padding:11px;background:#000;color:#fff;border:1px solid #444;border-radius:5px;outline:none;font-size:13px;">
+                        <option value="announcement">📢 Announcement</option>
+                        <option value="kyc">🪪 KYC Update</option>
+                        <option value="deposit">💰 Deposit</option>
+                        <option value="withdrawal">💸 Withdrawal</option>
+                        <option value="trade">📈 Trading</option>
+                    </select>
+                    <select id="notif-target" style="flex:1;min-width:140px;padding:11px;background:#000;color:#fff;border:1px solid #444;border-radius:5px;outline:none;font-size:13px;">
+                        <option value="all">📣 All Users</option>
+                    </select>
+                </div>
+                <button onclick="window.sendNotification()" class="refresh-btn" style="padding:12px;font-size:13px;">
+                    <i class="fas fa-paper-plane" style="margin-right:6px;"></i>Send Notification
+                </button>
+            </div>
+        </div>
+
+        <div class="section">
+            <h3><i class="fas fa-users"></i> Users Management</h3>
+            <div style="position: sticky; top: 0; z-index: 100; background: var(--bg-dark, #0C0D0F); padding: 10px 0; margin-bottom: 15px;">
+                <input type="text" id="userSearch" class="search-input" placeholder="Search by YLG ID, name, email, or user ID..." onkeyup="filterUsers()">
+                <span id="searchResultCount" style="margin-left:10px; color:#FFD700; font-size:12px; font-weight:600;"></span>
+            </div>
+            <div id="userList" class="empty-state">Loading users from database...</div>
+        </div>
+    </div>
+    
+    <div class="sidebar-right">
+        <div class="chat-header">
+            <h3><i class="fas fa-comments"></i> Live Chat Support</h3>
+        </div>
+        <div id="chatContainer"></div>
+        <div class="chat-input-group">
+            <input type="text" id="chatInput" class="chat-input" placeholder="Type message..." onkeypress="if(event.key==='Enter') sendChatMessage()">
+            <button class="chat-send-btn" onclick="sendChatMessage()"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+    
+    <!-- KYC Image Modal -->
+    <div id="kycModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:2000; padding:20px;">
+        <div style="position:relative; max-width:600px; margin:auto; height:90%; background:#1a1a1a; border-radius:10px; overflow:auto;">
+            <button onclick="closeKYCModal()" style="position:sticky; top:0; right:10px; background:var(--red); color:white; border:none; padding:10px 15px; border-radius:5px; cursor:pointer; font-weight:bold;">Close</button>
+            <div id="kycModalContent" style="padding:20px;"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { app, auth, db } from '../firebase-init.js';
+        import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getDatabase } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+        
+        const rtdb = getDatabase(app);
+
+        // Global state
+        let allUsers = [];
+        let allWithdrawals = [];
+        let allKYC = [];
+        let allDepositReqs = [];
+        let currentAdminEmail = null;
+        let currentWithdrawalFilter = 'pending';
+        let currentKYCFilter = 'pending';
+        let currentDepositReqFilter = 'pending';
+
+        const ADMIN_EMAILS = [
+            'junalama463@gmail.com'
+        ];
+
+        // Initialize — verify Firebase Auth state, not just sessionStorage
+        onAuthStateChanged(auth, async function(user) {
+            if (!user || !ADMIN_EMAILS.includes(user.email.toLowerCase())) {
+                // Not logged in or not an admin — sign out and redirect
+                try { await signOut(auth); } catch(e) {}
+                sessionStorage.removeItem('adminLoggedIn');
+                sessionStorage.removeItem('adminEmail');
+                window.location.href = 'admin-login.html';
+                return;
+            }
+            currentAdminEmail = user.email;
+            sessionStorage.setItem('adminLoggedIn', 'true');
+            sessionStorage.setItem('adminEmail', user.email);
+            document.getElementById('adminEmailDisplay').textContent = 'Admin: ' + currentAdminEmail;
+            loadAllData();
+            setupChatListener();
+        });
+
+        // Load all data
+        async function loadAllData() {
+            await loadUsers();
+            await loadWithdrawals();
+            await loadKYC();
+            loadDepositRequests();
+            loadPaymentAccounts();
+        }
+
+        // Load Users from Firestore (real-time)
+        let _usersUnsub = null;  // tracks subscription
+        async function loadUsers() {
+            try {
+                const { onSnapshot, collection } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+                
+                // Unsubscribe previous listener (avoid leaks)
+                if (typeof _usersUnsub === 'function') _usersUnsub();
+                
+                // Real-time listener — auto-updates when users register/edit
+                _usersUnsub = onSnapshot(collection(db, 'users'), (snapshot) => {
+                    allUsers = [];
+                    snapshot.forEach(function(doc) {
+                    const u = doc.data();
+                    allUsers.push({
+                        id: doc.id,
+                        fullName: u.fullName || u.fullname || u.userName || u.email || 'N/A',
+                        email: u.email || '',
+                        balance: u.balance || 0,
+                        depositBalance: u.depositBalance || 0,
+                        ylgId: u.ylgId || u.customYlgId || '',
+                        userIndex: u.userIndex,
+                        fullname: u.fullname || '',
+                        phone: u.phone || '',
+                        kycStatus: u.kycStatus || 'unverified',
+                        tradeControl: u.tradeControl || 'NORMAL',
+                        accountStatus: u.frozen ? 'FROZEN' : (u.blocked ? 'BLOCKED' : 'ACTIVE'),
+                        frozen: u.frozen || false,
+                        blocked: u.blocked || false,
+                        createdAt: u.createdAt
+                    });
+                });
+                
+                // Sort by userIndex desc (newest registered first)
+                allUsers.sort((a, b) => (b.userIndex || 0) - (a.userIndex || 0));
+                
+                // Detect duplicate userIndexes (DB conflict — append uid suffix to disambiguate)
+                const indexCount = {};
+                allUsers.forEach(u => {
+                    if (typeof u.userIndex === 'number') {
+                        indexCount[u.userIndex] = (indexCount[u.userIndex] || 0) + 1;
+                    }
+                });
+                allUsers.forEach(u => {
+                    if (typeof u.userIndex === 'number' && indexCount[u.userIndex] > 1) {
+                        u._idDuplicate = true;
+                    }
+                });
+                
+                displayUsers();
+                updatePlatformStats();
+                });  // end onSnapshot callback
+            } catch (error) {
+                console.error('Error loading users from Firestore:', error);
+                const listEl = document.getElementById('userList');
+                if (listEl) listEl.innerHTML = '<div class="empty-state">Error loading users. Check console.</div>';
+            }
+        }
+
+        // Load Withdrawals — real-time
+        let _withdrawUnsub = null;
+        async function loadWithdrawals() {
+            try {
+                const { collection, onSnapshot } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+                if (typeof _withdrawUnsub === 'function') _withdrawUnsub();
+                _withdrawUnsub = onSnapshot(collection(db, 'withdrawals'), (snapshot) => {
+                    allWithdrawals = [];
+                    snapshot.forEach(function(d) { allWithdrawals.push({id: d.id, ...d.data()}); });
+                    displayWithdrawals();
+                });
+            } catch (error) {
+                console.error('Error loading withdrawals:', error);
+                document.getElementById('withdrawList').innerHTML = '<div class="empty-state">Error loading withdrawals.</div>';
+            }
+        }
+
+        // Load KYC — real-time
+        let _kycUnsub = null;
+        async function loadKYC() {
+            try {
+                const { collection, onSnapshot } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+                if (typeof _kycUnsub === 'function') _kycUnsub();
+                _kycUnsub = onSnapshot(collection(db, 'kyc'), (snapshot) => {
+                    allKYC = [];
+                    snapshot.forEach(function(d) { allKYC.push({id: d.id, ...d.data()}); });
+                    displayKYC();
+                });
+            } catch (error) {
+                console.error('Error loading KYC:', error);
+                document.getElementById('kycList').innerHTML = '<div class="empty-state">Error loading KYC data.</div>';
+            }
+        }
+
+
+        // Filter users by search query
+        let _userSearchQuery = '';
+        window.filterUsers = function(query) {
+            // Accept either direct string arg or read from #userSearch input
+            if (typeof query !== 'string') {
+                const el = document.getElementById('userSearch') || document.getElementById('userSearchInput');
+                query = el ? el.value : '';
+            }
+            _userSearchQuery = (query || '').trim().toLowerCase();
+            displayUsers();
+        };
+
+        // Display Users
+        function displayUsers() {
+            const list = document.getElementById('userList');
+            const countEl = document.getElementById('searchResultCount');
+            
+            // Apply search filter
+            const q = _userSearchQuery;
+            // Normalize query: strip "YLG-", "YLG", "-", spaces for flexible matching
+            const normalizedQ = q.replace(/[^a-z0-9@.]/g, '').replace(/^ylg/, '');
+            
+            const users = q ? allUsers.filter(function(u) {
+                // Generate display ID same as user pages
+                let displayId = '';
+                if (typeof u.userIndex === 'number') {
+                    displayId = 'YLG-2026' + String(u.userIndex).padStart(4, '0');
+                } else if (u.ylgId) {
+                    displayId = u.ylgId;
+                }
+                
+                // Normalize: remove hyphens and spaces from both query and display ID for matching
+                const normalize = (s) => (s || '').toLowerCase().replace(/[\s-]/g, '');
+                const dq = normalize(q);
+                const did = normalize(displayId);
+                
+                const idMatch = did.includes(dq) || displayId.toLowerCase().includes(q);
+                const rawIdMatch = (u.id || '').toLowerCase().includes(q);
+                const nameMatch = (u.fullName || '').toLowerCase().includes(q);
+                const fullnameMatch = (u.fullname || '').toLowerCase().includes(q);
+                const emailMatch = (u.email || '').toLowerCase().includes(q);
+                const phoneMatch = (u.phone || '').toLowerCase().includes(q);
+                
+                return idMatch || rawIdMatch || nameMatch || fullnameMatch || emailMatch || phoneMatch;
+            }) : allUsers;
+            
+            if (countEl) {
+                countEl.innerText = q ? (users.length + ' / ' + allUsers.length) : '';
+            }
+            
+            if (allUsers.length === 0) {
+                list.innerHTML = '<div class="empty-state">No users found.</div>';
+                return;
+            }
+            if (users.length === 0) {
+                list.innerHTML = '<div class="empty-state">No users match "' + q + '"</div>';
+                return;
+            }
+            let html = '';
+            users.forEach(function(user) {
+                const isFrozen = user.accountStatus === 'FROZEN';
+                const tradeControl = user.tradeControl || 'NORMAL';
+                
+                const kycStatus = (user.kycStatus || 'unverified').toLowerCase();
+                const kycColor = kycStatus === 'verified' ? '#4CAF50' : kycStatus === 'pending' ? '#FF9800' : kycStatus === 'rejected' ? '#FF6B6B' : '#888';
+                const kycLabel = kycStatus === 'verified' ? '✓ Verified' : kycStatus === 'pending' ? '<i class="fas fa-hourglass-half"></i> Pending' : kycStatus === 'rejected' ? '✗ Rejected' : '— Unverified';
+
+                html += '<div class="user-card" style="border-left-color: ' + (isFrozen ? '#FF6B6B' : '#FFD700') + ';">' +
+                    '<div class="info"><h4>' + (user.fullName || 'N/A') + '</h4>' +
+                    '<p>' + (user.email || 'N/A') + '</p>' +
+                    '<p style="font-size:12px; color:#FFD700; font-weight:600; font-family:monospace;">ID: ' + (function(){
+                        // SAME logic as user pages (portfolio.html, account.html):
+                        // const mId = "YLG-2026" + String(userIndex).padStart(4, '0');
+                        // Match user pages format: YLG-2026NNNN (no hyphen)
+                        if (typeof user.userIndex === 'number') {
+                            const num = String(user.userIndex).padStart(4, '0');
+                            const baseId = 'YLG-2026' + num;
+                            // If duplicate userIndex detected, append short uid suffix to disambiguate
+                            if (user._idDuplicate) {
+                                return baseId + '-' + (user.id ? user.id.slice(0, 4).toUpperCase() : '????');
+                            }
+                            return baseId;
+                        }
+                        // Fallback: try ylgId field if userIndex missing
+                        if (user.ylgId) {
+                            const m = user.ylgId.match(/^YLG-(\\d{4})(\\d{4})$/);
+                            if (m) return 'YLG-' + m[1] + m[2];
+                            if (/^YLG-\\d{4}-\\d{4}$/.test(user.ylgId)) return user.ylgId;
+                            return user.ylgId;
+                        }
+                        // Last fallback: no userIndex and no ylgId = very old user
+                        return 'YLG-2026????';
+                    })() + '</p></div>' +
+
+                    '<div class="info"><h4>Balance</h4><p style="color:#FFD700; font-weight:bold;">$' + (user.balance || 0).toLocaleString() + '</p>' +
+                    '<button class="btn-action" style="background:#4CAF50; color:white; margin-top:5px;" onclick="openDepositDialog(\'' + user.id + '\', \'' + (user.fullName || 'User').replace(/\'/g, "&#39;") + '\')">+ Deposit</button>' +
+                    '<button class="btn-action" style="background:#FF9800; color:white; margin-top:5px;" onclick="openWithdrawDialog(\'' + user.id + '\', \'' + (user.fullName || 'User').replace(/\'/g, "&#39;") + '\')">- Withdraw</button>' +
+                    (function(){
+                        const credited = user.bonusDaysCredited || 0;
+                        const total    = user.bonusDaysTotal    || 0;
+                        const daily    = user.bonusDailyAmount  || 0;
+                        if (!total || !daily || credited >= total) return '';
+                        return '<button class="btn-action" style="background:#C9A84C; color:#000; margin-top:5px;" onclick="creditDailyBonus(\'' + user.id + '\')">🎁 Credit Bonus (' + credited + '/' + total + ')</button>';
+                    })() +
+                    '</div>' +
+
+                    '<div class="info"><h4>Trade Control</h4><p>' + tradeControl + '</p>' +
+                    '<button class="btn-action" style="background:#2196F3; color:white;" onclick="setTradeControl(\'' + user.id + '\', \'WIN\')">✓ WIN</button>' +
+                    '<button class="btn-action" style="background:#FF9800; color:white;" onclick="setTradeControl(\'' + user.id + '\', \'NORMAL\')">○ Normal</button>' +
+                    '<button class="btn-action" style="background:#FF6B6B; color:white;" onclick="setTradeControl(\'' + user.id + '\', \'LOSS\')">✗ LOSS</button></div>' +
+
+                    '<div class="info"><h4>Account Status</h4><p style="color: ' + (isFrozen ? '#FF6B6B' : '#4CAF50') + '; font-weight:bold;">' + (user.accountStatus || 'ACTIVE') + '</p>' +
+                    '<button class="btn-action" style="background: ' + (isFrozen ? '#4CAF50' : '#FF6B6B') + '; color:white;" onclick="toggleFreeze(\'' + user.id + '\', ' + isFrozen + ')">' + (isFrozen ? '<i class="fas fa-lock-open"></i> Unfreeze' : '<i class="fas fa-lock"></i> Freeze') + '</button></div>' +
+
+                    '<div class="info"><h4>KYC Status</h4>' +
+                    '<p style="color:' + kycColor + '; font-weight:bold;">' + kycLabel + '</p>' +
+                    '<button class="btn-action" style="background:#9C27B0; color:white;" onclick="viewKycDocs(\'' + user.id + '\')"><i class="fas fa-file-alt"></i> View Docs</button>' +
+                    '<button class="btn-action" style="background:#4CAF50; color:white;" onclick="setKycStatus(\'' + user.id + '\', \'verified\')">✓ Verify</button>' +
+                    '<button class="btn-action" style="background:#FF9800; color:white;" onclick="setKycStatus(\'' + user.id + '\', \'pending\')"><i class="fas fa-hourglass-half"></i> Pending</button>' +
+                    '<button class="btn-action" style="background:#FF6B6B; color:white;" onclick="setKycStatus(\'' + user.id + '\', \'rejected\')">✗ Reject</button></div>' +
+
+                    '<div class="info"><h4>Actions</h4>' +
+                    (function(){
+                        const unread = _userUnreadCounts[user.id] || 0;
+                        const badge = unread > 0 ? '<span style="background:#FF4444; color:#fff; border-radius:99px; padding:2px 7px; font-size:10px; font-weight:700; margin-left:5px;">' + unread + '</span>' : '';
+                        const btnStyle = unread > 0 ? 'background:#FF4444; color:#fff;' : 'background:#2196F3; color:#fff;';
+                        // Use data-attributes + delegated click handler (avoids onclick quote-escaping issues)
+                        const safeName = (user.fullName || user.email || 'User').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+                        return '<button class="btn-action btn-message" data-uid="' + user.id + '" data-uname="' + safeName + '" style="' + btnStyle + '"><i class="fas fa-comment"></i> Message' + badge + '</button>';
+                    })() +
+                    '<button class="btn-action btn-view" onclick="viewUserDetails(\'' + user.id + '\')"><i class="fas fa-eye"></i> View</button>' +
+                    '<button class="btn-action btn-delete" style="background:#D93025; color:white;" onclick="deleteUser(\'' + user.id + '\')"><i class="fas fa-trash"></i> Delete</button>' +
+                    '</div></div>';
+            });
+            list.innerHTML = html;
+        }
+
+        // Display Withdrawals
+        function displayWithdrawals() {
+            const list = document.getElementById('withdrawList');
+            const filtered = allWithdrawals.filter(function(w) {
+                return (w.status || '').toLowerCase() === currentWithdrawalFilter.toLowerCase();
+            });
+            if (filtered.length === 0) {
+                list.innerHTML = '<div class="empty-state">No ' + currentWithdrawalFilter + ' withdrawals.</div>';
+                return;
+            }
+            let html = '';
+            filtered.forEach(function(w) {
+                let actionButtons = '';
+                if (w.status === 'pending') {
+                    actionButtons = '<button class="btn-action btn-approve" onclick="updateWithdrawal(\'' + w.id + '\', \'approved\')">Approve</button>' +
+                        '<button class="btn-action btn-reject" onclick="updateWithdrawal(\'' + w.id + '\', \'rejected\')">Reject</button>';
+                } else {
+                    actionButtons = '<button class="btn-action btn-view" onclick="alert(\'Status: ' + w.status + '\')">View</button>';
+                }
+                html += '<div class="withdraw-card">' +
+                    '<div class="info"><h4>' + (w.userName || 'N/A') + '</h4>' +
+                    '<p>Amount: ' + (w.amount || 0) + ' USD</p>' +
+                    '<p>' + (w.userEmail || 'N/A') + '</p></div>' +
+                    '<div class="info"><h4>Method</h4><p>' + (w.withdrawalMethod || 'N/A') + '</p></div>' +
+                    '<div class="info"><h4>Date</h4><p>' + (w.requestDate ? new Date(w.requestDate.seconds * 1000).toLocaleDateString() : 'N/A') + '</p></div>' +
+                    '<div class="info">' + actionButtons + '</div></div>';
+            });
+            list.innerHTML = html;
+        }
+
+        // Display KYC
+        function displayKYC() {
+            const list = document.getElementById('kycList');
+            const filtered = allKYC.filter(function(k) {
+                return k.status === currentKYCFilter;
+            });
+            if (filtered.length === 0) {
+                list.innerHTML = '<div class="empty-state">No ' + currentKYCFilter + ' KYC requests.</div>';
+                return;
+            }
+            let html = '';
+            filtered.forEach(function(k) {
+                let actionButtons = '';
+                if (k.status === 'pending') {
+                    actionButtons = '<button class="btn-action btn-view" onclick="viewKYCDocuments(\'' + k.id + '\')">View Docs</button>' +
+                        '<button class="btn-action btn-verify" onclick="verifyKYC(\'' + k.id + '\')">Verify</button>' +
+                        '<button class="btn-action btn-reject" onclick="rejectKYC(\'' + k.id + '\')">Reject</button>';
+                } else {
+                    actionButtons = '<button class="btn-action btn-view" onclick="viewKYCDocuments(\'' + k.id + '\')">View</button>';
+                }
+                html += '<div class="user-card">' +
+                    '<div class="info"><h4>' + (k.fullName || 'N/A') + '</h4>' +
+                    '<p>' + (k.email || 'N/A') + '</p>' +
+                    '<span class="kyc-badge kyc-' + k.status + '">' + k.status + '</span></div>' +
+                    '<div class="info"><h4>ID Type</h4><p>' + (k.idType || 'N/A') + '</p></div>' +
+                    '<div class="info"><h4>Country</h4><p>' + (k.country || 'N/A') + '</p></div>' +
+                    '<div class="info">' + actionButtons + '</div></div>';
+            });
+            list.innerHTML = html;
+        }
+
+        // Withdrawal Actions
+        async function updateWithdrawal(withdrawalId, newStatus) {
+            try {
+                const { doc, updateDoc, increment } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+
+                // On rejection — refund balance (was already deducted when user submitted)
+                if (newStatus === 'rejected') {
+                    const wdoc = allWithdrawals.find(w => w.id === withdrawalId);
+                    if (wdoc && wdoc.uid && wdoc.amount) {
+                        await updateDoc(doc(db, 'users', wdoc.uid), {
+                            balance: increment(parseFloat(wdoc.amount))
+                        });
+                    }
+                }
+
+                await updateDoc(doc(db, 'withdrawals', withdrawalId), {
+                    status: newStatus,
+                    updatedAt: new Date(),
+                    reviewedBy: currentAdminEmail
+                });
+                Swal.fire({
+                    icon: 'success',
+                    title: newStatus === 'approved' ? 'Approved' : 'Rejected',
+                    text: 'Withdrawal ' + newStatus + (newStatus === 'rejected' ? ' — balance refunded to user' : ''),
+                    timer: 1800, showConfirmButton: false
+                });
+                loadWithdrawals();
+            } catch (error) {
+                Swal.fire('Error', 'Failed to update withdrawal: ' + error.message, 'error');
+            }
+        }
+
+        // KYC Actions
+        async function verifyKYC(kycId) {
+            try {
+                const { doc, updateDoc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+                await updateDoc(doc(db, 'kyc', kycId), {
+                    status: 'verified',
+                    verifiedAt: new Date(),
+                    verifiedBy: currentAdminEmail
+                });
+                Swal.fire('Success', 'KYC verified successfully', 'success');
+                loadKYC();
+            } catch (error) {
+                Swal.fire('Error', 'Failed to verify KYC: ' + error.message, 'error');
+            }
+        }
+
+        async function rejectKYC(kycId) {
+            Swal.fire({
+                title: 'Reject KYC',
+                input: 'textarea',
+                inputPlaceholder: 'Enter rejection reason...',
+                showCancelButton: true
+            }).then(async function(result) {
+                if (result.value) {
+                    try {
+                        const { doc, updateDoc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+                        await updateDoc(doc(db, 'kyc', kycId), {
+                            status: 'rejected',
+                            rejectionReason: result.value,
+                            rejectedAt: new Date(),
+                            rejectedBy: currentAdminEmail
+                        });
+                        Swal.fire('Success', 'KYC rejected', 'success');
+                        loadKYC();
+                    } catch (error) {
+                        Swal.fire('Error', error.message, 'error');
+                    }
+                }
+            });
+        }
+
+        async function viewKYCDocuments(kycId) {
+            try {
+                const { doc, getDoc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+                const docSnap = await getDoc(doc(db, 'kyc', kycId));
+                const data = docSnap.data();
+                let html = '<h3>KYC Documents</h3>';
+                html += '<p><strong>Name:</strong> ' + (data.fullName || 'N/A') + '</p>';
+                html += '<p><strong>Email:</strong> ' + (data.email || 'N/A') + '</p>';
+                html += '<p><strong>ID Type:</strong> ' + (data.idType || 'N/A') + '</p>';
+                html += '<p><strong>Country:</strong> ' + (data.country || 'N/A') + '</p>';
+                
+                if (data.idDocument) {
+                    html += '<p><strong>ID Document:</strong></p><img src="' + data.idDocument + '" style="max-width:100%; margin:10px 0; border-radius:5px;">';
+                }
+                if (data.proofOfAddress) {
+                    html += '<p><strong>Proof of Address:</strong></p><img src="' + data.proofOfAddress + '" style="max-width:100%; margin:10px 0; border-radius:5px;">';
+                }
+                
+                document.getElementById('kycModalContent').innerHTML = html;
+                document.getElementById('kycModal').style.display = 'block';
+            } catch (error) {
+                Swal.fire('Error', error.message, 'error');
+            }
+        }
+
+        function closeKYCModal() {
+            document.getElementById('kycModal').style.display = 'none';
+        }
+
+        // User Actions
+        async function viewUserDetails(userId) {
+            try {
+                const { doc, getDoc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+                const docSnap = await getDoc(doc(db, 'users', userId));
+                const data = docSnap.data();
+                const createdDate = data.createdAt ? new Date(data.createdAt.seconds * 1000).toLocaleDateString() : 'N/A';
+                Swal.fire({
+                    title: data.fullName || 'User',
+                    html: '<p><strong>Email:</strong> ' + (data.email || 'N/A') + '</p>' +
+                        '<p><strong>Balance:</strong> ' + (data.balance || 0) + ' USD</p>' +
+                        '<p><strong>Status:</strong> ' + (data.status || 'Active') + '</p>' +
+                        '<p><strong>Joined:</strong> ' + createdDate + '</p>' +
+                        '<p><strong>KYC Status:</strong> ' + (data.kycStatus || 'Pending') + '</p>',
+                    showConfirmButton: true
+                });
+            } catch (error) {
+                Swal.fire('Error', error.message, 'error');
+            }
+        }
+
+
+
+        // Set KYC Status (Admin override)
+
+
+        // ═══ Per-user chat from admin panel ═══
+        let _userUnreadCounts = {};  // { userId: count }
+        let _userChatUnsub = null;
+        
+        // Listen to all chat messages and compute unread per user
+        async function setupUserChatListener() {
+            const { collection, query, orderBy, onSnapshot } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+            const q = query(collection(db, 'chats'), orderBy('timestamp', 'desc'));
+            onSnapshot(q, (snap) => {
+                _userUnreadCounts = {};
+                snap.forEach(d => {
+                    const m = d.data();
+                    if (m.userId && !m.isAdmin && !m.adminRead) {
+                        _userUnreadCounts[m.userId] = (_userUnreadCounts[m.userId] || 0) + 1;
+                    }
+                });
+                // Refresh user list to show new badges
+                if (typeof displayUsers === 'function') displayUsers();
+            });
+        }
+        // Auto-start listener when page loads
+        if (typeof db !== 'undefined') {
+            setTimeout(() => setupUserChatListener().catch(e => console.error('Chat listener:', e)), 500);
+        }
+        
+        // Open chat modal with specific user
+        window.openUserChat = async function(userId, userName) {
+            const { collection, query, where, orderBy, onSnapshot, addDoc, doc, updateDoc, getDocs, serverTimestamp } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+            
+            // Build modal
+            const overlay = document.createElement('div');
+            overlay.id = 'userChatOverlay';
+            overlay.style.cssText = 'position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:9999; display:flex; align-items:center; justify-content:center; padding:20px;';
+            
+            // Compute YLG ID from allUsers list (matches user pages format)
+            let displayYlgId = '';
+            const userObj = (typeof allUsers !== 'undefined' ? allUsers : []).find(u => u.id === userId);
+            if (userObj) {
+                if (typeof userObj.userIndex === 'number') {
+                    const num = String(userObj.userIndex).padStart(4, '0');
+                    displayYlgId = 'YLG-2026' + num;
+                    if (userObj._idDuplicate) {
+                        displayYlgId += '-' + (userObj.id ? userObj.id.slice(0, 4).toUpperCase() : '????');
+                    }
+                } else if (userObj.ylgId) {
+                    displayYlgId = userObj.ylgId;
+                }
+            }
+            // Fallback: short uid if no match
+            if (!displayYlgId) {
+                displayYlgId = userId.slice(0, 8) + '...';
+            }
+            
+            overlay.innerHTML = `
+                <div style="background:#1a1a1a; border:2px solid #FFD700; border-radius:12px; width:100%; max-width:600px; height:80vh; display:flex; flex-direction:column;">
+                    <div style="padding:16px 20px; border-bottom:1px solid #333; display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <h3 style="margin:0; color:#FFD700;"><i class="fas fa-comments"></i> Chat with ${userName}</h3>
+                            <p style="margin:4px 0 0; color:#FFD700; font-size:12px; font-family:monospace; font-weight:600;">ID: ${displayYlgId}</p>
+                        </div>
+                        <button onclick="document.getElementById('userChatOverlay').remove()" style="background:#FF6B6B; color:#fff; border:none; padding:8px 14px; border-radius:6px; cursor:pointer; font-weight:600;">✗ Close</button>
+                    </div>
+                    <div id="userChatMessages" style="flex:1; overflow-y:auto; padding:16px 20px; display:flex; flex-direction:column; gap:10px; background:#0d0d0d;"></div>
+                    <div style="padding:14px 20px; border-top:1px solid #333; display:flex; gap:8px; align-items:center;">
+                        <input type="file" id="userChatImageInput" accept="image/*" style="display:none;">
+                        <button id="userChatImageBtn" title="Send image" style="background:#9C27B0; color:#fff; border:none; padding:10px 14px; border-radius:6px; font-weight:600; cursor:pointer;"><i class="fas fa-image"></i></button>
+                        <input type="text" id="userChatInput" placeholder="Type your reply..." style="flex:1; padding:10px 14px; background:#222; border:1px solid #444; color:#fff; border-radius:6px; outline:none; font-size:14px;">
+                        <button id="userChatSendBtn" style="background:#FFD700; color:#000; border:none; padding:10px 20px; border-radius:6px; font-weight:700; cursor:pointer;"><i class="fas fa-paper-plane"></i> Send</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(overlay);
+            
+            const msgBox = document.getElementById('userChatMessages');
+            const inputEl = document.getElementById('userChatInput');
+            const sendBtn = document.getElementById('userChatSendBtn');
+            
+            // Listen to messages for this user only — NO orderBy to avoid composite index issue
+            const q = query(collection(db, 'chats'), where('userId', '==', userId));
+            const unsub = onSnapshot(q, (snap) => {
+                const msgs = [];
+                snap.forEach(d => msgs.push({ id: d.id, ...d.data() }));
+                
+                // Client-side sort by timestamp ascending
+                msgs.sort((a, b) => {
+                    const tA = a.timestamp?.toDate?.() || a.timestamp?.seconds || 0;
+                    const tB = b.timestamp?.toDate?.() || b.timestamp?.seconds || 0;
+                    return tA - tB;
+                });
+                
+                msgBox.innerHTML = msgs.map(m => {
+                    const time = m.timestamp?.toDate ? m.timestamp.toDate().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : '';
+                    const isAdmin = m.isAdmin;
+                    const bgColor = isAdmin ? '#4CAF50' : '#333';
+                    const align = isAdmin ? 'flex-end' : 'flex-start';
+                    
+                    if (m.chatImageUrl || m.imageUrl) {
+                        const img = m.chatImageUrl || m.imageUrl;
+                        return `<div style="align-self:${align}; max-width:75%; background:${bgColor}; padding:8px; border-radius:12px;"><img src="${img}" style="max-width:100%; border-radius:8px; display:block; cursor:zoom-in;" onclick="window.open(this.src, '_blank')"><div style="font-size:10px; opacity:0.7; margin-top:4px; text-align:right;">${time}</div></div>`;
+                    }
+                    return `<div style="align-self:${align}; max-width:75%; background:${bgColor}; color:#fff; padding:10px 14px; border-radius:12px; word-wrap:break-word;">${m.message || ''}<div style="font-size:10px; opacity:0.7; margin-top:4px; text-align:right;">${time}</div></div>`;
+                }).join('') || '<div style="text-align:center; color:#888; padding:40px;">No messages yet. Send the first reply!</div>';
+                
+                msgBox.scrollTop = msgBox.scrollHeight;
+            });
+            
+            // Mark unread as read
+            try {
+                // Mark unread - use simpler query then filter client-side (avoids composite index)
+                const unreadQ = query(collection(db, 'chats'), where('userId', '==', userId));
+                const unreadSnap = await getDocs(unreadQ);
+                const updates = [];
+                unreadSnap.forEach(d => {
+                    const data = d.data();
+                    // Client-side filter: only mark non-admin messages without adminRead flag
+                    if (data.isAdmin !== true && data.adminRead !== true) {
+                        updates.push(updateDoc(doc(db, 'chats', d.id), { adminRead: true }));
+                    }
+                });
+                await Promise.all(updates);
+            } catch (e) { console.log('mark read:', e.message); }
+            
+            // Send handler
+            async function sendUserReply() {
+                const text = inputEl.value.trim();
+                if (!text) return;
+                try {
+                    await addDoc(collection(db, 'chats'), {
+                        userId, message: text, isAdmin: true, adminRead: true,
+                        userEmail: userName.includes('@') ? userName : '',
+                        timestamp: serverTimestamp()
+                    });
+                    inputEl.value = '';
+                } catch (e) {
+                    alert('Send error: ' + e.message);
+                }
+            }
+            sendBtn.onclick = sendUserReply;
+            inputEl.addEventListener('keypress', e => { if (e.key === 'Enter') { e.preventDefault(); sendUserReply(); } });
+            inputEl.focus();
+            
+            // ─── Image upload handler ───
+            const imageBtn = document.getElementById('userChatImageBtn');
+            const imageInput = document.getElementById('userChatImageInput');
+            
+            // Compress image to base64 (same logic as user side)
+            function compressImage(file) {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onerror = reject;
+                    reader.onload = (e) => {
+                        const img = new Image();
+                        img.src = e.target.result;
+                        img.onload = () => {
+                            const canvas = document.createElement('canvas');
+                            let w = img.width, h = img.height, m = 800;
+                            if (w > h && w > m) { h *= m / w; w = m; }
+                            else if (h > m) { w *= m / h; h = m; }
+                            canvas.width = w;
+                            canvas.height = h;
+                            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                            resolve(canvas.toDataURL('image/jpeg', 0.75));
+                        };
+                        img.onerror = reject;
+                    };
+                    reader.readAsDataURL(file);
+                });
+            }
+            
+            imageBtn.onclick = () => imageInput.click();
+            
+            imageInput.onchange = async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                // Validate file
+                if (!file.type.startsWith('image/')) {
+                    alert('Please select an image file');
+                    return;
+                }
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('Image too large. Please select an image under 5MB.');
+                    return;
+                }
+                
+                imageBtn.disabled = true;
+                imageBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                
+                try {
+                    const base64 = await compressImage(file);
+                    await addDoc(collection(db, 'chats'), {
+                        userId,
+                        userEmail: userName.includes('@') ? userName : '',
+                        message: '[Image]',
+                        chatImageUrl: base64,
+                        isAdmin: true,
+                        adminRead: true,
+                        timestamp: serverTimestamp()
+                    });
+                } catch (err) {
+                    console.error('Image upload error:', err);
+                    alert('Failed to send image: ' + err.message);
+                } finally {
+                    imageBtn.disabled = false;
+                    imageBtn.innerHTML = '<i class="fas fa-image"></i>';
+                    imageInput.value = '';
+                }
+            };
+            
+            // Cleanup on close
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) {
+                    if (typeof unsub === 'function') unsub();
+                    overlay.remove();
+                }
+            });
+        };
+
+        // Delegated click handler for Message buttons
+        if (!window._msgClickHandlerAdded) {
+            document.addEventListener('click', function(e) {
+                const btn = e.target.closest('.btn-message');
+                if (btn && btn.dataset.uid) {
+                    const decoded = (btn.dataset.uname || 'User').replace(/&#39;/g, "'").replace(/&quot;/g, '"');
+                    if (typeof window.openUserChat === 'function') {
+                        window.openUserChat(btn.dataset.uid, decoded);
+                    }
+                }
+            });
+            window._msgClickHandlerAdded = true;
+        }
+
+
+        // View KYC documents in modal
+        window.viewKycDocs = async function(userId) {
+            try {
+                const { doc, getDoc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+                const snap = await getDoc(doc(db, 'users', userId));
+                if (!snap.exists()) {
+                    Swal.fire('Not Found', 'User document not found', 'warning');
+                    return;
+                }
+                const u = snap.data();
+                const front = u.kycFrontImage || u.kycDocFront || '';
+                const back = u.kycBackImage || u.kycDocBack || '';
+                const docType = u.kycType || u.kycDocType || 'Unknown';
+                const submittedAt = u.kycSubmittedAt && u.kycSubmittedAt.toDate ? u.kycSubmittedAt.toDate().toLocaleString() : '—';
+                
+                if (!front && !back) {
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'No KYC Documents',
+                        text: 'This user has not submitted KYC documents yet.',
+                        background: '#1a1a1a', color: '#fff'
+                    });
+                    return;
+                }
+                
+                const html = `
+                    <div style="text-align:left; max-height:70vh; overflow-y:auto;">
+                        <div style="margin-bottom:14px; padding:10px; background:#222; border-radius:6px;">
+                            <p style="margin:4px 0; color:#FFD700;"><strong>User:</strong> ${u.fullname || u.fullName || u.email || userId}</p>
+                            <p style="margin:4px 0; color:#aaa;"><strong>Document Type:</strong> ${docType}</p>
+                            <p style="margin:4px 0; color:#aaa;"><strong>Submitted:</strong> ${submittedAt}</p>
+                            <p style="margin:4px 0; color:#aaa;"><strong>Status:</strong> <span style="color:${u.kycStatus === 'verified' ? '#4CAF50' : u.kycStatus === 'pending' ? '#FF9800' : '#FF6B6B'};">${u.kycStatus || 'unverified'}</span></p>
+                        </div>
+                        ${front ? `
+                        <div style="margin-bottom:14px;">
+                            <h4 style="color:#FFD700; margin-bottom:8px;">Front Side</h4>
+                            <img src="${front}" style="width:100%; max-width:500px; border-radius:8px; border:2px solid #FFD700; cursor:zoom-in;" onclick="window.open(this.src, '_blank')">
+                        </div>` : '<p style="color:#888;">No front image submitted.</p>'}
+                        ${back ? `
+                        <div>
+                            <h4 style="color:#FFD700; margin-bottom:8px;">Back Side</h4>
+                            <img src="${back}" style="width:100%; max-width:500px; border-radius:8px; border:2px solid #FFD700; cursor:zoom-in;" onclick="window.open(this.src, '_blank')">
+                        </div>` : '<p style="color:#888;">No back image submitted.</p>'}
+                    </div>
+                `;
+                
+                Swal.fire({
+                    title: '<span style="color:#FFD700;"><i class="fas fa-file-alt"></i> KYC Documents</span>',
+                    html,
+                    width: 600,
+                    background: '#1a1a1a',
+                    color: '#fff',
+                    confirmButtonColor: '#FFD700',
+                    confirmButtonText: 'Close',
+                    showCancelButton: true,
+                    cancelButtonText: '✓ Verify',
+                    cancelButtonColor: '#4CAF50'
+                }).then((result) => {
+                    if (result.dismiss === Swal.DismissReason.cancel) {
+                        // User clicked Verify
+                        setKycStatus(userId, 'verified');
+                    }
+                });
+            } catch (e) {
+                console.error('KYC view error:', e);
+                Swal.fire('Error', 'Failed to load documents: ' + e.message, 'error');
+            }
+        };
+
+        async function setKycStatus(userId, status) {
+            try {
+                const { doc, updateDoc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+                await updateDoc(doc(db, 'users', userId), {
+                    kycStatus: status,
+                    kycReviewedBy: currentAdminEmail,
+                    kycReviewedAt: new Date()
+                });
+                Swal.fire({
+                    icon: 'success',
+                    title: 'KYC Status Updated',
+                    text: 'Status set to: ' + status,
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+                loadUsers();
+            } catch (error) {
+                Swal.fire('Error', error.message || 'Failed to set KYC status', 'error');
+            }
+        }
+
+        async function deleteUser(userId) {
+            const result = await Swal.fire({
+                title: 'Delete this user?',
+                html: 'This will permanently delete the user document.<br><br>' +
+                      '<strong style="color:#FF6B6B;"><i class="fas fa-exclamation-triangle"></i> Warning:</strong> Subcollections (trades, deposits, withdrawals) will become orphaned. ' +
+                      'For full cleanup, use Firebase Console.<br><br>' +
+                      'User ID: <code>' + userId + '</code>',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#D93025',
+                cancelButtonColor: '#888',
+                confirmButtonText: 'Yes, delete',
+                cancelButtonText: 'Cancel',
+                background: '#1a1a1a',
+                color: '#fff'
+            });
+            if (!result.isConfirmed) return;
+
+            // Second confirm — type "DELETE"
+            const second = await Swal.fire({
+                title: 'Final confirmation',
+                input: 'text',
+                inputLabel: 'Type DELETE to confirm',
+                inputPlaceholder: 'DELETE',
+                showCancelButton: true,
+                confirmButtonColor: '#D93025',
+                background: '#1a1a1a',
+                color: '#fff',
+                inputValidator: function(value) {
+                    if (value !== 'DELETE') return 'Please type DELETE exactly';
+                }
+            });
+            if (!second.isConfirmed) return;
+
+            try {
+                const { doc, deleteDoc, collection, getDocs } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+
+                // Try to clean up known subcollections (best-effort)
+                const subcollections = ['trades', 'deposits', 'withdrawals_admin', 'positions'];
+                for (const sub of subcollections) {
+                    try {
+                        const snap = await getDocs(collection(db, 'users', userId, sub));
+                        for (const d of snap.docs) {
+                            await deleteDoc(d.ref);
+                        }
+                    } catch (e) { /* ignore — subcollection may not exist */ }
+                }
+
+                // Delete the main user doc
+                await deleteDoc(doc(db, 'users', userId));
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'User Deleted',
+                    text: 'User and known subcollections removed.',
+                    background: '#1a1a1a',
+                    color: '#fff',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+                loadUsers();
+            } catch (error) {
+                Swal.fire('Error', error.message || 'Delete failed', 'error');
+            }
+        }
+
+        // Admin Control Functions
+        async function setTradeControl(userId, status) {
+            try {
+                const { doc, updateDoc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+                await updateDoc(doc(db, 'users', userId), {
+                    tradeControl: status,
+                    tradeControlBy: currentAdminEmail,
+                    tradeControlAt: new Date()
+                });
+                Swal.fire('Success', 'Trade control set to ' + status, 'success');
+                loadUsers();
+            } catch (error) {
+                Swal.fire('Error', error.message || 'Failed to set trade control', 'error');
+            }
+        }
+
+        async function toggleFreeze(userId, currentlyFrozen) {
+            try {
+                const { doc, updateDoc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+                await updateDoc(doc(db, 'users', userId), {
+                    frozen: !currentlyFrozen,
+                    freezeBy: currentAdminEmail,
+                    freezeAt: new Date()
+                });
+                Swal.fire('Success', !currentlyFrozen ? 'User frozen' : 'User unfrozen', 'success');
+                loadUsers();
+            } catch (error) {
+                Swal.fire('Error', error.message || 'Failed to toggle freeze', 'error');
+            }
+        }
+
+        async function openDepositDialog(userId, userName) {
+            Swal.fire({
+                title: 'Manual Deposit for ' + userName,
+                html: '<input id="depositAmount" type="number" placeholder="Amount (USD)" min="0" step="0.01" style="width:100%; padding:10px; margin:10px 0; border:1px solid #333; border-radius:5px; background:#000; color:#fff;">',
+                showCancelButton: true,
+                confirmButtonText: 'Confirm Deposit',
+                confirmButtonColor: '#4CAF50',
+                preConfirm: function() {
+                    const amount = parseFloat(document.getElementById('depositAmount').value);
+                    if (!amount || amount <= 0) {
+                        Swal.showValidationMessage('Please enter a valid amount');
+                        return false;
+                    }
+                    return amount;
+                }
+            }).then(async function(result) {
+                if (result.value) {
+                    await performDeposit(userId, result.value);
+                }
+            });
+        }
+
+        const BONUS_TIERS = [
+            { name: 'Silver',   min: 0,      max: 10000,  days: 0,  daily: 0    },
+            { name: 'Gold',     min: 10000,  max: 30000,  days: 5,  daily: 100  },
+            { name: 'Platinum', min: 30000,  max: 100000, days: 10, daily: 500  },
+            { name: 'Diamond',  min: 100000, max: 500000, days: 20, daily: 1500 },
+            { name: 'Supreme',  min: 500000, max: Infinity, days: 30, daily: 3000 },
+        ];
+        function getTier(dep) {
+            for (let i = BONUS_TIERS.length - 1; i >= 0; i--) {
+                if (dep >= BONUS_TIERS[i].min) return BONUS_TIERS[i];
+            }
+            return BONUS_TIERS[0];
+        }
+
+        async function performDeposit(userId, amount) {
+            try {
+                const { doc, getDoc, updateDoc, addDoc, collection, increment, serverTimestamp } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+                const amt = parseFloat(amount);
+                if (isNaN(amt) || amt <= 0) { Swal.fire('Error', 'Invalid amount', 'error'); return; }
+
+                // Read current depositBalance to detect tier upgrade
+                const snap = await getDoc(doc(db, 'users', userId));
+                const oldDep = parseFloat(snap.data()?.depositBalance || 0);
+                const newDep = oldDep + amt;
+                const oldTier = getTier(oldDep);
+                const newTier = getTier(newDep);
+
+                const update = {
+                    balance: increment(amt),
+                    depositBalance: increment(amt)
+                };
+
+                // Activate bonus only when tier upgrades to a bonus tier
+                if (newTier.name !== oldTier.name && newTier.days > 0) {
+                    update.bonusActivatedAt  = serverTimestamp();
+                    update.bonusDaysTotal    = newTier.days;
+                    update.bonusDaysCredited = 0;
+                    update.bonusDailyAmount  = newTier.daily;
+                    update.bonusLastCredited = serverTimestamp();
+                }
+
+                await updateDoc(doc(db, 'users', userId), update);
+                await addDoc(collection(db, 'users', userId, 'deposits'), {
+                    amount: amt,
+                    note: 'Admin manual deposit',
+                    by: currentAdminEmail,
+                    at: serverTimestamp()
+                });
+
+                const tierMsg = (newTier.name !== oldTier.name && newTier.days > 0)
+                    ? '<br><small style="color:#C9A84C">🎁 ' + newTier.name + ' bonus activated — $' + newTier.daily + '/day × ' + newTier.days + ' days</small>'
+                    : '';
+                Swal.fire({ title: 'Success', html: 'Deposited ' + amt + ' USD' + tierMsg, icon: 'success' });
+                loadUsers();
+            } catch (error) {
+                Swal.fire('Error', error.message || 'Deposit failed', 'error');
+            }
+        }
+
+        async function creditDailyBonus(userId) {
+            try {
+                const { doc, getDoc, updateDoc, increment, serverTimestamp } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+                const snap = await getDoc(doc(db, 'users', userId));
+                const d = snap.data() || {};
+                const credited = d.bonusDaysCredited || 0;
+                const total    = d.bonusDaysTotal    || 0;
+                const daily    = d.bonusDailyAmount  || 0;
+                if (!total || !daily) { Swal.fire('Info', 'No active bonus for this user.', 'info'); return; }
+                if (credited >= total) { Swal.fire('Info', 'All bonus days already credited.', 'info'); return; }
+                await updateDoc(doc(db, 'users', userId), {
+                    balance:          increment(daily),
+                    bonusDaysCredited: increment(1),
+                    bonusLastCredited: serverTimestamp()
+                });
+                Swal.fire('Success', '$' + daily + ' bonus credited. (' + (credited + 1) + '/' + total + ' days)', 'success');
+                loadUsers();
+            } catch (error) {
+                Swal.fire('Error', error.message || 'Failed to credit bonus', 'error');
+            }
+        }
+
+        async function openWithdrawDialog(userId, userName) {
+            Swal.fire({
+                title: 'Manual Withdrawal for ' + userName,
+                html: '<input id="withdrawAmount" type="number" placeholder="Amount (USD)" min="0" step="0.01" style="width:100%; padding:10px; margin:10px 0; border:1px solid #333; border-radius:5px; background:#000; color:#fff;">',
+                showCancelButton: true,
+                confirmButtonText: 'Confirm Withdrawal',
+                confirmButtonColor: '#FF9800',
+                preConfirm: function() {
+                    const amount = parseFloat(document.getElementById('withdrawAmount').value);
+                    if (!amount || amount <= 0) {
+                        Swal.showValidationMessage('Please enter a valid amount');
+                        return false;
+                    }
+                    return amount;
+                }
+            }).then(async function(result) {
+                if (result.value) {
+                    await performWithdraw(userId, result.value);
+                }
+            });
+        }
+
+        async function performWithdraw(userId, amount) {
+            try {
+                const { doc, updateDoc, addDoc, collection, increment, serverTimestamp } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+                const amt = parseFloat(amount);
+                if (isNaN(amt) || amt <= 0) { Swal.fire('Error', 'Invalid amount', 'error'); return; }
+                await updateDoc(doc(db, 'users', userId), {
+                    balance: increment(-amt)
+                });
+                await addDoc(collection(db, 'users', userId, 'withdrawals_admin'), {
+                    amount: amt,
+                    note: 'Admin manual withdrawal',
+                    by: currentAdminEmail,
+                    at: serverTimestamp()
+                });
+                Swal.fire('Success', 'Withdrawn ' + amt + ' USD', 'success');
+                loadUsers();
+            } catch (error) {
+                Swal.fire('Error', error.message || 'Withdrawal failed', 'error');
+            }
+        }
+
+        /* ══════════════════════════════════════════════
+           PLATFORM STATS
+        ══════════════════════════════════════════════ */
+        function updatePlatformStats() {
+            const totalUsers = allUsers.length;
+            const totalDep   = allUsers.reduce((s, u) => s + (parseFloat(u.depositBalance) || 0), 0);
+            const totalBal   = allUsers.reduce((s, u) => s + (parseFloat(u.balance)        || 0), 0);
+            const pendingDep = allDepositReqs.filter(r => r.status === 'pending').length;
+
+            function fmt(n) { return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 }); }
+            function el(id, v) { const e = document.getElementById(id); if (e) e.textContent = v; }
+            el('stat-total-users', totalUsers);
+            el('stat-total-dep',   fmt(totalDep));
+            el('stat-total-bal',   fmt(totalBal));
+            el('stat-pending-dep', pendingDep);
+        }
+
+        /* ══════════════════════════════════════════════
+           PAYMENT ACCOUNTS
+        ══════════════════════════════════════════════ */
+        let _payAccUnsub = null;
+        let allPaymentAccounts = [];
+
+        async function loadPaymentAccounts() {
+            try {
+                const { onSnapshot, collection, query, orderBy } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+                if (typeof _payAccUnsub === 'function') _payAccUnsub();
+                _payAccUnsub = onSnapshot(
+                    query(collection(db, 'paymentAccounts'), orderBy('sortOrder')),
+                    snap => {
+                        allPaymentAccounts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                        renderPaymentAccounts();
+                    }
+                );
+            } catch(e) { console.error('loadPaymentAccounts', e); }
+        }
+
+        function renderPaymentAccounts() {
+            const el = document.getElementById('paymentAccountsList');
+            if (!allPaymentAccounts.length) {
+                el.innerHTML = '<div class="empty-state">No payment accounts yet. Click "Add Account" to add one.</div>';
+                return;
+            }
+            el.innerHTML = allPaymentAccounts.map(a => `
+                <div style="background:#1a1a1a;border:1px solid ${a.active !== false ? '#2a6a2a' : '#3a3a3a'};
+                            border-radius:10px;padding:14px 18px;margin-bottom:10px;
+                            display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
+                    <div>
+                        <div style="font-size:13px;font-weight:700;color:#C9A84C;margin-bottom:4px;">
+                            <i class="fas fa-credit-card" style="margin-right:6px;opacity:0.6;"></i>${a.label}
+                        </div>
+                        <div style="font-size:15px;font-weight:800;color:#fff;margin-bottom:3px;">${a.number}</div>
+                        <div style="font-size:12px;color:#888;">${a.accountName}</div>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+                        <span style="font-size:11px;padding:3px 10px;border-radius:20px;font-weight:700;
+                                     ${a.active !== false
+                                        ? 'background:rgba(76,175,80,0.15);color:#4CAF50;border:1px solid #4CAF5044;'
+                                        : 'background:rgba(100,100,100,0.15);color:#666;border:1px solid #44444444;'}">
+                            ${a.active !== false ? 'Active' : 'Hidden'}
+                        </span>
+                        <button onclick="editPaymentAccount('${a.id}')" class="btn-action" style="background:#2196F3;color:#fff;padding:5px 12px;font-size:11px;">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button onclick="deletePaymentAccount('${a.id}','${a.label.replace(/'/g,"\\'")}')" class="btn-action" style="background:#FF6B6B;color:#fff;padding:5px 12px;font-size:11px;">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>`
+            ).join('');
+        }
+
+        async function openAddPaymentAccount() {
+            const { value: formData } = await Swal.fire({
+                title: 'Add Payment Account',
+                background: '#1a1a1a', color: '#fff',
+                html: `
+                    <div style="text-align:left;display:grid;gap:10px;margin-top:8px;">
+                        <div>
+                            <label style="font-size:12px;color:#888;display:block;margin-bottom:4px;">Label (e.g. KBZ Pay)</label>
+                            <input id="pa-label" class="swal2-input" placeholder="KBZ Pay" style="margin:0;width:100%;">
+                        </div>
+                        <div>
+                            <label style="font-size:12px;color:#888;display:block;margin-bottom:4px;">Account Number / Phone</label>
+                            <input id="pa-number" class="swal2-input" placeholder="09 XXX XXX XXX" style="margin:0;width:100%;">
+                        </div>
+                        <div>
+                            <label style="font-size:12px;color:#888;display:block;margin-bottom:4px;">Account Name</label>
+                            <input id="pa-name" class="swal2-input" placeholder="YLG Bullion Co." style="margin:0;width:100%;">
+                        </div>
+                        <div>
+                            <label style="font-size:12px;color:#888;display:block;margin-bottom:4px;">Sort Order (number)</label>
+                            <input id="pa-order" class="swal2-input" type="number" placeholder="1" value="${allPaymentAccounts.length + 1}" style="margin:0;width:100%;">
+                        </div>
+                    </div>`,
+                showCancelButton: true,
+                confirmButtonText: 'Add',
+                confirmButtonColor: '#4CAF50',
+                preConfirm: () => ({
+                    label:       document.getElementById('pa-label').value.trim(),
+                    number:      document.getElementById('pa-number').value.trim(),
+                    accountName: document.getElementById('pa-name').value.trim(),
+                    sortOrder:   parseInt(document.getElementById('pa-order').value) || 99,
+                })
+            });
+            if (!formData) return;
+            if (!formData.label || !formData.number) {
+                Swal.fire('Error', 'Label and number are required.', 'error'); return;
+            }
+            try {
+                const { addDoc, collection, serverTimestamp } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+                await addDoc(collection(db, 'paymentAccounts'), {
+                    ...formData, active: true, createdAt: serverTimestamp()
+                });
+                Swal.fire('Added!', 'Payment account saved.', 'success');
+            } catch(e) { Swal.fire('Error', e.message, 'error'); }
+        }
+
+        async function editPaymentAccount(id) {
+            const acc = allPaymentAccounts.find(a => a.id === id);
+            if (!acc) return;
+            const { value: formData } = await Swal.fire({
+                title: 'Edit Payment Account',
+                background: '#1a1a1a', color: '#fff',
+                html: `
+                    <div style="text-align:left;display:grid;gap:10px;margin-top:8px;">
+                        <div>
+                            <label style="font-size:12px;color:#888;display:block;margin-bottom:4px;">Label</label>
+                            <input id="pa-label" class="swal2-input" value="${acc.label||''}" style="margin:0;width:100%;">
+                        </div>
+                        <div>
+                            <label style="font-size:12px;color:#888;display:block;margin-bottom:4px;">Account Number / Phone</label>
+                            <input id="pa-number" class="swal2-input" value="${acc.number||''}" style="margin:0;width:100%;">
+                        </div>
+                        <div>
+                            <label style="font-size:12px;color:#888;display:block;margin-bottom:4px;">Account Name</label>
+                            <input id="pa-name" class="swal2-input" value="${acc.accountName||''}" style="margin:0;width:100%;">
+                        </div>
+                        <div>
+                            <label style="font-size:12px;color:#888;display:block;margin-bottom:4px;">Sort Order</label>
+                            <input id="pa-order" class="swal2-input" type="number" value="${acc.sortOrder||1}" style="margin:0;width:100%;">
+                        </div>
+                        <div style="display:flex;align-items:center;gap:8px;margin-top:4px;">
+                            <input type="checkbox" id="pa-active" ${acc.active !== false ? 'checked' : ''} style="width:16px;height:16px;">
+                            <label for="pa-active" style="font-size:13px;color:#ccc;">Visible to users</label>
+                        </div>
+                    </div>`,
+                showCancelButton: true,
+                confirmButtonText: 'Save',
+                confirmButtonColor: '#2196F3',
+                preConfirm: () => ({
+                    label:       document.getElementById('pa-label').value.trim(),
+                    number:      document.getElementById('pa-number').value.trim(),
+                    accountName: document.getElementById('pa-name').value.trim(),
+                    sortOrder:   parseInt(document.getElementById('pa-order').value) || 1,
+                    active:      document.getElementById('pa-active').checked,
+                })
+            });
+            if (!formData) return;
+            try {
+                const { doc, updateDoc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+                await updateDoc(doc(db, 'paymentAccounts', id), formData);
+                Swal.fire('Saved!', 'Payment account updated.', 'success');
+            } catch(e) { Swal.fire('Error', e.message, 'error'); }
+        }
+
+        async function deletePaymentAccount(id, label) {
+            const confirm = await Swal.fire({
+                title: 'Delete "' + label + '"?',
+                text: 'This will remove it from the deposit page.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Delete',
+                confirmButtonColor: '#FF6B6B'
+            });
+            if (!confirm.isConfirmed) return;
+            try {
+                const { doc, deleteDoc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+                await deleteDoc(doc(db, 'paymentAccounts', id));
+                Swal.fire('Deleted', 'Payment account removed.', 'success');
+            } catch(e) { Swal.fire('Error', e.message, 'error'); }
+        }
+
+        /* ══════════════════════════════════════════════
+           DEPOSIT REQUESTS
+        ══════════════════════════════════════════════ */
+        let _depositReqUnsub = null;
+
+        async function loadDepositRequests() {
+            try {
+                const { onSnapshot, collection, query, orderBy } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+                if (typeof _depositReqUnsub === 'function') _depositReqUnsub();
+                _depositReqUnsub = onSnapshot(
+                    query(collection(db, 'depositRequests'), orderBy('createdAt', 'desc')),
+                    snap => {
+                        allDepositReqs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                        displayDepositReqs();
+                        updatePlatformStats();
+                    }
+                );
+            } catch (e) { console.error('loadDepositRequests', e); }
+        }
+
+        function filterDepositReqs(status) {
+            currentDepositReqFilter = status;
+            document.getElementById('depositReqTabs').querySelectorAll('.tab-btn')
+                .forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            displayDepositReqs();
+        }
+
+        function displayDepositReqs() {
+            const list = document.getElementById('depositReqList');
+            const filtered = allDepositReqs.filter(r => (r.status || 'pending') === currentDepositReqFilter);
+            if (!filtered.length) {
+                list.innerHTML = '<div class="empty-state">No ' + currentDepositReqFilter + ' deposit requests.</div>';
+                return;
+            }
+
+            function fmtDate(ts) {
+                if (!ts?.seconds) return '—';
+                return new Date(ts.seconds * 1000).toLocaleString('en-GB', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
+            }
+
+            const statusColor = { pending:'#FF9800', approved:'#4CAF50', rejected:'#FF6B6B' };
+
+            list.innerHTML = filtered.map(r => `
+                <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:16px;margin-bottom:12px;">
+                    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;">
+                        <div style="flex:1;min-width:0;">
+                            <div style="font-size:16px;font-weight:800;color:#4CAF50;margin-bottom:4px;">
+                                + $${parseFloat(r.amount || 0).toLocaleString()}
+                            </div>
+                            <div style="font-size:12px;color:#888;margin-bottom:2px;">
+                                <i class="fas fa-user" style="margin-right:4px;"></i>${r.userName || r.userEmail || '—'} &nbsp;·&nbsp; ${r.ylgId || ''}
+                            </div>
+                            <div style="font-size:12px;color:#888;margin-bottom:2px;">
+                                <i class="fas fa-credit-card" style="margin-right:4px;"></i>${r.paymentMethod || '—'}
+                            </div>
+                            <div style="font-size:11px;color:#555;">${fmtDate(r.createdAt)}</div>
+                        </div>
+                        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;flex-shrink:0;">
+                            <span style="font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;
+                                         color:${statusColor[r.status]||'#888'};border:1px solid ${statusColor[r.status]||'#888'}44;
+                                         background:${statusColor[r.status]||'#888'}11;">
+                                ${(r.status||'pending').toUpperCase()}
+                            </span>
+                            ${r.proofBase64 ? `<button onclick="viewDepositProof('${r.id}')" class="btn-action" style="background:#2196F3;color:#fff;padding:5px 12px;font-size:11px;">
+                                <i class="fas fa-image"></i> Proof
+                            </button>` : ''}
+                            ${r.status === 'pending' ? `
+                            <button onclick="approveDepositReq('${r.id}')" class="btn-action" style="background:#4CAF50;color:#fff;padding:5px 12px;font-size:11px;">
+                                <i class="fas fa-check"></i> Approve
+                            </button>
+                            <button onclick="rejectDepositReq('${r.id}')" class="btn-action" style="background:#FF6B6B;color:#fff;padding:5px 12px;font-size:11px;">
+                                <i class="fas fa-times"></i> Reject
+                            </button>` : ''}
+                        </div>
+                    </div>
+                    ${r.note ? `<div style="margin-top:8px;font-size:11px;color:#FF9800;border-top:1px solid #2a2a2a;padding-top:8px;"><i class="fas fa-comment" style="margin-right:4px;"></i>${r.note}</div>` : ''}
+                </div>`
+            ).join('');
+        }
+
+        async function approveDepositReq(reqId) {
+            const req = allDepositReqs.find(r => r.id === reqId);
+            if (!req) return;
+            const { doc, updateDoc, increment, serverTimestamp } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+
+            const confirm = await Swal.fire({
+                title: 'Approve Deposit?',
+                html: `Credit <b>$${parseFloat(req.amount).toLocaleString()}</b> to <b>${req.userName || req.userEmail}</b>?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Approve',
+                confirmButtonColor: '#4CAF50'
+            });
+            if (!confirm.isConfirmed) return;
+
+            try {
+                // Credit user balance
+                const amt = parseFloat(req.amount);
+                await updateDoc(doc(db, 'users', req.uid), {
+                    balance:        increment(amt),
+                    depositBalance: increment(amt)
+                });
+                // Mark request approved
+                await updateDoc(doc(db, 'depositRequests', reqId), {
+                    status:      'approved',
+                    processedAt: serverTimestamp(),
+                    processedBy: currentAdminEmail
+                });
+                Swal.fire('Approved!', `$${amt.toLocaleString()} credited to ${req.userName || req.userEmail}.`, 'success');
+            } catch (e) {
+                Swal.fire('Error', e.message || 'Failed to approve', 'error');
+            }
+        }
+
+        async function rejectDepositReq(reqId) {
+            const req = allDepositReqs.find(r => r.id === reqId);
+            if (!req) return;
+
+            const { value: note } = await Swal.fire({
+                title: 'Reject Deposit Request',
+                input: 'text',
+                inputPlaceholder: 'Reason for rejection (optional)',
+                showCancelButton: true,
+                confirmButtonText: 'Reject',
+                confirmButtonColor: '#FF6B6B'
+            });
+            if (note === undefined) return; // cancelled
+
+            try {
+                const { doc, updateDoc, serverTimestamp } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+                await updateDoc(doc(db, 'depositRequests', reqId), {
+                    status:      'rejected',
+                    note:        note || '',
+                    processedAt: serverTimestamp(),
+                    processedBy: currentAdminEmail
+                });
+                Swal.fire('Rejected', 'Request has been rejected.', 'info');
+            } catch (e) {
+                Swal.fire('Error', e.message || 'Failed to reject', 'error');
+            }
+        }
+
+        const _depProofCache = {};
+        function viewDepositProof(reqId) {
+            // Cache the base64 to avoid re-reading from allDepositReqs each time
+            if (!_depProofCache[reqId]) {
+                const req = allDepositReqs.find(r => r.id === reqId);
+                if (!req?.proofBase64) return;
+                _depProofCache[reqId] = req.proofBase64;
+            }
+            Swal.fire({
+                title: 'Payment Proof',
+                html: `<img src="${_depProofCache[reqId]}" style="max-width:100%;border-radius:8px;">`,
+                showConfirmButton: false,
+                showCloseButton: true,
+                width: '90%',
+                background: '#1a1a1a'
+            });
+        }
+
+        // Filter functions
+        function filterWithdrawals(status) {
+            currentWithdrawalFilter = status;
+            const buttons = document.getElementById('withdrawalTabs').querySelectorAll('.tab-btn');
+            buttons.forEach(function(btn) { btn.classList.remove('active'); });
+            event.target.classList.add('active');
+            displayWithdrawals();
+        }
+
+        function filterKYC(status) {
+            currentKYCFilter = status;
+            const buttons = document.getElementById('kycTabs').querySelectorAll('.tab-btn');
+            buttons.forEach(function(btn) { btn.classList.remove('active'); });
+            event.target.classList.add('active');
+            displayKYC();
+        }
+
+        // Chat Support — Firestore chats collection (live from users)
+        async function setupChatListener() {
+            try {
+                const { collection, query, orderBy, onSnapshot } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+                const q = query(collection(db, 'chats'), orderBy('timestamp', 'asc'));
+                let isFirstLoad = true;
+                let lastMessageIds = new Set();
+                
+                onSnapshot(q, (snap) => {
+                    const container = document.getElementById('chatContainer');
+                    if (!container) return;
+                    
+                    const messages = [];
+                    snap.forEach(d => messages.push({ id: d.id, ...d.data() }));
+                    
+                    // Render last 50 messages (latest at bottom)
+                    const recent = messages.slice(-50);
+                    container.innerHTML = recent.map(m => {
+                        const isAdmin = m.isAdmin === true;
+                        const time = m.timestamp?.toDate ? m.timestamp.toDate().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : '';
+                        const sender = isAdmin ? 'Admin' : (m.userEmail || (m.userId ? m.userId.slice(0,8) : 'User'));
+                        const cls = isAdmin ? 'admin' : 'user';
+                        
+                        if (m.chatImageUrl || m.imageUrl) {
+                            const img = m.chatImageUrl || m.imageUrl;
+                            return `<div class="chat-msg ${cls}" data-uid="${m.userId || ''}" data-uname="${(m.userEmail || '').replace(/"/g, '&quot;')}" style="cursor:pointer;" title="Click to open full chat">
+                                <strong>${sender}:</strong>
+                                <img src="${img}" style="max-width:140px; display:block; margin-top:4px; border-radius:6px;">
+                                <span style="font-size:9px; opacity:0.6; display:block; margin-top:2px;">${time}</span>
+                            </div>`;
+                        }
+                        return `<div class="chat-msg ${cls}" data-uid="${m.userId || ''}" data-uname="${(m.userEmail || '').replace(/"/g, '&quot;')}" style="cursor:pointer;" title="Click to open full chat">
+                            <strong>${sender}:</strong> ${m.message || ''}
+                            <span style="font-size:9px; opacity:0.6; display:block; margin-top:2px;">${time}</span>
+                        </div>`;
+                    }).join('') || '<div style="color:#888; padding:20px; text-align:center;">No messages yet</div>';
+                    
+                    container.scrollTop = container.scrollHeight;
+                    
+                    // Notification sound for NEW user messages (not on first load)
+                    if (!isFirstLoad) {
+                        recent.forEach(m => {
+                            if (!lastMessageIds.has(m.id) && !m.isAdmin) {
+                                // New user message arrived — play sound
+                                const snd = document.getElementById('notifSound');
+                                if (snd) {
+                                    try { snd.currentTime = 0; snd.play(); } catch (e) {}
+                                }
+                                // Browser notification (if permission granted)
+                                if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+                                    new Notification('New message from ' + (m.userEmail || 'user'), {
+                                        body: (m.message || '[Image]').slice(0, 80),
+                                        icon: '/logo.png'
+                                    });
+                                }
+                            }
+                        });
+                    }
+                    
+                    // Update tracking
+                    lastMessageIds = new Set(recent.map(m => m.id));
+                    isFirstLoad = false;
+                    
+                    // Click any message → open dedicated chat with that user
+                    container.querySelectorAll('.chat-msg.user').forEach(el => {
+                        el.onclick = () => {
+                            const uid = el.dataset.uid;
+                            const uname = (el.dataset.uname || 'User').replace(/&quot;/g, '"');
+                            if (uid && typeof window.openUserChat === 'function') {
+                                window.openUserChat(uid, uname);
+                            }
+                        };
+                    });
+                });
+                
+                // Request browser notification permission
+                if (typeof Notification !== 'undefined' && Notification.permission === 'default') {
+                    Notification.requestPermission();
+                }
+            } catch (error) {
+                console.error('Error setting up chat listener:', error);
+            }
+        }
+
+        function addChatMessage(sender, text, isAdmin) {
+            const container = document.getElementById('chatContainer');
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'chat-msg ' + (isAdmin ? 'admin' : 'user');
+            msgDiv.innerHTML = '<strong>' + sender + ':</strong> ' + text;
+            container.appendChild(msgDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        async function sendChatMessage() {
+            // From sidebar, this acts as a quick reply to LAST user who messaged
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
+            if (!text) return;
+            
+            try {
+                const { collection, query, where, orderBy, limit, getDocs, addDoc, serverTimestamp } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+                
+                // Find most recent USER (non-admin) message to determine recipient
+                const q = query(collection(db, 'chats'), where('isAdmin', '==', false), orderBy('timestamp', 'desc'), limit(1));
+                const snap = await getDocs(q);
+                
+                if (snap.empty) {
+                    Swal.fire('No User', 'No user has sent a message yet. Use the user list to send a message instead.', 'info');
+                    return;
+                }
+                
+                const lastMsg = snap.docs[0].data();
+                const targetUserId = lastMsg.userId;
+                const targetEmail = lastMsg.userEmail || '';
+                
+                // Confirm before sending
+                const confirm = await Swal.fire({
+                    icon: 'question',
+                    title: 'Send to last user?',
+                    html: `Reply to: <b>${targetEmail || targetUserId}</b><br><br><i>Tip: Use the "<i class="fas fa-comment"></i> Message" button in user cards to message a specific user.</i>`,
+                    showCancelButton: true,
+                    confirmButtonText: 'Send',
+                    background: '#1a1a1a', color: '#fff',
+                    confirmButtonColor: '#FFD700'
+                });
+                if (!confirm.isConfirmed) return;
+                
+                await addDoc(collection(db, 'chats'), {
+                    userId: targetUserId,
+                    userEmail: targetEmail,
+                    message: text,
+                    isAdmin: true,
+                    adminRead: true,
+                    timestamp: serverTimestamp()
+                });
+                input.value = '';
+            } catch (error) {
+                Swal.fire('Error', error.message, 'error');
+            }
+        }
+
+        // Send Notification
+        async function sendNotification() {
+            const title  = (document.getElementById('notif-title')?.value || '').trim();
+            const msg    = (document.getElementById('notif-msg')?.value   || '').trim();
+            const type   = document.getElementById('notif-type')?.value   || 'announcement';
+            const target = document.getElementById('notif-target')?.value || 'all';
+
+            if (!title || !msg) {
+                Swal.fire('Missing Fields', 'Please enter both title and message.', 'warning');
+                return;
+            }
+
+            try {
+                const { addDoc, collection, serverTimestamp } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+                await addDoc(collection(db, 'notifications'), {
+                    title, message: msg, type,
+                    targetUserId: target,
+                    createdAt: serverTimestamp(),
+                    createdBy: currentAdminEmail
+                });
+                document.getElementById('notif-title').value = '';
+                document.getElementById('notif-msg').value   = '';
+                Swal.fire({ icon:'success', title:'Sent!', text:'Notification delivered to ' + (target === 'all' ? 'all users' : target), timer:1800, showConfirmButton:false });
+            } catch (e) {
+                Swal.fire('Error', e.message, 'error');
+            }
+        }
+
+        // Admin Logout
+        async function adminLogout() {
+            sessionStorage.removeItem('adminLoggedIn');
+            sessionStorage.removeItem('adminEmail');
+            try {
+                await signOut(auth);
+            } catch (e) { console.error('signOut error', e); }
+            window.location.href = 'admin-login.html';
+        }
+
+        // Refresh All
+        function refreshAll() {
+            loadAllData();
+            Swal.fire('Success', 'Data refreshed', 'success');
+        }
+
+        // Export functions to global scope for onclick handlers
+        window.viewUserDetails = viewUserDetails;
+        window.setKycStatus = setKycStatus;
+        window.deleteUser = deleteUser;
+        window.setTradeControl = setTradeControl;
+        window.toggleFreeze = toggleFreeze;
+        window.openDepositDialog = openDepositDialog;
+        window.openWithdrawDialog = openWithdrawDialog;
+        window.updateWithdrawal = updateWithdrawal;
+        window.filterWithdrawals = filterWithdrawals;
+        window.verifyKYC = verifyKYC;
+        window.rejectKYC = rejectKYC;
+        window.viewKYCDocuments = viewKYCDocuments;
+        window.closeKYCModal = closeKYCModal;
+        window.filterKYC = filterKYC;
+        window.setupChatListener = setupChatListener;
+        window.addChatMessage = addChatMessage;
+        window.sendChatMessage = sendChatMessage;
+        window.adminLogout = adminLogout;
+        window.refreshAll = refreshAll;
+        window.sendNotification  = sendNotification;
+        window.creditDailyBonus  = creditDailyBonus;
+        window.filterDepositReqs      = filterDepositReqs;
+        window.approveDepositReq      = approveDepositReq;
+        window.rejectDepositReq       = rejectDepositReq;
+        window.viewDepositProof       = viewDepositProof;
+        window.openAddPaymentAccount  = openAddPaymentAccount;
+        window.editPaymentAccount     = editPaymentAccount;
+        window.deletePaymentAccount   = deletePaymentAccount;
+    </script>
+</body>
+</html>
