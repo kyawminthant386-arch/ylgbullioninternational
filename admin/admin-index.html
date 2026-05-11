@@ -3,522 +3,328 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YLG Admin - Control Panel</title>
+    <title>YLG Admin Panel</title>
     <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline' https://www.gstatic.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com;">
-    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
     <style>
         :root {
-            --bg-dark: #111111;
-            --card-bg: #1A1A1A;
-            --gold: #FFD700;
-            --green: #00B050;
-            --red: #D93025;
-            --orange: #FF9800;
+            --bg: #F0F2F5;
+            --card: #FFFFFF;
+            --navy: #1A1A2E;
+            --gold: #C9A84C;
+            --gold-light: #FFD700;
+            --green: #22C55E;
+            --red: #EF4444;
+            --orange: #F97316;
+            --blue: #3B82F6;
+            --text: #1A1A2E;
+            --muted: #6B7280;
+            --border: #E5E7EB;
+            --nav-h: 64px;
+            --top-h: 60px;
         }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Segoe UI',system-ui,sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+
+        /* ── Top Bar ── */
+        .top-bar {
+            position:fixed; top:0; left:0; right:0; height:var(--top-h);
+            background:var(--navy); display:flex; align-items:center;
+            justify-content:space-between; padding:0 16px; z-index:200;
+            box-shadow:0 2px 8px rgba(0,0,0,0.3);
         }
-        
-        body {
-            display: flex;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-dark);
-            color: #e0e0e0;
-            overflow: hidden;
+        .top-bar-left { display:flex; align-items:center; gap:10px; }
+        .admin-logo { width:34px; height:34px; border-radius:8px; object-fit:cover; border:1.5px solid var(--gold); }
+        .top-bar-title { font-size:15px; font-weight:700; color:#fff; }
+        .top-bar-sub { font-size:11px; color:var(--gold); }
+        .top-bar-actions { display:flex; gap:8px; }
+        .icon-btn { background:rgba(255,255,255,0.08); border:none; color:#fff; width:36px; height:36px; border-radius:8px; cursor:pointer; font-size:14px; transition:.2s; display:flex; align-items:center; justify-content:center; }
+        .icon-btn:hover { background:rgba(255,255,255,0.18); }
+        .icon-btn.logout { color:#fca5a5; }
+
+        /* ── Main Area ── */
+        .main-area { padding-top:calc(var(--top-h) + 12px); padding-bottom:calc(var(--nav-h) + 12px); min-height:100vh; }
+
+        /* ── Views ── */
+        .view { display:none; padding:0 14px; }
+        .view.active { display:block; }
+
+        /* ── Section Card ── */
+        .s-card { background:var(--card); border-radius:14px; padding:16px; margin-bottom:14px; box-shadow:0 1px 4px rgba(0,0,0,0.08); }
+        .s-title { font-size:14px; font-weight:700; color:var(--text); margin-bottom:12px; display:flex; align-items:center; gap:8px; }
+        .s-title i { color:var(--gold); }
+
+        /* ── Stat Cards ── */
+        .stat-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px; }
+        .stat-card { background:var(--card); border-radius:14px; padding:16px; box-shadow:0 1px 4px rgba(0,0,0,0.08); }
+        .stat-label { font-size:11px; color:var(--muted); margin-bottom:6px; display:flex; align-items:center; gap:6px; }
+        .stat-icon { width:28px; height:28px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:13px; flex-shrink:0; }
+        .stat-val { font-size:26px; font-weight:800; color:var(--text); line-height:1; }
+        .stat-sub { font-size:11px; color:var(--muted); margin-top:4px; }
+
+        /* ── Tab Buttons ── */
+        .tab-buttons { display:flex; gap:6px; margin-bottom:12px; flex-wrap:wrap; }
+        .tab-btn { padding:7px 14px; background:#F3F4F6; color:var(--muted); border:none; border-radius:20px; cursor:pointer; font-size:12px; font-weight:600; transition:.2s; }
+        .tab-btn.active { background:var(--navy); color:#fff; }
+
+        /* ── Cards ── */
+        .user-card { background:var(--card); border-radius:12px; padding:14px; margin-bottom:10px; border-left:4px solid var(--border); display:grid; grid-template-columns:1.4fr 1.1fr 1.1fr 1.1fr 1.2fr 1fr; gap:10px; align-items:center; box-shadow:0 1px 3px rgba(0,0,0,0.06); transition:.2s; }
+        .user-card:hover { border-left-color:var(--gold); box-shadow:0 2px 8px rgba(0,0,0,0.1); }
+        .withdraw-card { background:var(--card); border-radius:12px; padding:14px; margin-bottom:10px; border-left:4px solid var(--orange); display:grid; grid-template-columns:1.5fr 1fr 1fr 1fr; gap:10px; box-shadow:0 1px 3px rgba(0,0,0,0.06); }
+        .info h4 { margin:0 0 4px; color:var(--text); font-size:13px; word-break:break-word; }
+        .info p { margin:2px 0; font-size:11px; color:var(--muted); }
+
+        /* ── Badges ── */
+        .kyc-badge { display:inline-block; padding:3px 10px; border-radius:20px; font-size:10px; font-weight:700; text-transform:uppercase; }
+        .kyc-pending { background:#FEF3C7; color:#92400E; }
+        .kyc-verified { background:#D1FAE5; color:#065F46; }
+        .kyc-rejected { background:#FEE2E2; color:#991B1B; }
+
+        /* ── Action Buttons ── */
+        .btn-action { padding:6px 12px; font-size:11px; margin:3px 2px; border-radius:6px; border:none; cursor:pointer; font-weight:600; transition:.2s; }
+        .btn-approve { background:#D1FAE5; color:#065F46; }
+        .btn-reject { background:#FEE2E2; color:#991B1B; }
+        .btn-view { background:#DBEAFE; color:#1E40AF; }
+        .btn-verify { background:#D1FAE5; color:#065F46; }
+        .btn-delete { background:transparent; color:var(--red); border:1px solid #FECACA; width:100%; margin-top:6px; padding:7px; border-radius:6px; cursor:pointer; font-size:11px; font-weight:600; }
+
+        /* ── Search ── */
+        .search-input { width:100%; padding:11px 14px; border:1.5px solid var(--border); border-radius:10px; background:#fff; color:var(--text); font-size:13px; outline:none; transition:.2s; font-family:inherit; }
+        .search-input:focus { border-color:var(--gold); }
+
+        /* ── Chat ── */
+        .chat-wrap { background:var(--card); border-radius:14px; overflow:hidden; box-shadow:0 1px 4px rgba(0,0,0,0.08); margin-bottom:14px; display:flex; flex-direction:column; height:60vh; }
+        .chat-header { padding:13px 16px; background:var(--navy); color:#fff; font-size:13px; font-weight:700; display:flex; align-items:center; gap:8px; flex-shrink:0; }
+        .chat-header i { color:var(--gold); }
+        #chatContainer { flex:1; padding:12px; overflow-y:auto; display:flex; flex-direction:column; gap:8px; }
+        .chat-msg { padding:10px 12px; border-radius:10px; font-size:12px; max-width:85%; line-height:1.5; }
+        .chat-msg.admin { background:var(--navy); color:#fff; align-self:flex-end; border-bottom-right-radius:3px; }
+        .chat-msg.user { background:#F3F4F6; color:var(--text); align-self:flex-start; border-bottom-left-radius:3px; border-left:3px solid var(--blue); }
+        .chat-input-group { padding:10px 12px; display:flex; gap:8px; border-top:1px solid var(--border); flex-shrink:0; }
+        .chat-input { flex:1; padding:9px 12px; border:1.5px solid var(--border); border-radius:8px; background:#fff; color:var(--text); font-size:13px; outline:none; font-family:inherit; }
+        .chat-input:focus { border-color:var(--gold); }
+        .chat-send-btn { padding:9px 16px; background:var(--gold); color:#000; border:none; border-radius:8px; font-weight:700; cursor:pointer; font-size:13px; }
+
+        /* ── Refresh btn ── */
+        .refresh-btn { background:var(--gold); color:#000; border:none; border-radius:8px; padding:8px 16px; font-weight:700; font-size:12px; cursor:pointer; transition:.2s; }
+        .refresh-btn:hover { background:#b8943f; }
+        .logout-btn { background:#F3F4F6; color:var(--text); border:none; border-radius:8px; padding:8px 16px; font-weight:700; font-size:12px; cursor:pointer; }
+
+        /* ── Empty State ── */
+        .empty-state { text-align:center; color:var(--muted); padding:28px 14px; font-size:13px; }
+
+        /* ── Bottom Nav ── */
+        .bottom-nav { position:fixed; bottom:0; left:0; right:0; height:var(--nav-h); background:var(--navy); display:flex; align-items:stretch; z-index:200; box-shadow:0 -2px 12px rgba(0,0,0,0.2); }
+        .nav-item { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; background:none; border:none; cursor:pointer; color:rgba(255,255,255,0.4); font-size:10px; font-weight:600; transition:.2s; position:relative; padding:0; }
+        .nav-item i { font-size:18px; }
+        .nav-item.active { color:var(--gold); }
+        .nav-item.active::after { content:''; position:absolute; top:0; left:20%; right:20%; height:2px; background:var(--gold); border-radius:0 0 3px 3px; }
+        .nav-badge { position:absolute; top:8px; right:calc(50% - 16px); background:var(--red); color:#fff; font-size:9px; font-weight:800; min-width:16px; height:16px; border-radius:8px; display:flex; align-items:center; justify-content:center; padding:0 4px; }
+
+        /* ── Notification form ── */
+        .notif-form { display:grid; gap:10px; }
+        .notif-form input, .notif-form textarea, .notif-form select { width:100%; padding:10px 12px; border:1.5px solid var(--border); border-radius:8px; background:#fff; color:var(--text); font-size:13px; outline:none; font-family:inherit; }
+        .notif-form textarea { height:80px; resize:vertical; }
+        .notif-form select { cursor:pointer; }
+        .notif-form input:focus, .notif-form textarea:focus, .notif-form select:focus { border-color:var(--gold); }
+
+        /* ── Responsive ── */
+        @media(min-width:768px) {
+            .stat-grid { grid-template-columns:repeat(4,1fr); }
+            .main-area { max-width:900px; margin:0 auto; }
         }
-        
-        .main-content {
-            flex: 1;
-            padding: 20px;
-            height: 100vh;
-            overflow-y: auto;
-            margin-right: 380px;
+        @media(max-width:700px) {
+            .user-card { grid-template-columns:1fr 1fr; }
+            .withdraw-card { grid-template-columns:1fr; }
         }
-        
-        .sidebar-right {
-            width: 380px;
-            background: #151515;
-            border-left: 2px solid var(--gold);
-            height: 100vh;
-            position: fixed;
-            right: 0;
-            top: 0;
-            display: flex;
-            flex-direction: column;
-            z-index: 1000;
-        }
-        
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 2px solid var(--gold);
-            padding-bottom: 15px;
-            margin-bottom: 25px;
-        }
-        
-        header h2 {
-            font-size: 24px;
-            color: var(--gold);
-        }
-        
-        header small {
-            color: var(--gold);
-            font-weight: bold;
-            font-size: 12px;
-            margin-top: 5px;
-            display: block;
-        }
-        
-        .btn-group {
-            display: flex;
-            gap: 10px;
-        }
-        
-        button {
-            padding: 10px 15px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 12px;
-            transition: 0.2s all;
-        }
-        
-        button:hover {
-            opacity: 0.85;
-            transform: scale(1.02);
-        }
-        
-        .refresh-btn {
-            background: var(--gold);
-            color: black;
-            font-weight: bold;
-        }
-        
-        .logout-btn {
-            background: #333;
-            color: #fff;
-            border: 1px solid #444;
-        }
-        
-        .section {
-            margin-top: 25px;
-        }
-        
-        .section h3 {
-            font-size: 18px;
-            color: var(--gold);
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #333;
-        }
-        
-        .search-input {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 20px;
-            border: 1px solid #444;
-            border-radius: 5px;
-            background: #000;
-            color: #fff;
-            outline: none;
-        }
-        
-        .search-input:focus {
-            border-color: var(--gold);
-            box-shadow: 0 0 5px rgba(255, 215, 0, 0.3);
-        }
-        
-        .user-card {
-            background: var(--card-bg);
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 12px;
-            border-left: 5px solid #333;
-            display: grid;
-            grid-template-columns: 1.4fr 1.1fr 1.1fr 1.1fr 1.2fr 1fr;
-            gap: 12px;
-            align-items: center;
-            transition: 0.3s;
-        }
-        
-        .user-card:hover, .withdraw-card:hover {
-            background: #222;
-            border-left-color: var(--gold);
-        }
-        
-        .withdraw-card { background: var(--card-bg); border-radius: 8px; padding: 15px; margin-bottom: 12px; border-left: 5px solid var(--orange, #FF9800); display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: 15px; }
-        
-        .info h4 {
-            margin: 0 0 5px 0;
-            color: var(--gold);
-            font-size: 14px;
-            word-break: break-word;
-        }
-        
-        .info p {
-            margin: 3px 0;
-            font-size: 11px;
-            color: #999;
-        }
-        
-        .kyc-badge {
-            display: inline-block;
-            padding: 5px 10px;
-            border-radius: 4px;
-            font-size: 11px;
-            font-weight: bold;
-            margin-top: 5px;
-            text-transform: uppercase;
-        }
-        
-        .kyc-pending {
-            background: #444;
-            color: #fff;
-        }
-        
-        .kyc-verified {
-            background: var(--green);
-            color: #fff;
-        }
-        
-        .kyc-rejected {
-            background: var(--red);
-            color: #fff;
-        }
-        
-        .btn-action {
-            padding: 8px 12px;
-            font-size: 11px;
-            margin: 4px 2px;
-            border-radius: 4px;
-            border: none;
-            cursor: pointer;
-            font-weight: bold;
-            display: inline-block;
-            transition: 0.2s all;
-        }
-        
-        .btn-action:hover {
-            opacity: 0.9;
-            transform: translateY(-1px);
-        }
-        
-        .btn-action:active {
-            transform: translateY(0);
-        }
-        
-        .btn-approve {
-            background: var(--green);
-            color: white;
-        }
-        
-        .btn-reject {
-            background: var(--red);
-            color: white;
-        }
-        
-        .btn-view {
-            background: #2196F3;
-            color: white;
-        }
-        
-        .btn-verify {
-            background: var(--green);
-            color: white;
-        }
-        
-        .btn-delete {
-            background: transparent;
-            color: var(--red);
-            border: 1px solid var(--red);
-            width: 100%;
-            margin-top: 8px;
-        }
-        
-        .chat-header {
-            padding: 15px;
-            background: var(--card-bg);
-            border-bottom: 1px solid #333;
-            text-align: center;
-            color: var(--gold);
-            font-weight: bold;
-        }
-        
-        #chatContainer {
-            flex: 1;
-            padding: 12px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        
-        .chat-msg {
-            padding: 10px;
-            background: #222;
-            border-radius: 6px;
-            border-left: 4px solid transparent;
-            font-size: 12px;
-            margin-bottom: 5px;
-        }
-        
-        .chat-msg.admin {
-            border-left-color: var(--gold);
-        }
-        
-        .chat-msg.user {
-            border-left-color: #2196F3;
-        }
-        
-        .chat-input-group {
-            padding: 12px;
-            display: flex;
-            gap: 8px;
-            border-top: 1px solid #333;
-        }
-        
-        .chat-input {
-            flex: 1;
-            padding: 8px;
-            border: 1px solid #444;
-            border-radius: 4px;
-            background: #000;
-            color: #fff;
-            outline: none;
-            font-size: 12px;
-        }
-        
-        .chat-input:focus {
-            border-color: var(--gold);
-        }
-        
-        .chat-send-btn {
-            padding: 8px 15px;
-            background: var(--gold);
-            color: black;
-            border: none;
-            border-radius: 4px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        
-        .empty-state {
-            text-align: center;
-            color: #666;
-            padding: 30px 15px;
-        }
-        
-        .tab-buttons {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-        
-        .tab-btn {
-            padding: 8px 15px;
-            background: #333;
-            color: #ccc;
-            border: 1px solid #444;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: bold;
-            transition: 0.2s;
-        }
-        
-        .tab-btn.active {
-            background: var(--gold);
-            color: black;
-            border-color: var(--gold);
-        }
-        
-        @media (max-width: 1200px) {
-            .main-content {
-                margin-right: 0;
-            }
-            
-            body {
-                flex-direction: column;
-            }
-            
-            .sidebar-right {
-                width: 100%;
-                height: 400px;
-                bottom: 0;
-                top: auto;
-                right: 0;
-                border-left: none;
-                border-top: 2px solid var(--gold);
-            }
-        }
-        
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: #000;
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: #444;
-            border-radius: 4px;
-        }
-        
-        ::-webkit-scrollbar-thumb:hover {
-            background: #666;
-        }
-    
-        @media (max-width: 1100px) {
-            .user-card { grid-template-columns: 1fr 1fr 1fr; }
-        }
-        @media (max-width: 700px) {
-            .user-card { grid-template-columns: 1fr; }
-            .withdraw-card { grid-template-columns: 1fr; }
+        @media(max-width:480px) {
+            .user-card { grid-template-columns:1fr; }
         }
 
-        </style>
+        ::-webkit-scrollbar { width:5px; }
+        ::-webkit-scrollbar-track { background:transparent; }
+        ::-webkit-scrollbar-thumb { background:#D1D5DB; border-radius:99px; }
+    </style>
 </head>
 <body>
     <audio id="notifSound" src="https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3" preload="auto"></audio>
-    
-    <div class="main-content">
-        <header>
+
+    <!-- Top Bar -->
+    <header class="top-bar">
+        <div class="top-bar-left">
+            <img src="../logo.png" class="admin-logo" alt="YLG" onerror="this.src='https://ui-avatars.com/api/?name=YLG&background=C9A84C&color=000&bold=true'">
             <div>
-                <h2><i class="fas fa-user-shield"></i> YLG Admin Control Panel</h2>
-                <small id="adminEmailDisplay">Authenticating...</small>
+                <div class="top-bar-title">YLG Admin</div>
+                <div class="top-bar-sub" id="adminEmailDisplay">Authenticating...</div>
             </div>
-            <div class="btn-group">
-                <button onclick="window.refreshAll()" class="refresh-btn"><i class="fas fa-sync"></i> Refresh</button>
-                <button onclick="window.adminLogout()" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
-            </div>
-        </header>
-        
-        <!-- ── Platform Stats ── -->
-        <div class="section" id="platform-stats-section">
-            <h3><i class="fas fa-chart-bar"></i> Platform Stats</h3>
-            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;">
-                <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:16px 18px;">
-                    <div style="font-size:11px;color:#666;margin-bottom:6px;"><i class="fas fa-users" style="color:#2196F3;margin-right:5px;"></i>Total Users</div>
-                    <div id="stat-total-users" style="font-size:24px;font-weight:800;color:#fff;">—</div>
+        </div>
+        <div class="top-bar-actions">
+            <button class="icon-btn" onclick="window.refreshAll()" title="Refresh"><i class="fas fa-sync-alt"></i></button>
+            <button class="icon-btn logout" onclick="window.adminLogout()" title="Logout"><i class="fas fa-sign-out-alt"></i></button>
+        </div>
+    </header>
+
+    <!-- Main Area -->
+    <main class="main-area">
+
+        <!-- ── DASHBOARD VIEW ── -->
+        <div class="view active" id="view-dashboard">
+            <div class="stat-grid" id="platform-stats-section">
+                <div class="stat-card">
+                    <div class="stat-label"><div class="stat-icon" style="background:#EFF6FF;"><i class="fas fa-users" style="color:#3B82F6;"></i></div> Total Users</div>
+                    <div class="stat-val" id="stat-total-users">—</div>
+                    <div class="stat-sub" id="stat-users-sub">0 active</div>
                 </div>
-                <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:16px 18px;">
-                    <div style="font-size:11px;color:#666;margin-bottom:6px;"><i class="fas fa-arrow-down" style="color:#4CAF50;margin-right:5px;"></i>Total Deposited</div>
-                    <div id="stat-total-dep" style="font-size:24px;font-weight:800;color:#4CAF50;">—</div>
+                <div class="stat-card">
+                    <div class="stat-label"><div class="stat-icon" style="background:#F0FDF4;"><i class="fas fa-arrow-down" style="color:#22C55E;"></i></div> Total Deposits</div>
+                    <div class="stat-val" style="color:var(--green);" id="stat-total-dep">—</div>
+                    <div class="stat-sub" id="stat-dep-sub">0 pending</div>
                 </div>
-                <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:16px 18px;">
-                    <div style="font-size:11px;color:#666;margin-bottom:6px;"><i class="fas fa-wallet" style="color:#FFD700;margin-right:5px;"></i>Total Balance</div>
-                    <div id="stat-total-bal" style="font-size:24px;font-weight:800;color:#FFD700;">—</div>
+                <div class="stat-card">
+                    <div class="stat-label"><div class="stat-icon" style="background:#FFFBEB;"><i class="fas fa-wallet" style="color:#F59E0B;"></i></div> Total Balance</div>
+                    <div class="stat-val" style="color:#F59E0B;" id="stat-total-bal">—</div>
+                    <div class="stat-sub">platform total</div>
                 </div>
-                <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:16px 18px;">
-                    <div style="font-size:11px;color:#666;margin-bottom:6px;"><i class="fas fa-hourglass-half" style="color:#FF9800;margin-right:5px;"></i>Pending Deposits</div>
-                    <div id="stat-pending-dep" style="font-size:24px;font-weight:800;color:#FF9800;">—</div>
+                <div class="stat-card">
+                    <div class="stat-label"><div class="stat-icon" style="background:#FFF7ED;"><i class="fas fa-hourglass-half" style="color:#F97316;"></i></div> Pending Deps</div>
+                    <div class="stat-val" style="color:var(--orange);" id="stat-pending-dep">—</div>
+                    <div class="stat-sub">awaiting review</div>
                 </div>
             </div>
         </div>
 
-        <!-- ── Payment Accounts ── -->
-        <div class="section">
-            <h3><i class="fas fa-university" style="color:#C9A84C;"></i> Payment Accounts
-                <button onclick="window.openAddPaymentAccount()" class="refresh-btn" style="margin-left:12px;padding:6px 14px;font-size:12px;">
-                    <i class="fas fa-plus"></i> Add Account
-                </button>
-            </h3>
-            <div id="paymentAccountsList" class="empty-state">Loading...</div>
+        <!-- ── USERS VIEW ── -->
+        <div class="view" id="view-users">
+            <div class="s-card">
+                <div class="s-title"><i class="fas fa-users"></i> Users Management</div>
+                <input type="text" id="userSearch" class="search-input" placeholder="Search by YLG ID, name, email..." onkeyup="filterUsers()" style="margin-bottom:12px;">
+                <span id="searchResultCount" style="font-size:12px;color:var(--gold);font-weight:600;"></span>
+                <div id="userList" class="empty-state">Loading users...</div>
+            </div>
         </div>
 
-        <!-- ── Deposit Requests ── -->
-        <div class="section">
-            <h3><i class="fas fa-arrow-circle-down" style="color:#4CAF50;"></i> Deposit Requests</h3>
-            <div class="tab-buttons" id="depositReqTabs">
-                <button class="tab-btn active" onclick="filterDepositReqs('pending')">Pending</button>
-                <button class="tab-btn" onclick="filterDepositReqs('approved')">Approved</button>
-                <button class="tab-btn" onclick="filterDepositReqs('rejected')">Rejected</button>
-            </div>
-            <div id="depositReqList" class="empty-state">Loading deposit requests...</div>
-        </div>
-
-        <div class="section">
-            <h3><i class="fas fa-hand-holding-usd"></i> Withdrawal Requests</h3>
-            <div class="tab-buttons" id="withdrawalTabs">
-                <button class="tab-btn active" onclick="filterWithdrawals('pending')">Pending</button>
-                <button class="tab-btn" onclick="filterWithdrawals('approved')">Approved</button>
-                <button class="tab-btn" onclick="filterWithdrawals('rejected')">Rejected</button>
-            </div>
-            <div id="withdrawList" class="empty-state">Loading withdrawal requests...</div>
-        </div>
-        
-        <div class="section">
-            <h3><i class="fas fa-certificate"></i> KYC Verification</h3>
-            <div class="tab-buttons" id="kycTabs">
-                <button class="tab-btn active" onclick="filterKYC('pending')">Pending</button>
-                <button class="tab-btn" onclick="filterKYC('verified')">Verified</button>
-                <button class="tab-btn" onclick="filterKYC('rejected')">Rejected</button>
-            </div>
-            <div id="kycList" class="empty-state">Loading KYC requests...</div>
-        </div>
-        
-        <!-- Send Notification -->
-        <div class="section">
-            <h3><i class="fas fa-bullhorn"></i> Send Notification</h3>
-            <div style="max-width:600px;display:grid;gap:12px;">
-                <input id="notif-title" type="text" class="search-input" placeholder="Notification title..." style="margin:0;">
-                <textarea id="notif-msg" class="search-input" placeholder="Message body..." style="margin:0;height:80px;resize:vertical;font-family:inherit;"></textarea>
-                <div style="display:flex;gap:12px;flex-wrap:wrap;">
-                    <select id="notif-type" style="flex:1;min-width:140px;padding:11px;background:#000;color:#fff;border:1px solid #444;border-radius:5px;outline:none;font-size:13px;">
-                        <option value="announcement">📢 Announcement</option>
-                        <option value="kyc">🪪 KYC Update</option>
-                        <option value="deposit">💰 Deposit</option>
-                        <option value="withdrawal">💸 Withdrawal</option>
-                        <option value="trade">📈 Trading</option>
-                    </select>
-                    <select id="notif-target" style="flex:1;min-width:140px;padding:11px;background:#000;color:#fff;border:1px solid #444;border-radius:5px;outline:none;font-size:13px;">
-                        <option value="all">📣 All Users</option>
-                    </select>
+        <!-- ── FINANCE VIEW ── -->
+        <div class="view" id="view-finance">
+            <div class="s-card">
+                <div class="s-title" style="justify-content:space-between;">
+                    <span><i class="fas fa-university"></i> Payment Accounts</span>
+                    <button onclick="window.openAddPaymentAccount()" class="refresh-btn" style="padding:6px 12px;font-size:11px;"><i class="fas fa-plus"></i> Add</button>
                 </div>
-                <button onclick="window.sendNotification()" class="refresh-btn" style="padding:12px;font-size:13px;">
-                    <i class="fas fa-paper-plane" style="margin-right:6px;"></i>Send Notification
-                </button>
+                <div id="paymentAccountsList" class="empty-state">Loading...</div>
+            </div>
+            <div class="s-card">
+                <div class="s-title"><i class="fas fa-arrow-circle-down" style="color:var(--green);"></i> Deposit Requests</div>
+                <div class="tab-buttons" id="depositReqTabs">
+                    <button class="tab-btn active" onclick="filterDepositReqs('pending')">Pending</button>
+                    <button class="tab-btn" onclick="filterDepositReqs('approved')">Approved</button>
+                    <button class="tab-btn" onclick="filterDepositReqs('rejected')">Rejected</button>
+                </div>
+                <div id="depositReqList" class="empty-state">Loading...</div>
+            </div>
+            <div class="s-card">
+                <div class="s-title"><i class="fas fa-hand-holding-usd" style="color:var(--orange);"></i> Withdrawal Requests</div>
+                <div class="tab-buttons" id="withdrawalTabs">
+                    <button class="tab-btn active" onclick="filterWithdrawals('pending')">Pending</button>
+                    <button class="tab-btn" onclick="filterWithdrawals('approved')">Approved</button>
+                    <button class="tab-btn" onclick="filterWithdrawals('rejected')">Rejected</button>
+                </div>
+                <div id="withdrawList" class="empty-state">Loading...</div>
             </div>
         </div>
 
-        <div class="section">
-            <h3><i class="fas fa-users"></i> Users Management</h3>
-            <div style="position: sticky; top: 0; z-index: 100; background: var(--bg-dark, #0C0D0F); padding: 10px 0; margin-bottom: 15px;">
-                <input type="text" id="userSearch" class="search-input" placeholder="Search by YLG ID, name, email, or user ID..." onkeyup="filterUsers()">
-                <span id="searchResultCount" style="margin-left:10px; color:#FFD700; font-size:12px; font-weight:600;"></span>
+        <!-- ── MESSAGES VIEW ── -->
+        <div class="view" id="view-messages">
+            <div class="chat-wrap">
+                <div class="chat-header"><i class="fas fa-comments"></i> Live Chat Support</div>
+                <div id="chatContainer"></div>
+                <div class="chat-input-group">
+                    <input type="text" id="chatInput" class="chat-input" placeholder="Reply to user..." onkeypress="if(event.key==='Enter') sendChatMessage()">
+                    <button class="chat-send-btn" onclick="sendChatMessage()"><i class="fas fa-paper-plane"></i></button>
+                </div>
             </div>
-            <div id="userList" class="empty-state">Loading users from database...</div>
+            <div class="s-card">
+                <div class="s-title"><i class="fas fa-bullhorn"></i> Send Notification</div>
+                <div class="notif-form">
+                    <input id="notif-title" type="text" placeholder="Notification title...">
+                    <textarea id="notif-msg" placeholder="Message body..."></textarea>
+                    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                        <select id="notif-type" style="flex:1;min-width:130px;">
+                            <option value="announcement">📢 Announcement</option>
+                            <option value="kyc">🪪 KYC Update</option>
+                            <option value="deposit">💰 Deposit</option>
+                            <option value="withdrawal">💸 Withdrawal</option>
+                            <option value="trade">📈 Trading</option>
+                        </select>
+                        <select id="notif-target" style="flex:1;min-width:130px;">
+                            <option value="all">📣 All Users</option>
+                        </select>
+                    </div>
+                    <button onclick="window.sendNotification()" class="refresh-btn" style="padding:11px;font-size:13px;">
+                        <i class="fas fa-paper-plane" style="margin-right:6px;"></i>Send Notification
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── CONTROL VIEW ── -->
+        <div class="view" id="view-control">
+            <div class="s-card">
+                <div class="s-title"><i class="fas fa-certificate"></i> KYC Verification</div>
+                <div class="tab-buttons" id="kycTabs">
+                    <button class="tab-btn active" onclick="filterKYC('pending')">Pending</button>
+                    <button class="tab-btn" onclick="filterKYC('verified')">Verified</button>
+                    <button class="tab-btn" onclick="filterKYC('rejected')">Rejected</button>
+                </div>
+                <div id="kycList" class="empty-state">Loading KYC...</div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <button class="nav-item active" id="nav-dashboard" onclick="switchView('dashboard')">
+            <i class="fas fa-chart-bar"></i>
+            <span>Dashboard</span>
+        </button>
+        <button class="nav-item" id="nav-users" onclick="switchView('users')">
+            <i class="fas fa-users"></i>
+            <span>Users</span>
+        </button>
+        <button class="nav-item" id="nav-finance" onclick="switchView('finance')">
+            <i class="fas fa-dollar-sign"></i>
+            <span>Finance</span>
+        </button>
+        <button class="nav-item" id="nav-messages" onclick="switchView('messages')">
+            <i class="fas fa-comments"></i>
+            <span>Messages</span>
+        </button>
+        <button class="nav-item" id="nav-control" onclick="switchView('control')">
+            <i class="fas fa-sliders-h"></i>
+            <span>Control</span>
+        </button>
+    </nav>
+
+    <!-- KYC Modal -->
+    <div id="kycModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:2000;padding:20px;">
+        <div style="position:relative;max-width:600px;margin:auto;height:90%;background:#fff;border-radius:14px;overflow:auto;">
+            <button onclick="closeKYCModal()" style="position:sticky;top:0;right:0;background:var(--red);color:white;border:none;padding:10px 18px;border-radius:0 14px 0 8px;cursor:pointer;font-weight:700;float:right;">✕ Close</button>
+            <div id="kycModalContent" style="padding:20px;clear:both;"></div>
         </div>
     </div>
-    
-    <div class="sidebar-right">
-        <div class="chat-header">
-            <h3><i class="fas fa-comments"></i> Live Chat Support</h3>
-        </div>
-        <div id="chatContainer"></div>
-        <div class="chat-input-group">
-            <input type="text" id="chatInput" class="chat-input" placeholder="Type message..." onkeypress="if(event.key==='Enter') sendChatMessage()">
-            <button class="chat-send-btn" onclick="sendChatMessage()"><i class="fas fa-paper-plane"></i></button>
-        </div>
-    </div>
-    
-    <!-- KYC Image Modal -->
-    <div id="kycModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:2000; padding:20px;">
-        <div style="position:relative; max-width:600px; margin:auto; height:90%; background:#1a1a1a; border-radius:10px; overflow:auto;">
-            <button onclick="closeKYCModal()" style="position:sticky; top:0; right:10px; background:var(--red); color:white; border:none; padding:10px 15px; border-radius:5px; cursor:pointer; font-weight:bold;">Close</button>
-            <div id="kycModalContent" style="padding:20px;"></div>
-        </div>
-    </div>
 
+    <script>
+    function switchView(view) {
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        document.getElementById('view-' + view).classList.add('active');
+        document.getElementById('nav-' + view).classList.add('active');
+        // Scroll to top of main area
+        document.querySelector('.main-area').scrollTop = 0;
+        window.scrollTo(0, 0);
+    }
+    </script>
     <script type="module">
         import { app, auth, db } from './firebase-init.js';
         import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
