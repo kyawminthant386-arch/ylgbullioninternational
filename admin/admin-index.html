@@ -520,7 +520,7 @@
     </div>
 
     <script type="module">
-        import { app, auth, db } from '../firebase-init.js';
+        import { app, auth, db } from './firebase-init.js';
         import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getDatabase } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
         
@@ -811,18 +811,26 @@
             let html = '';
             filtered.forEach(function(w) {
                 let actionButtons = '';
-                if (w.status === 'pending') {
+                const statusLower = (w.status || '').toLowerCase();
+                if (statusLower === 'pending') {
                     actionButtons = '<button class="btn-action btn-approve" onclick="updateWithdrawal(\'' + w.id + '\', \'approved\')">Approve</button>' +
-                        '<button class="btn-action btn-reject" onclick="updateWithdrawal(\'' + w.id + '\', \'rejected\')">Reject</button>';
+                        '<button class="btn-action btn-reject" onclick="updateWithdrawal(\'' + w.id + '\', \'rejected\')">Reject</button>' +
+                        '<button class="btn-action" style="background:#555;color:#fff;margin-top:4px;" onclick="editWithdrawal(\'' + w.id + '\')"><i class="fas fa-edit"></i> Edit</button>';
                 } else {
-                    actionButtons = '<button class="btn-action btn-view" onclick="alert(\'Status: ' + w.status + '\')">View</button>';
+                    actionButtons = '<span style="color:#888;font-size:13px;display:block;margin-bottom:6px;">Status: ' + w.status + '</span>' +
+                        '<button class="btn-action" style="background:#555;color:#fff;" onclick="editWithdrawal(\'' + w.id + '\')"><i class="fas fa-edit"></i> Edit</button>';
                 }
+                const ts = w.timestamp || w.requestDate;
+                const dateStr = ts ? new Date(ts.seconds * 1000).toLocaleDateString() : (w.date || 'N/A');
+                const wUser = allUsers.find(u => u.id === w.uid);
+                const wName = wUser ? (wUser.fullName || wUser.email) : (w.email || w.uid || 'N/A');
                 html += '<div class="withdraw-card">' +
-                    '<div class="info"><h4>' + (w.userName || 'N/A') + '</h4>' +
-                    '<p>Amount: ' + (w.amount || 0) + ' USD</p>' +
-                    '<p>' + (w.userEmail || 'N/A') + '</p></div>' +
-                    '<div class="info"><h4>Method</h4><p>' + (w.withdrawalMethod || 'N/A') + '</p></div>' +
-                    '<div class="info"><h4>Date</h4><p>' + (w.requestDate ? new Date(w.requestDate.seconds * 1000).toLocaleDateString() : 'N/A') + '</p></div>' +
+                    '<div class="info"><h4>' + wName + '</h4>' +
+                    '<p>Amount: $' + (w.amount || 0) + '</p>' +
+                    '<p style="font-size:11px;color:#aaa;">' + (w.email || '') + '</p></div>' +
+                    '<div class="info"><h4>Method</h4><p>' + (w.method || w.withdrawalMethod || 'N/A') + '</p>' +
+                    '<p style="font-size:11px;color:#aaa;">' + (w.details || '') + '</p></div>' +
+                    '<div class="info"><h4>Date</h4><p>' + dateStr + '</p></div>' +
                     '<div class="info">' + actionButtons + '</div></div>';
             });
             list.innerHTML = html;
@@ -875,7 +883,7 @@
                 }
 
                 await updateDoc(doc(db, 'withdrawals', withdrawalId), {
-                    status: newStatus,
+                    status: newStatus === 'approved' ? 'Approved' : 'Rejected',
                     updatedAt: new Date(),
                     reviewedBy: currentAdminEmail
                 });
@@ -891,16 +899,113 @@
             }
         }
 
+        // Edit Withdrawal
+        async function editWithdrawal(withdrawalId) {
+            const w = allWithdrawals.find(x => x.id === withdrawalId);
+            if (!w) return;
+
+            const { value: formData } = await Swal.fire({
+                title: '<span style="color:#FFD700">Edit Withdrawal</span>',
+                background: '#1a1a1a',
+                color: '#fff',
+                html:
+                    '<div style="text-align:left;font-size:13px;color:#aaa;margin-bottom:6px;">Email: ' + (w.email || 'N/A') + '</div>' +
+                    '<label style="display:block;text-align:left;font-size:12px;color:#aaa;margin-bottom:4px;">Amount (USD)</label>' +
+                    '<input id="sw-amount" type="number" min="0" step="0.01" value="' + (w.amount || 0) + '" style="width:100%;padding:9px;background:#111;border:1px solid #333;border-radius:6px;color:#fff;margin-bottom:10px;">' +
+                    '<label style="display:block;text-align:left;font-size:12px;color:#aaa;margin-bottom:4px;">Method</label>' +
+                    '<input id="sw-method" type="text" value="' + (w.method || w.withdrawalMethod || '') + '" style="width:100%;padding:9px;background:#111;border:1px solid #333;border-radius:6px;color:#fff;margin-bottom:10px;">' +
+                    '<label style="display:block;text-align:left;font-size:12px;color:#aaa;margin-bottom:4px;">Account Details</label>' +
+                    '<input id="sw-details" type="text" value="' + (w.details || '') + '" style="width:100%;padding:9px;background:#111;border:1px solid #333;border-radius:6px;color:#fff;margin-bottom:10px;">' +
+                    '<label style="display:block;text-align:left;font-size:12px;color:#aaa;margin-bottom:4px;">Status</label>' +
+                    '<select id="sw-status" style="width:100%;padding:9px;background:#111;border:1px solid #333;border-radius:6px;color:#fff;margin-bottom:10px;">' +
+                    '<option value="Pending"' + ((w.status||'').toLowerCase()==='pending'?' selected':'') + '>Pending</option>' +
+                    '<option value="Approved"' + ((w.status||'').toLowerCase()==='approved'?' selected':'') + '>Approved</option>' +
+                    '<option value="Rejected"' + ((w.status||'').toLowerCase()==='rejected'?' selected':'') + '>Rejected</option>' +
+                    '</select>' +
+                    '<label style="display:block;text-align:left;font-size:12px;color:#aaa;margin-bottom:4px;">Admin Note (optional)</label>' +
+                    '<input id="sw-note" type="text" placeholder="e.g. manually adjusted" style="width:100%;padding:9px;background:#111;border:1px solid #333;border-radius:6px;color:#fff;">',
+                showCancelButton: true,
+                confirmButtonText: 'Save Changes',
+                confirmButtonColor: '#FFD700',
+                cancelButtonColor: '#555',
+                preConfirm: () => {
+                    const amount = parseFloat(document.getElementById('sw-amount').value);
+                    if (isNaN(amount) || amount < 0) {
+                        Swal.showValidationMessage('Please enter a valid amount');
+                        return false;
+                    }
+                    return {
+                        amount: amount,
+                        method: document.getElementById('sw-method').value.trim(),
+                        details: document.getElementById('sw-details').value.trim(),
+                        status: document.getElementById('sw-status').value,
+                        note: document.getElementById('sw-note').value.trim()
+                    };
+                }
+            });
+
+            if (!formData) return;
+
+            try {
+                const { doc, updateDoc, increment } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+
+                const oldStatus = (w.status || '').toLowerCase();
+                const newStatus = formData.status.toLowerCase();
+                const oldAmount = parseFloat(w.amount || 0);
+                const newAmount = parseFloat(formData.amount);
+
+                // Balance adjustment if status or amount changed
+                if (w.uid) {
+                    const wasDeducted = oldStatus === 'pending' || oldStatus === 'approved';
+                    const willDeduct  = newStatus === 'pending' || newStatus === 'approved';
+
+                    if (wasDeducted && !willDeduct) {
+                        // Rejected — refund old amount
+                        await updateDoc(doc(db, 'users', w.uid), { balance: increment(oldAmount) });
+                    } else if (!wasDeducted && willDeduct) {
+                        // Was rejected, now active again — deduct new amount
+                        await updateDoc(doc(db, 'users', w.uid), { balance: increment(-newAmount) });
+                    } else if (wasDeducted && willDeduct && oldAmount !== newAmount) {
+                        // Amount changed — adjust difference
+                        await updateDoc(doc(db, 'users', w.uid), { balance: increment(oldAmount - newAmount) });
+                    }
+                }
+
+                await updateDoc(doc(db, 'withdrawals', withdrawalId), {
+                    amount: newAmount,
+                    method: formData.method,
+                    details: formData.details,
+                    status: formData.status,
+                    adminNote: formData.note || null,
+                    editedAt: new Date(),
+                    editedBy: currentAdminEmail
+                });
+
+                Swal.fire({ icon: 'success', title: 'Updated', timer: 1500, showConfirmButton: false, background: '#1a1a1a', color: '#fff' });
+            } catch (err) {
+                Swal.fire('Error', err.message, 'error');
+            }
+        }
+
         // KYC Actions
         async function verifyKYC(kycId) {
             try {
                 const { doc, updateDoc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+                // Update kyc collection
                 await updateDoc(doc(db, 'kyc', kycId), {
                     status: 'verified',
                     verifiedAt: new Date(),
                     verifiedBy: currentAdminEmail
                 });
-                Swal.fire('Success', 'KYC verified successfully', 'success');
+                // Also update user's kycStatus so the KYC page shows verified banner
+                const kycDoc = allKYC.find(k => k.id === kycId);
+                if (kycDoc && kycDoc.uid) {
+                    await updateDoc(doc(db, 'users', kycDoc.uid), {
+                        kycStatus: 'verified',
+                        kycVerifiedAt: new Date()
+                    });
+                }
+                Swal.fire({ icon: 'success', title: 'KYC Verified', timer: 1500, showConfirmButton: false, background: '#1a1a1a', color: '#fff' });
                 loadKYC();
             } catch (error) {
                 Swal.fire('Error', 'Failed to verify KYC: ' + error.message, 'error');
@@ -923,7 +1028,15 @@
                             rejectedAt: new Date(),
                             rejectedBy: currentAdminEmail
                         });
-                        Swal.fire('Success', 'KYC rejected', 'success');
+                        // Update user's kycStatus so KYC page resets to form
+                        const kycDoc = allKYC.find(k => k.id === kycId);
+                        if (kycDoc && kycDoc.uid) {
+                            await updateDoc(doc(db, 'users', kycDoc.uid), {
+                                kycStatus: 'rejected',
+                                kycRejectionReason: result.value
+                            });
+                        }
+                        Swal.fire({ icon: 'info', title: 'KYC Rejected', timer: 1500, showConfirmButton: false, background: '#1a1a1a', color: '#fff' });
                         loadKYC();
                     } catch (error) {
                         Swal.fire('Error', error.message, 'error');
@@ -2109,6 +2222,7 @@
         window.openDepositDialog = openDepositDialog;
         window.openWithdrawDialog = openWithdrawDialog;
         window.updateWithdrawal = updateWithdrawal;
+        window.editWithdrawal = editWithdrawal;
         window.filterWithdrawals = filterWithdrawals;
         window.verifyKYC = verifyKYC;
         window.rejectKYC = rejectKYC;

@@ -278,7 +278,10 @@
                 <p id="kycSubtitle">Submit your identity documents for account verification. Your personal data is protected and secured.</p>
             </div>
 
-            <div class="kyc-card">
+            <!-- KYC Status Banner (shown when submitted or approved) -->
+            <div id="kycStatusBanner" style="display:none;"></div>
+
+            <div class="kyc-card" id="kycFormCard">
                 <!-- Document Selection Section -->
                 <div class="form-section">
                     <div class="form-section-title" id="docSectionTitle">
@@ -343,7 +346,7 @@
 
     <script type="module">
         import { app, auth, db } from './firebase-init.js';
-                import { doc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { doc, getDoc, updateDoc, addDoc, collection, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
         const inputFront = document.getElementById('kycFront');
@@ -359,16 +362,66 @@
         let backBase64 = null;
         let currentUser = null;
 
-        onAuthStateChanged(auth, (user) => {
+        onAuthStateChanged(auth, async (user) => {
             if (user) {
                 localStorage.setItem('userShortUID', user.uid.slice(0, 8).toUpperCase());
                 currentUser = user;
                 const displayName = localStorage.getItem('userName') || 'Member';
                 document.getElementById('head-user-display').innerText = "Account: " + displayName;
+
+                // Check KYC status from Firestore
+                try {
+                    const userSnap = await getDoc(doc(db, 'users', user.uid));
+                    if (userSnap.exists()) {
+                        const data = userSnap.data();
+                        const status = (data.kycStatus || '').toLowerCase();
+                        if (status === 'verified') {
+                            showKycStatusBanner('verified');
+                        } else if (status === 'pending') {
+                            showKycStatusBanner('pending');
+                        } else if (status === 'rejected') {
+                            showKycStatusBanner('rejected', data.kycRejectionReason);
+                        }
+                    }
+                } catch(e) { /* show form normally */ }
             } else {
                 window.location.replace("login.html");
             }
         });
+
+        function showKycStatusBanner(status, reason) {
+            const banner = document.getElementById('kycStatusBanner');
+            const form   = document.getElementById('kycFormCard');
+            if (status === 'verified') {
+                banner.innerHTML =
+                    '<div style="background:linear-gradient(135deg,#1a3a1a,#0d2b0d);border:1.5px solid #4CAF50;border-radius:14px;padding:32px 24px;text-align:center;margin-bottom:20px;">' +
+                    '<div style="font-size:56px;margin-bottom:12px;">✅</div>' +
+                    '<h3 style="color:#4CAF50;font-size:20px;margin:0 0 8px;">KYC Verified</h3>' +
+                    '<p style="color:#aaa;margin:0;font-size:14px;">Your identity has been verified successfully.<br>Your account is fully activated.</p>' +
+                    '</div>';
+                form.style.display = 'none';
+            } else if (status === 'pending') {
+                banner.innerHTML =
+                    '<div style="background:linear-gradient(135deg,#2a2000,#1a1400);border:1.5px solid #FFD700;border-radius:14px;padding:32px 24px;text-align:center;margin-bottom:20px;">' +
+                    '<div style="font-size:56px;margin-bottom:12px;">⏳</div>' +
+                    '<h3 style="color:#FFD700;font-size:20px;margin:0 0 8px;">Under Review</h3>' +
+                    '<p style="color:#aaa;margin:0;font-size:14px;">Your KYC documents have been submitted.<br>Admin will review within 1–2 business days.</p>' +
+                    '</div>';
+                form.style.display = 'none';
+            } else if (status === 'rejected') {
+                banner.innerHTML =
+                    '<div style="background:linear-gradient(135deg,#3a1010,#2b0d0d);border:1.5px solid #FF5252;border-radius:14px;padding:32px 24px;text-align:center;margin-bottom:20px;">' +
+                    '<div style="font-size:56px;margin-bottom:12px;">❌</div>' +
+                    '<h3 style="color:#FF5252;font-size:20px;margin:0 0 8px;">KYC Rejected</h3>' +
+                    (reason ? '<p style="color:#FF8A80;margin:4px 0 12px;font-size:13px;">Reason: ' + reason + '</p>' : '') +
+                    '<p style="color:#aaa;margin:0 0 16px;font-size:14px;">Please resubmit with correct documents.</p>' +
+                    '<button onclick="document.getElementById(\'kycStatusBanner\').style.display=\'none\';document.getElementById(\'kycFormCard\').style.display=\'\'" ' +
+                    'style="background:#FF5252;color:#fff;border:none;padding:10px 24px;border-radius:8px;font-weight:700;cursor:pointer;">Resubmit KYC</button>' +
+                    '</div>';
+                form.style.display = 'none';
+            }
+            banner.style.display = 'block';
+        }
 
         function toggleLangList() {
             const list = document.getElementById('sidebar-lang-list');
@@ -404,7 +457,7 @@
                     docOptions: [
                         { value: "NRC Card", label: "National ID Card (NRC)" },
                         { value: "Driving License", label: "Driving License" },
-                        { value: "Passport", label: " Passport" }
+                        { value: "Passport", label: "Passport" }
                     ],
                     uploadSectionTitle: "Upload Documents",
                     uploadHelpText: "Upload clear photos of both the front and back sides of your document.",
@@ -580,12 +633,25 @@
             });
 
             try {
+                const userName = localStorage.getItem('userName') || '';
+                // Update user document
                 await updateDoc(doc(db, "users", currentUser.uid), {
                     kycFrontImage: frontBase64,
                     kycBackImage: backBase64,
                     kycType: docTypeSelect.value,
                     kycStatus: "pending",
                     kycSubmittedAt: serverTimestamp()
+                });
+                // Create kyc collection document (for admin panel)
+                await addDoc(collection(db, "kyc"), {
+                    uid: currentUser.uid,
+                    email: currentUser.email,
+                    fullName: userName,
+                    idType: docTypeSelect.value,
+                    frontImage: frontBase64,
+                    backImage: backBase64,
+                    status: "pending",
+                    submittedAt: serverTimestamp()
                 });
                 
                 Swal.fire({

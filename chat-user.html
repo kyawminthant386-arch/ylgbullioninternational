@@ -175,7 +175,7 @@
 <script type="module">
     import { app, auth, db } from './firebase-init.js';
     import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { collection, addDoc, serverTimestamp, query, where, onSnapshot, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { collection, addDoc, serverTimestamp, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     let currentUserId = null, currentUserEmail = null, authResolved = false;
 
@@ -231,14 +231,17 @@
 
     function listenForMessages() {
         const msgBox = document.getElementById('chat-messages'); if(!currentUserId) return;
-        const q = query(collection(db,'chats'),where('userId','==',currentUserId),orderBy('timestamp','asc'));
+        const q = query(collection(db,'chats'),where('userId','==',currentUserId));
         onSnapshot(q, (snapshot) => {
             msgBox.innerHTML = '';
             const lang = localStorage.getItem('selectedLang')||'en'; const texts = langTexts[lang]||langTexts.en;
             const welcome = document.createElement('div'); welcome.className='message welcome-message';
             welcome.innerHTML=`<div>${texts.welcomeLabel}</div><span class="message-time">${texts.supportLabelShort}</span>`;
             msgBox.appendChild(welcome);
-            snapshot.forEach((docItem) => {
+            const docs = [];
+            snapshot.forEach((docItem) => { docs.push(docItem); });
+            docs.sort((a,b) => { const ta=a.data().timestamp?.seconds||0; const tb=b.data().timestamp?.seconds||0; return ta-tb; });
+            docs.forEach((docItem) => {
                 const data=docItem.data(); const div=document.createElement('div');
                 const isAdmin = data.isAdmin===true||data.userEmail==='Admin';
                 div.className = isAdmin ? 'message admin-message' : 'message user-message';

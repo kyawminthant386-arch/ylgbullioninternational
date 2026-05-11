@@ -93,7 +93,7 @@ function subscribe(user) {
                     new Notification(n.title || 'YLG Bullion', {
                         body: n.message || '',
                         icon: '/icon-192.png',
-                        badge: '/favicon-32.png'
+                        badge: '/badge-96.svg'
                     });
                 }
             });

@@ -3,7 +3,7 @@
    Service Worker: PWA caching + trade notifications
    ═══════════════════════════════════════════ */
 
-var CACHE = 'ylg-v1';
+var CACHE = 'ylg-v2';
 var SHELL = [
     '/',
     '/index.html',
@@ -15,7 +15,8 @@ var SHELL = [
     '/dashboard-styles.css',
     '/mobile-responsive.css',
     '/theme.css',
-    '/mobile-nav.js'
+    '/mobile-nav.js',
+    '/badge-96.svg'
 ];
 
 /* ── Install: cache app shell ── */
@@ -66,8 +67,8 @@ self.addEventListener('message', async function(event) {
     if (!event.data || event.data.type !== 'TRADE_RESULT') return;
     await self.registration.showNotification(event.data.title, {
         body:             event.data.body,
-        icon:             '/logo.png',
-        badge:            '/logo.png',
+        icon:             '/icon-192.png',
+        badge:            '/badge-96.svg',
         tag:              'ylg-trade-result',
         renotify:         true,
         requireInteraction: false,

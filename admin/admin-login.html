@@ -50,7 +50,8 @@
         label{ display:block; font-size:13px; color:#999; margin-bottom:6px; }
         .field{ margin-bottom:16px; }
         input[type=email],
-        input[type=password]{
+        input[type=password],
+        input[type=text]{
             width:100%;
             padding:11px 14px;
             background:#111;
@@ -138,7 +139,7 @@
 </div>
 
 <script type="module">
-    import { auth } from '../firebase-init.js';
+    import { auth } from './firebase-init.js';
     import { signInWithEmailAndPassword, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 
     const ADMIN_EMAILS = [
