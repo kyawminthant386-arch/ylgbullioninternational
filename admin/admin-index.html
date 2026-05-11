@@ -117,19 +117,26 @@
         .search-input { width:100%; padding:11px 14px; border:1.5px solid var(--border); border-radius:10px; background:#fff; color:var(--text); font-size:13px; outline:none; transition:.2s; font-family:inherit; }
         .search-input:focus { border-color:var(--gold); }
 
-        /* ── Chat (desktop: side-by-side) ── */
-        .messages-grid { display:grid; grid-template-columns:1fr 380px; gap:16px; align-items:start; }
-        .chat-wrap { background:var(--card); border-radius:14px; overflow:hidden; box-shadow:0 1px 4px rgba(0,0,0,0.07); display:flex; flex-direction:column; height:calc(100vh - 140px); min-height:480px; }
-        .chat-header { padding:14px 18px; background:var(--navy); color:#fff; font-size:13px; font-weight:700; display:flex; align-items:center; gap:8px; flex-shrink:0; }
-        .chat-header i { color:var(--gold); }
-        #chatContainer { flex:1; padding:14px; overflow-y:auto; display:flex; flex-direction:column; gap:8px; }
-        .chat-msg { padding:10px 12px; border-radius:10px; font-size:13px; max-width:80%; line-height:1.5; }
-        .chat-msg.admin { background:var(--navy); color:#fff; align-self:flex-end; border-bottom-right-radius:3px; }
-        .chat-msg.user { background:#F3F4F6; color:var(--text); align-self:flex-start; border-bottom-left-radius:3px; border-left:3px solid var(--blue); }
-        .chat-input-group { padding:12px 14px; display:flex; gap:8px; border-top:1px solid var(--border); flex-shrink:0; }
-        .chat-input { flex:1; padding:10px 14px; border:1.5px solid var(--border); border-radius:8px; background:#fff; color:var(--text); font-size:13px; outline:none; font-family:inherit; }
-        .chat-input:focus { border-color:var(--gold); }
-        .chat-send-btn { padding:10px 18px; background:var(--gold); color:#000; border:none; border-radius:8px; font-weight:700; cursor:pointer; font-size:13px; }
+        /* ── Messages layout ── */
+        .messages-layout { display:grid; grid-template-columns:1fr 360px; gap:16px; align-items:start; }
+        .convos-panel { background:var(--card); border-radius:14px; box-shadow:0 1px 4px rgba(0,0,0,0.07); overflow:hidden; }
+        .convos-header { padding:14px 20px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+        .convos-header-title { font-size:15px; font-weight:700; color:var(--text); display:flex; align-items:center; gap:8px; }
+        .convos-header-title i { color:var(--gold); }
+        .convo-item { display:flex; gap:12px; padding:14px 20px; border-bottom:1px solid var(--border); cursor:pointer; align-items:center; transition:.15s; }
+        .convo-item:last-child { border-bottom:none; }
+        .convo-item:hover { background:#F9FAFB; }
+        .convo-item.unread { background:#FFFEF0; border-left:3px solid var(--gold); }
+        .convo-avatar { width:44px; height:44px; border-radius:50%; background:var(--navy); color:var(--gold); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:17px; flex-shrink:0; }
+        .convo-info { flex:1; min-width:0; }
+        .convo-name { font-weight:600; font-size:14px; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .convo-preview { font-size:12px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:2px; }
+        .convo-preview.is-admin { color:var(--blue); }
+        .convo-meta { display:flex; flex-direction:column; align-items:flex-end; gap:5px; flex-shrink:0; }
+        .convo-time { font-size:11px; color:var(--muted); }
+        .convo-unread { background:var(--red); color:#fff; font-size:10px; font-weight:800; min-width:20px; height:20px; border-radius:10px; display:flex; align-items:center; justify-content:center; padding:0 5px; }
+        /* keep hidden chat elements for JS compat */
+        #chatContainer, .chat-input { display:none; }
 
         /* ── Refresh btn ── */
         .refresh-btn { background:var(--gold); color:#000; border:none; border-radius:8px; padding:9px 18px; font-weight:700; font-size:13px; cursor:pointer; transition:.2s; }
@@ -279,34 +286,40 @@
 
         <!-- ── MESSAGES VIEW ── -->
         <div class="view" id="view-messages">
-            <div class="page-header"><h1>Messages</h1><p>Live chat support &amp; push notifications</p></div>
-            <div class="messages-grid">
-                <div class="chat-wrap">
-                    <div class="chat-header"><i class="fas fa-comments"></i> Live Chat Support</div>
-                    <div id="chatContainer"></div>
-                    <div class="chat-input-group">
-                        <input type="text" id="chatInput" class="chat-input" placeholder="Reply to user..." onkeypress="if(event.key==='Enter') sendChatMessage()">
-                        <button class="chat-send-btn" onclick="sendChatMessage()"><i class="fas fa-paper-plane"></i></button>
+            <div class="page-header"><h1>Messages</h1><p>User conversations — click to open chat</p></div>
+            <!-- hidden elements kept for JS compatibility -->
+            <div id="chatContainer" style="display:none;"></div>
+            <input type="text" id="chatInput" style="display:none;">
+            <div class="messages-layout">
+                <!-- Conversations list -->
+                <div class="convos-panel">
+                    <div class="convos-header">
+                        <div class="convos-header-title"><i class="fas fa-comments"></i> Conversations</div>
+                        <span id="totalUnreadBadge"></span>
                     </div>
+                    <div id="conversationList" class="empty-state">Loading conversations...</div>
                 </div>
-                <div class="s-card">
-                    <div class="s-title"><i class="fas fa-bullhorn"></i> Send Notification</div>
-                    <div class="notif-form">
-                        <input id="notif-title" type="text" placeholder="Notification title...">
-                        <textarea id="notif-msg" placeholder="Message body..."></textarea>
-                        <select id="notif-type">
-                            <option value="announcement">📢 Announcement</option>
-                            <option value="kyc">🪪 KYC Update</option>
-                            <option value="deposit">💰 Deposit</option>
-                            <option value="withdrawal">💸 Withdrawal</option>
-                            <option value="trade">📈 Trading</option>
-                        </select>
-                        <select id="notif-target">
-                            <option value="all">📣 All Users</option>
-                        </select>
-                        <button onclick="window.sendNotification()" class="refresh-btn" style="padding:11px;font-size:13px;">
-                            <i class="fas fa-paper-plane" style="margin-right:6px;"></i>Send Notification
-                        </button>
+                <!-- Notification panel -->
+                <div>
+                    <div class="s-card">
+                        <div class="s-title"><i class="fas fa-bullhorn"></i> Send Notification</div>
+                        <div class="notif-form">
+                            <input id="notif-title" type="text" placeholder="Notification title...">
+                            <textarea id="notif-msg" placeholder="Message body..."></textarea>
+                            <select id="notif-type">
+                                <option value="announcement">📢 Announcement</option>
+                                <option value="kyc">🪪 KYC Update</option>
+                                <option value="deposit">💰 Deposit</option>
+                                <option value="withdrawal">💸 Withdrawal</option>
+                                <option value="trade">📈 Trading</option>
+                            </select>
+                            <select id="notif-target">
+                                <option value="all">📣 All Users</option>
+                            </select>
+                            <button onclick="window.sendNotification()" class="refresh-btn" style="padding:11px;font-size:13px;">
+                                <i class="fas fa-paper-plane" style="margin-right:6px;"></i>Send Notification
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1862,48 +1875,73 @@
                 const q = query(collection(db, 'chats'), orderBy('timestamp', 'asc'));
                 let isFirstLoad = true;
                 let lastMessageIds = new Set();
-                
+
                 onSnapshot(q, (snap) => {
-                    const container = document.getElementById('chatContainer');
-                    if (!container) return;
-                    
                     const messages = [];
                     snap.forEach(d => messages.push({ id: d.id, ...d.data() }));
-                    
-                    // Render last 50 messages (latest at bottom)
-                    const recent = messages.slice(-50);
-                    container.innerHTML = recent.map(m => {
-                        const isAdmin = m.isAdmin === true;
-                        const time = m.timestamp?.toDate ? m.timestamp.toDate().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : '';
-                        const sender = isAdmin ? 'Admin' : (m.userEmail || (m.userId ? m.userId.slice(0,8) : 'User'));
-                        const cls = isAdmin ? 'admin' : 'user';
-                        
-                        if (m.chatImageUrl || m.imageUrl) {
-                            const img = m.chatImageUrl || m.imageUrl;
-                            return `<div class="chat-msg ${cls}" data-uid="${m.userId || ''}" data-uname="${(m.userEmail || '').replace(/"/g, '&quot;')}" style="cursor:pointer;" title="Click to open full chat">
-                                <strong>${sender}:</strong>
-                                <img src="${img}" style="max-width:140px; display:block; margin-top:4px; border-radius:6px;">
-                                <span style="font-size:9px; opacity:0.6; display:block; margin-top:2px;">${time}</span>
-                            </div>`;
+
+                    // ── Group by userId → build conversation list ──
+                    const convoMap = {};
+                    messages.forEach(m => {
+                        const uid = m.userId;
+                        if (!uid) return;
+                        const ts = m.timestamp?.seconds || (m.timestamp?.toDate ? m.timestamp.toDate().getTime() / 1000 : 0);
+                        if (!convoMap[uid]) {
+                            convoMap[uid] = { uid, email: m.userEmail || '', lastMsg: m, lastTs: ts, unread: 0 };
+                        } else {
+                            if (ts >= convoMap[uid].lastTs) {
+                                convoMap[uid].lastMsg = m;
+                                convoMap[uid].lastTs = ts;
+                                if (m.userEmail) convoMap[uid].email = m.userEmail;
+                            }
                         }
-                        return `<div class="chat-msg ${cls}" data-uid="${m.userId || ''}" data-uname="${(m.userEmail || '').replace(/"/g, '&quot;')}" style="cursor:pointer;" title="Click to open full chat">
-                            <strong>${sender}:</strong> ${m.message || ''}
-                            <span style="font-size:9px; opacity:0.6; display:block; margin-top:2px;">${time}</span>
-                        </div>`;
-                    }).join('') || '<div style="color:#888; padding:20px; text-align:center;">No messages yet</div>';
-                    
-                    container.scrollTop = container.scrollHeight;
-                    
-                    // Notification sound for NEW user messages (not on first load)
+                        if (m.isAdmin !== true && m.adminRead !== true) convoMap[uid].unread++;
+                    });
+
+                    // Sort: most recent first
+                    const convos = Object.values(convoMap).sort((a, b) => b.lastTs - a.lastTs);
+
+                    const listEl = document.getElementById('conversationList');
+                    if (listEl) {
+                        if (convos.length === 0) {
+                            listEl.innerHTML = '<div class="empty-state">No conversations yet.</div>';
+                        } else {
+                            listEl.innerHTML = convos.map(c => {
+                                const userObj = (typeof allUsers !== 'undefined' ? allUsers : []).find(u => u.id === c.uid);
+                                const displayName = userObj?.fullName || userObj?.email || c.email || c.uid.slice(0, 10);
+                                const initials = (displayName || '?').slice(0, 1).toUpperCase();
+                                const lastText = (c.lastMsg.chatImageUrl || c.lastMsg.imageUrl) ? '📷 Image' : (c.lastMsg.message || '');
+                                const prefix = c.lastMsg.isAdmin ? 'You: ' : '';
+                                const timeStr = c.lastMsg.timestamp?.toDate
+                                    ? c.lastMsg.timestamp.toDate().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})
+                                    : '';
+                                const unreadBadge = c.unread > 0 ? `<span class="convo-unread">${c.unread}</span>` : '';
+                                const safeName = displayName.replace(/'/g, "&#39;");
+                                return `<div class="convo-item${c.unread > 0 ? ' unread' : ''}" onclick="window.openUserChat('${c.uid}','${safeName}')">
+                                    <div class="convo-avatar">${initials}</div>
+                                    <div class="convo-info">
+                                        <div class="convo-name">${displayName}</div>
+                                        <div class="convo-preview${c.lastMsg.isAdmin ? ' is-admin' : ''}">${prefix}${lastText.slice(0,60)}</div>
+                                    </div>
+                                    <div class="convo-meta">
+                                        <span class="convo-time">${timeStr}</span>
+                                        ${unreadBadge}
+                                    </div>
+                                </div>`;
+                            }).join('');
+                        }
+                        // Total unread badge
+                        const totalUnread = convos.reduce((s, c) => s + c.unread, 0);
+                        const badge = document.getElementById('totalUnreadBadge');
+                        if (badge) badge.innerHTML = totalUnread > 0 ? `<span class="convo-unread">${totalUnread}</span>` : '';
+                    }
+
+                    // ── Sound + browser notification for new user messages ──
                     if (!isFirstLoad) {
-                        recent.forEach(m => {
+                        messages.forEach(m => {
                             if (!lastMessageIds.has(m.id) && !m.isAdmin) {
-                                // New user message arrived — play sound
                                 const snd = document.getElementById('notifSound');
-                                if (snd) {
-                                    try { snd.currentTime = 0; snd.play(); } catch (e) {}
-                                }
-                                // Browser notification (if permission granted)
+                                if (snd) { try { snd.currentTime = 0; snd.play(); } catch(e) {} }
                                 if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
                                     new Notification('New message from ' + (m.userEmail || 'user'), {
                                         body: (m.message || '[Image]').slice(0, 80),
@@ -1913,24 +1951,11 @@
                             }
                         });
                     }
-                    
-                    // Update tracking
-                    lastMessageIds = new Set(recent.map(m => m.id));
+
+                    lastMessageIds = new Set(messages.map(m => m.id));
                     isFirstLoad = false;
-                    
-                    // Click any message → open dedicated chat with that user
-                    container.querySelectorAll('.chat-msg.user').forEach(el => {
-                        el.onclick = () => {
-                            const uid = el.dataset.uid;
-                            const uname = (el.dataset.uname || 'User').replace(/&quot;/g, '"');
-                            if (uid && typeof window.openUserChat === 'function') {
-                                window.openUserChat(uid, uname);
-                            }
-                        };
-                    });
                 });
-                
-                // Request browser notification permission
+
                 if (typeof Notification !== 'undefined' && Notification.permission === 'default') {
                     Notification.requestPermission();
                 }
