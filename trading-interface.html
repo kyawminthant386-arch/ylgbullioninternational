@@ -968,7 +968,7 @@
                 });
 
             } catch (err) {
-                console.error("Trade error:", err);
+                Swal.fire({ icon: 'error', title: 'Trade Error', text: 'Something went wrong. Please try again.', confirmButtonColor: '#FFD700', background: '#1a1a1a', color: '#fff' });
             } finally {
                 isTrading = false;
                 btnUp.classList.remove('btn-disabled');
