@@ -218,8 +218,13 @@
         const input = document.getElementById('chat-input-field'); const text = input.value.trim();
         if (!text || !currentUserId || !currentUserEmail) return;
         const btn = document.getElementById('send-btn'); btn.disabled=true;
-        try { await addDoc(collection(db,'chats'),{userId:currentUserId,userEmail:currentUserEmail,message:text,isAdmin:false,timestamp:serverTimestamp()}); input.value=''; }
-        catch(err){ console.error(err); alert('Failed to send message.'); }
+        try {
+            await addDoc(collection(db,'chats'),{userId:currentUserId,userEmail:currentUserEmail,message:text,isAdmin:false,timestamp:serverTimestamp()});
+            input.value='';
+            const msgBox = document.getElementById('chat-messages');
+            requestAnimationFrame(() => { msgBox.scrollTop = msgBox.scrollHeight; });
+        }
+        catch(err){ alert('Failed to send message.'); }
         finally { const lang=localStorage.getItem('selectedLang')||'en'; btn.disabled=false; btn.innerHTML=`<i class="fas fa-paper-plane"></i> ${langTexts[lang].sendButton}`; }
     }
 
@@ -235,18 +240,26 @@
             const docs = [];
             snapshot.forEach((docItem) => { docs.push(docItem); });
             docs.sort((a,b) => { const ta=a.data().timestamp?.seconds||0; const tb=b.data().timestamp?.seconds||0; return ta-tb; });
+            let lastDiv = null;
             docs.forEach((docItem) => {
                 const data=docItem.data(); const div=document.createElement('div');
                 const isAdmin = data.isAdmin===true||data.userEmail==='Admin';
                 div.className = isAdmin ? 'message admin-message' : 'message user-message';
                 const time = data.timestamp ? new Date(data.timestamp.seconds*1000).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) : '...';
                 let content='';
-                if(data.chatImageUrl){ content=`<img src="${data.chatImageUrl}" style="max-width:100%;border-radius:8px;margin-top:6px;cursor:pointer;" onclick="window.open('${data.chatImageUrl}','_blank')">`; if(data.message&&data.message!=='[Image]') content=`<div>${data.message}</div>`+content; }
-                else { content=`<div>${data.message||''}</div>`; }
+                if(data.chatImageUrl){
+                    const img = `<img src="${data.chatImageUrl}" style="max-width:100%;border-radius:8px;margin-top:6px;cursor:pointer;" onload="this.closest('#chat-messages').scrollTop=this.closest('#chat-messages').scrollHeight" onclick="window.open('${data.chatImageUrl}','_blank')">`;
+                    content = (data.message&&data.message!=='[Image]') ? `<div>${data.message}</div>`+img : img;
+                } else { content=`<div>${data.message||''}</div>`; }
                 div.innerHTML=content+`<span class="message-time">${isAdmin?texts.supportLabelShort:texts.youLabel} • ${time}</span>`;
                 msgBox.appendChild(div);
+                lastDiv = div;
             });
-            msgBox.scrollTop=msgBox.scrollHeight;
+            // Scroll to bottom after DOM render
+            requestAnimationFrame(() => {
+                msgBox.scrollTop = msgBox.scrollHeight;
+                if (lastDiv) lastDiv.scrollIntoView({ block: 'end' });
+            });
         }, (err) => { console.error(err); document.getElementById('chat-messages').innerHTML='<div class="empty-state"><i class="fas fa-exclamation-circle"></i><p>Failed to load chat. Please refresh.</p></div>'; });
     }
 
