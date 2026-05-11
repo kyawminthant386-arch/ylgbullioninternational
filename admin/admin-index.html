@@ -180,9 +180,11 @@
             <div class="nav-label">Finance</div>
             <button class="nav-item" id="nav-withdraw" onclick="switchView('withdraw')">
                 <i class="fas fa-hand-holding-usd"></i> Withdraw
+                <span class="nav-badge" id="badge-withdraw" style="display:none;"></span>
             </button>
             <button class="nav-item" id="nav-deposit" onclick="switchView('deposit')">
                 <i class="fas fa-arrow-circle-down"></i> Deposit
+                <span class="nav-badge" id="badge-deposit" style="display:none;"></span>
             </button>
             <button class="nav-item" id="nav-payment" onclick="switchView('payment')">
                 <i class="fas fa-university"></i> Payment Account
@@ -190,9 +192,11 @@
             <div class="nav-label">Management</div>
             <button class="nav-item" id="nav-kyc" onclick="switchView('kyc')">
                 <i class="fas fa-certificate"></i> KYC
+                <span class="nav-badge" id="badge-kyc" style="display:none;"></span>
             </button>
             <button class="nav-item" id="nav-messages" onclick="switchView('messages')">
                 <i class="fas fa-comments"></i> Messages
+                <span class="nav-badge" id="badge-messages" style="display:none;"></span>
             </button>
         </nav>
         <div class="sidebar-footer">
@@ -380,6 +384,18 @@
             'junalama463@gmail.com'
         ];
 
+        // ── Nav badge helper ──
+        function setNavBadge(id, count) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            if (count > 0) {
+                el.textContent = count > 99 ? '99+' : count;
+                el.style.display = 'flex';
+            } else {
+                el.style.display = 'none';
+            }
+        }
+
         // Initialize — verify Firebase Auth state, not just sessionStorage
         onAuthStateChanged(auth, async function(user) {
             if (!user || !ADMIN_EMAILS.includes(user.email.toLowerCase())) {
@@ -476,6 +492,8 @@
                     allWithdrawals = [];
                     snapshot.forEach(function(d) { allWithdrawals.push({id: d.id, ...d.data()}); });
                     displayWithdrawals();
+                    const pending = allWithdrawals.filter(w => (w.status || '').toLowerCase() === 'pending').length;
+                    setNavBadge('badge-withdraw', pending);
                 });
             } catch (error) {
                 console.error('Error loading withdrawals:', error);
@@ -493,6 +511,8 @@
                     allKYC = [];
                     snapshot.forEach(function(d) { allKYC.push({id: d.id, ...d.data()}); });
                     displayKYC();
+                    const pending = allKYC.filter(k => k.status === 'pending').length;
+                    setNavBadge('badge-kyc', pending);
                 });
             } catch (error) {
                 console.error('Error loading KYC:', error);
@@ -1705,6 +1725,8 @@
                         allDepositReqs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
                         displayDepositReqs();
                         updatePlatformStats();
+                        const pending = allDepositReqs.filter(r => (r.status || 'pending') === 'pending').length;
+                        setNavBadge('badge-deposit', pending);
                     }
                 );
             } catch (e) { console.error('loadDepositRequests', e); }
@@ -1930,10 +1952,11 @@
                                 </div>`;
                             }).join('');
                         }
-                        // Total unread badge
+                        // Total unread badge (in conversation header + nav sidebar)
                         const totalUnread = convos.reduce((s, c) => s + c.unread, 0);
                         const badge = document.getElementById('totalUnreadBadge');
                         if (badge) badge.innerHTML = totalUnread > 0 ? `<span class="convo-unread">${totalUnread}</span>` : '';
+                        setNavBadge('badge-messages', totalUnread);
                     }
 
                     // ── Sound + browser notification for new user messages ──
