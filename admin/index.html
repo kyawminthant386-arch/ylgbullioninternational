@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="my">
 <head>
     <meta charset="UTF-8">
@@ -100,7 +100,6 @@ const ADMIN_EMAIL = 'junalama463@gmail.com';
 
 onAuthStateChanged(auth, (user) => {
     if (user && user.email === ADMIN_EMAIL) {
-        console.log("Already logged in as admin");
         // Ensure sessionStorage flags are set so admin-index gate passes
         sessionStorage.setItem('adminLoggedIn', 'true');
         sessionStorage.setItem('adminEmail', user.email);

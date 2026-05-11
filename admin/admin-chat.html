@@ -433,7 +433,6 @@ async function markAsRead(userId) {
         await Promise.all(promises);
     } catch (e) {
         // adminRead field might not exist on old docs - ignore
-        console.log('mark read:', e.message);
     }
 }
 

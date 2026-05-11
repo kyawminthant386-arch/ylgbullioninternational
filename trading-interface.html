@@ -992,7 +992,6 @@
 <script>
 /* ═══ YLG Language Sync — v2 ═══ */
 (function(){
-    console.log('[YLG Sync] Initialising language sync');
     function triggerApply(lang){
         const fns = ['applyLanguage','applyChatLanguage','applyHistoryLanguage',
                      'applyKycLanguage','applyWalletLanguage','applyPortfolioLanguage',
@@ -1001,7 +1000,6 @@
         for (const fn of fns) {
             if (typeof window[fn] === 'function') {
                 foundAny = true;
-                console.log('[YLG Sync] Calling window.' + fn + '(' + lang + ')');
                 try { window[fn](lang); } catch(e) { console.error('[YLG Sync]', e); }
             }
         }
@@ -1012,7 +1010,6 @@
     });
     function initialApply(){
         const lang = localStorage.getItem('selectedLang') || 'en';
-        console.log('[YLG Sync] Initial apply for lang=' + lang);
         triggerApply(lang);
     }
     if (document.readyState === 'loading') {
