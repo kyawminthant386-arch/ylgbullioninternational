@@ -674,7 +674,8 @@
         });
 
         function loadHistory(email) {
-            const q = query(collection(db, "withdrawals"), where("email", "==", email), orderBy("timestamp", "desc"));
+            // No orderBy to avoid composite index requirement — sort client-side
+            const q = query(collection(db, "withdrawals"), where("email", "==", email));
             onSnapshot(q, (snapshot) => {
                 const container = document.getElementById('withdrawHistoryContainer');
                 container.innerHTML = '';
@@ -682,11 +683,18 @@
                     container.innerHTML = '<div class="history-empty"><i class="fas fa-inbox"></i>No withdrawal history yet.</div>';
                     return;
                 }
-                let count = 0;
-                snapshot.forEach((docSnap) => {
-                    count++;
-                    const d = docSnap.data();
-                    const chipClass = d.status === 'APPROVED' ? 'chip-approved' : (d.status === 'REJECTED' ? 'chip-rejected' : 'chip-pending');
+                const docs = [];
+                snapshot.forEach(docSnap => docs.push(docSnap.data()));
+                // Sort newest first client-side
+                docs.sort((a, b) => {
+                    const ta = a.timestamp?.seconds || 0;
+                    const tb = b.timestamp?.seconds || 0;
+                    return tb - ta;
+                });
+                container.innerHTML = '';
+                docs.forEach(d => {
+                    const st = (d.status || 'Pending').toLowerCase();
+                    const chipClass = st === 'approved' ? 'chip-approved' : st === 'rejected' ? 'chip-rejected' : 'chip-pending';
                     const row = document.createElement('div');
                     row.className = 'history-row';
                     row.innerHTML = `
@@ -694,16 +702,16 @@
                             <div class="hr-icon"><i class="fas fa-arrow-up-from-bracket"></i></div>
                             <div>
                                 <div class="hr-amount">$ ${Number(d.amount).toLocaleString()}</div>
-                                <div class="hr-details">${d.details || '—'}</div>
+                                <div class="hr-details">${d.details || d.method || '—'}</div>
                                 <div class="hr-date">${d.date || ''}</div>
                             </div>
                         </div>
-                        <span class="status-chip ${chipClass}">${d.status || 'PENDING'}</span>
+                        <span class="status-chip ${chipClass}">${(d.status || 'Pending')}</span>
                     `;
                     container.appendChild(row);
                 });
                 if (document.getElementById('stat-withdrawals-val'))
-                    document.getElementById('stat-withdrawals-val').textContent = count;
+                    document.getElementById('stat-withdrawals-val').textContent = docs.length;
             });
         }
 
@@ -732,7 +740,8 @@
         };
 
         function loadDepositHistory(email) {
-            const q = query(collection(db, "deposits"), where("email", "==", email), orderBy("timestamp", "desc"));
+            // depositRequests collection (written by deposit.html) — no orderBy to avoid composite index
+            const q = query(collection(db, "depositRequests"), where("userEmail", "==", email));
             onSnapshot(q, (snapshot) => {
                 const container = document.getElementById('depositHistoryContainer');
                 container.innerHTML = '';
@@ -740,9 +749,19 @@
                     container.innerHTML = '<div class="history-empty"><i class="fas fa-inbox"></i><p>No deposit history yet.</p></div>';
                     return;
                 }
-                snapshot.forEach((docSnap) => {
-                    const d = docSnap.data();
-                    const chipClass = d.status === 'APPROVED' ? 'chip-approved' : (d.status === 'REJECTED' ? 'chip-rejected' : 'chip-pending');
+                const docs = [];
+                snapshot.forEach(docSnap => docs.push(docSnap.data()));
+                // Sort newest first client-side
+                docs.sort((a, b) => {
+                    const ta = a.createdAt?.seconds || a.timestamp?.seconds || 0;
+                    const tb = b.createdAt?.seconds || b.timestamp?.seconds || 0;
+                    return tb - ta;
+                });
+                container.innerHTML = '';
+                docs.forEach(d => {
+                    const st = (d.status || 'pending').toLowerCase();
+                    const chipClass = st === 'approved' ? 'chip-approved' : st === 'rejected' ? 'chip-rejected' : 'chip-pending';
+                    const dateStr = d.createdAt?.toDate ? d.createdAt.toDate().toLocaleDateString() : (d.date || '');
                     const row = document.createElement('div');
                     row.className = 'history-row';
                     row.innerHTML = `
@@ -752,11 +771,11 @@
                             </div>
                             <div>
                                 <div class="hr-amount" style="color:#22c55e;">+ $ ${Number(d.amount).toLocaleString()}</div>
-                                <div class="hr-details">${d.method || d.details || '—'}</div>
-                                <div class="hr-date">${d.date || ''}</div>
+                                <div class="hr-details">${d.paymentMethod || d.method || '—'}</div>
+                                <div class="hr-date">${dateStr}</div>
                             </div>
                         </div>
-                        <span class="status-chip ${chipClass}">${d.status || 'PENDING'}</span>
+                        <span class="status-chip ${chipClass}">${(d.status || 'pending').charAt(0).toUpperCase() + (d.status || 'pending').slice(1)}</span>
                     `;
                     container.appendChild(row);
                 });
