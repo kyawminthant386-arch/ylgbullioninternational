@@ -115,11 +115,12 @@
         .empty-state { text-align:center; color:var(--muted); padding:28px 14px; font-size:13px; }
 
         /* ── Bottom Nav ── */
-        .bottom-nav { position:fixed; bottom:0; left:0; right:0; height:var(--nav-h); background:var(--navy); display:flex; align-items:stretch; z-index:200; box-shadow:0 -2px 12px rgba(0,0,0,0.2); }
-        .nav-item { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; background:none; border:none; cursor:pointer; color:rgba(255,255,255,0.4); font-size:10px; font-weight:600; transition:.2s; position:relative; padding:0; }
-        .nav-item i { font-size:18px; }
+        .bottom-nav { position:fixed; bottom:0; left:0; right:0; height:var(--nav-h); background:var(--navy); display:flex; align-items:stretch; z-index:200; box-shadow:0 -2px 12px rgba(0,0,0,0.2); overflow-x:auto; overflow-y:hidden; scrollbar-width:none; -ms-overflow-style:none; }
+        .bottom-nav::-webkit-scrollbar { display:none; }
+        .nav-item { min-width:68px; flex:0 0 68px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; background:none; border:none; cursor:pointer; color:rgba(255,255,255,0.4); font-size:9.5px; font-weight:600; transition:.2s; position:relative; padding:0 4px; }
+        .nav-item i { font-size:17px; }
         .nav-item.active { color:var(--gold); }
-        .nav-item.active::after { content:''; position:absolute; top:0; left:20%; right:20%; height:2px; background:var(--gold); border-radius:0 0 3px 3px; }
+        .nav-item.active::after { content:''; position:absolute; top:0; left:15%; right:15%; height:2px; background:var(--gold); border-radius:0 0 3px 3px; }
         .nav-badge { position:absolute; top:8px; right:calc(50% - 16px); background:var(--red); color:#fff; font-size:9px; font-weight:800; min-width:16px; height:16px; border-radius:8px; display:flex; align-items:center; justify-content:center; padding:0 4px; }
 
         /* ── Notification form ── */
@@ -204,24 +205,21 @@
             </div>
         </div>
 
-        <!-- ── FINANCE VIEW ── -->
-        <div class="view" id="view-finance">
+        <!-- ── KYC VIEW ── -->
+        <div class="view" id="view-kyc">
             <div class="s-card">
-                <div class="s-title" style="justify-content:space-between;">
-                    <span><i class="fas fa-university"></i> Payment Accounts</span>
-                    <button onclick="window.openAddPaymentAccount()" class="refresh-btn" style="padding:6px 12px;font-size:11px;"><i class="fas fa-plus"></i> Add</button>
+                <div class="s-title"><i class="fas fa-certificate"></i> KYC Verification</div>
+                <div class="tab-buttons" id="kycTabs">
+                    <button class="tab-btn active" onclick="filterKYC('pending')">Pending</button>
+                    <button class="tab-btn" onclick="filterKYC('verified')">Verified</button>
+                    <button class="tab-btn" onclick="filterKYC('rejected')">Rejected</button>
                 </div>
-                <div id="paymentAccountsList" class="empty-state">Loading...</div>
+                <div id="kycList" class="empty-state">Loading KYC...</div>
             </div>
-            <div class="s-card">
-                <div class="s-title"><i class="fas fa-arrow-circle-down" style="color:var(--green);"></i> Deposit Requests</div>
-                <div class="tab-buttons" id="depositReqTabs">
-                    <button class="tab-btn active" onclick="filterDepositReqs('pending')">Pending</button>
-                    <button class="tab-btn" onclick="filterDepositReqs('approved')">Approved</button>
-                    <button class="tab-btn" onclick="filterDepositReqs('rejected')">Rejected</button>
-                </div>
-                <div id="depositReqList" class="empty-state">Loading...</div>
-            </div>
+        </div>
+
+        <!-- ── WITHDRAW VIEW ── -->
+        <div class="view" id="view-withdraw">
             <div class="s-card">
                 <div class="s-title"><i class="fas fa-hand-holding-usd" style="color:var(--orange);"></i> Withdrawal Requests</div>
                 <div class="tab-buttons" id="withdrawalTabs">
@@ -230,6 +228,19 @@
                     <button class="tab-btn" onclick="filterWithdrawals('rejected')">Rejected</button>
                 </div>
                 <div id="withdrawList" class="empty-state">Loading...</div>
+            </div>
+        </div>
+
+        <!-- ── DEPOSIT VIEW ── -->
+        <div class="view" id="view-deposit">
+            <div class="s-card">
+                <div class="s-title"><i class="fas fa-arrow-circle-down" style="color:var(--green);"></i> Deposit Requests</div>
+                <div class="tab-buttons" id="depositReqTabs">
+                    <button class="tab-btn active" onclick="filterDepositReqs('pending')">Pending</button>
+                    <button class="tab-btn" onclick="filterDepositReqs('approved')">Approved</button>
+                    <button class="tab-btn" onclick="filterDepositReqs('rejected')">Rejected</button>
+                </div>
+                <div id="depositReqList" class="empty-state">Loading...</div>
             </div>
         </div>
 
@@ -267,22 +278,20 @@
             </div>
         </div>
 
-        <!-- ── CONTROL VIEW ── -->
-        <div class="view" id="view-control">
+        <!-- ── PAYMENT ACCOUNT VIEW ── -->
+        <div class="view" id="view-payment">
             <div class="s-card">
-                <div class="s-title"><i class="fas fa-certificate"></i> KYC Verification</div>
-                <div class="tab-buttons" id="kycTabs">
-                    <button class="tab-btn active" onclick="filterKYC('pending')">Pending</button>
-                    <button class="tab-btn" onclick="filterKYC('verified')">Verified</button>
-                    <button class="tab-btn" onclick="filterKYC('rejected')">Rejected</button>
+                <div class="s-title" style="justify-content:space-between;">
+                    <span><i class="fas fa-university"></i> Payment Accounts</span>
+                    <button onclick="window.openAddPaymentAccount()" class="refresh-btn" style="padding:6px 12px;font-size:11px;"><i class="fas fa-plus"></i> Add</button>
                 </div>
-                <div id="kycList" class="empty-state">Loading KYC...</div>
+                <div id="paymentAccountsList" class="empty-state">Loading...</div>
             </div>
         </div>
 
     </main>
 
-    <!-- Bottom Navigation -->
+    <!-- Bottom Navigation (scrollable for 7 items) -->
     <nav class="bottom-nav">
         <button class="nav-item active" id="nav-dashboard" onclick="switchView('dashboard')">
             <i class="fas fa-chart-bar"></i>
@@ -292,17 +301,25 @@
             <i class="fas fa-users"></i>
             <span>Users</span>
         </button>
-        <button class="nav-item" id="nav-finance" onclick="switchView('finance')">
-            <i class="fas fa-dollar-sign"></i>
-            <span>Finance</span>
+        <button class="nav-item" id="nav-kyc" onclick="switchView('kyc')">
+            <i class="fas fa-certificate"></i>
+            <span>KYC</span>
+        </button>
+        <button class="nav-item" id="nav-withdraw" onclick="switchView('withdraw')">
+            <i class="fas fa-hand-holding-usd"></i>
+            <span>Withdraw</span>
+        </button>
+        <button class="nav-item" id="nav-deposit" onclick="switchView('deposit')">
+            <i class="fas fa-arrow-circle-down"></i>
+            <span>Deposit</span>
         </button>
         <button class="nav-item" id="nav-messages" onclick="switchView('messages')">
             <i class="fas fa-comments"></i>
             <span>Messages</span>
         </button>
-        <button class="nav-item" id="nav-control" onclick="switchView('control')">
-            <i class="fas fa-sliders-h"></i>
-            <span>Control</span>
+        <button class="nav-item" id="nav-payment" onclick="switchView('payment')">
+            <i class="fas fa-university"></i>
+            <span>Payment</span>
         </button>
     </nav>
 
@@ -1027,7 +1044,8 @@
                     }
                 });
                 await Promise.all(updates);
-            
+            } catch(e) {}
+
             // Send handler
             async function sendUserReply() {
                 const text = inputEl.value.trim();
