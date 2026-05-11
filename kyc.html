@@ -586,12 +586,12 @@
             const file = e.target.files[0];
             if (file) {
                 const uploadArea = document.querySelector('.upload-grid > div:nth-child(1)');
-                document.getElementById('textFront').innerHTML = "â³ á€œá€¯á€•á€ºá€†á€±á€¬á€„á€ºá€”á€±á€žá€Šá€º...";
+                document.getElementById('textFront').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
                 frontBase64 = await compressImage(file);
                 previewFront.src = frontBase64;
                 previewFront.style.display = 'block';
                 document.getElementById('placeholderFront').style.display = 'none';
-                document.getElementById('textFront').innerHTML = "âœ“ á€¡á€›á€¾á€±á€·á€˜á€€á€º á€›á€½á€±á€¸á€á€»á€šá€ºá€•á€¼á€®á€¸á€•á€«á€•á€¼á€®";
+                document.getElementById('textFront').innerHTML = '<i class="fas fa-check" style="color:#4CAF50"></i> Front uploaded';
                 uploadArea.style.borderColor = 'var(--color-gold-accent)';
             }
         };
@@ -600,12 +600,12 @@
             const file = e.target.files[0];
             if (file) {
                 const uploadArea = document.querySelector('.upload-grid > div:nth-child(2)');
-                document.getElementById('textBack').innerHTML = "â³ á€œá€¯á€•á€ºá€†á€±á€¬á€„á€ºá€”á€±á€žá€Šá€º...";
+                document.getElementById('textBack').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
                 backBase64 = await compressImage(file);
                 previewBack.src = backBase64;
                 previewBack.style.display = 'block';
                 document.getElementById('placeholderBack').style.display = 'none';
-                document.getElementById('textBack').innerHTML = "âœ“ á€¡á€”á€±á€¬á€€á€ºá€˜á€€á€º á€›á€½á€±á€¸á€á€»á€šá€ºá€•á€¼á€®á€¸á€•á€«á€•á€¼á€®";
+                document.getElementById('textBack').innerHTML = '<i class="fas fa-check" style="color:#4CAF50"></i> Back uploaded';
                 uploadArea.style.borderColor = 'var(--color-gold-accent)';
             }
         };
@@ -614,8 +614,8 @@
             if (!frontBase64 || !backBase64) {
                 Swal.fire({
                     icon: 'warning',
-                    title: 'á€¡á€á€»á€€á€ºá€¡á€œá€€á€º á€™á€•á€¼á€Šá€·á€ºá€á€•á€«',
-                    text: 'á€¡á€›á€¾á€±á€·á€˜á€€á€ºá€”á€¾á€„á€·á€º á€¡á€”á€±á€¬á€€á€ºá€˜á€€á€º á€“á€¬á€á€ºá€•á€¯á€¶ á€”á€¾á€…á€ºá€á€¯á€œá€¯á€¶á€¸ á€œá€­á€¯á€¡á€•á€ºá€žá€Šá€º',
+                    title: 'Images Required',
+                    text: 'Please upload both front and back photos of your document.',
                     background: '#1a1a1a',
                     color: '#fff'
                 });
@@ -624,8 +624,8 @@
 
             submitBtn.disabled = true;
             Swal.fire({
-                title: 'â³ á€œá€¯á€•á€ºá€†á€±á€¬á€„á€ºá€”á€±á€•á€«á€žá€Šá€º...',
-                text: 'KYC á€¡á€á€Šá€ºá€•á€¼á€¯á€á€¼á€„á€ºá€¸ á€œá€»á€¾á€±á€¬á€€á€ºá€‘á€¬á€¸á€”á€±á€•á€«á€žá€Šá€º',
+                title: 'Submitting KYC...',
+                text: 'Uploading your documents, please wait.',
                 allowOutsideClick: false,
                 didOpen: () => { Swal.showLoading(); },
                 background: '#1a1a1a',
@@ -656,8 +656,8 @@
                 
                 Swal.fire({
                     icon: 'success',
-                    title: 'âœ“ á€¡á€±á€¬á€„á€ºá€™á€¼á€„á€ºá€•á€«á€žá€Šá€º',
-                    text: 'KYC á€¡á€á€Šá€ºá€•á€¼á€¯á€á€¼á€„á€ºá€¸ á€œá€»á€¾á€±á€¬á€€á€ºá€‘á€¬á€¸á€™á€¾á€¯ á€•á€±á€¸á€•á€­á€¯á€·á€•á€¼á€®á€¸á€•á€«á€•á€¼á€®á‹ Admin á€™á€¾ á€¡á€á€Šá€ºá€•á€¼á€¯á€™á€Šá€º á€–á€¼á€…á€ºá€žá€Šá€ºá‹',
+                    title: 'Submitted Successfully',
+                    text: 'Your KYC documents have been submitted. Admin will review within 1-2 business days.',
                     background: '#1a1a1a',
                     color: '#fff'
                 }).then(() => { location.reload(); });
@@ -665,8 +665,8 @@
                 console.log("Error:", error);
                 Swal.fire({
                     icon: 'success',
-                    title: 'âœ“ á€¡á€±á€¬á€„á€ºá€™á€¼á€„á€ºá€•á€«á€žá€Šá€º',
-                    text: 'KYC á€¡á€á€Šá€ºá€•á€¼á€¯á€á€¼á€„á€ºá€¸ á€œá€»á€¾á€±á€¬á€€á€ºá€‘á€¬á€¸á€™á€¾á€¯ á€•á€±á€¸á€•á€­á€¯á€·á€•á€¼á€®á€¸á€•á€«á€•á€¼á€®á‹ Admin á€™á€¾ á€¡á€á€Šá€ºá€•á€¼á€¯á€™á€Šá€º á€–á€¼á€…á€ºá€žá€Šá€ºá‹',
+                    title: 'Submitted Successfully',
+                    text: 'Your KYC documents have been submitted. Admin will review within 1-2 business days.',
                     background: '#1a1a1a',
                     color: '#fff'
                 }).then(() => { location.reload(); });
